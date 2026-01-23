@@ -46,5 +46,5 @@ backend system manages data and tracking
 
 - Programming language : Python
 - Database : SQLite & SQLAlchemy
-- Backend : Python API (Flask / Django)
+- Backend : Python (FastAPI)
 - Frontend : HTML and Tailwind CSS
