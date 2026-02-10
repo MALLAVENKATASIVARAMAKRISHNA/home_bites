@@ -72,6 +72,8 @@ CREATE TABLE IF NOT EXISTS order_details (
     conn.close()
 
 def get_db():
-    
-try:
     conn = get_db_connection()
+try:
+    yield conn
+finally:
+    conn.close()
