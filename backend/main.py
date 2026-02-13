@@ -96,7 +96,7 @@ def update_user(user_id: int, user: Users, db: Connection = Depends(get_db)):
         raise HTTPException(status_code=500, detail=str(e))
     finally:
         cursor.close()
-        
+
 @app.delete("/users/{user_id}")
 def delete_user(user_id: int, db: Connection = Depends(get_db)):
     cursor = db.cursor()
@@ -123,5 +123,69 @@ def get_user_by_id(user_id: int, db: Connection = Depends(get_db)):
             raise HTTPException(status_code=404, detail="User not found")
         
         return dict(user)
+    finally:
+        cursor.close()
+
+@app.post("/items/", status_code=201)
+def add_item(item: Items, db: Connection = Depends(get_db)):
+    cursor = db.cursor()
+    try:
+        cursor.execute("""
+            INSERT INTO items (item_name, price, weight, photos, videos, description)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (item.item_name, item.price, item.weight, item.photos, item.videos, item.description))
+        db.commit()
+        return {"message": "Item created successfully", "item_id": cursor.lastrowid}
+    finally:
+        cursor.close()
+
+@app.get("/items", response_model=List[ItemResponse])
+def get_items(db: Connection = Depends(get_db)):
+    cursor = db.cursor()
+    try:
+        data = cursor.execute("SELECT * FROM items").fetchall()
+        return [dict(row) for row in data]
+    finally:
+        cursor.close()
+
+@app.get("/items/{item_id}", response_model=ItemResponse)
+def get_item(item_id: int, db: Connection = Depends(get_db)):
+    cursor = db.cursor()
+    try:
+        item = cursor.execute("SELECT * FROM items WHERE item_id = ?", (item_id,)).fetchone()
+        if not item:
+            raise HTTPException(status_code=404, detail="Item not found")
+        return dict(item)
+    finally:
+        cursor.close()
+
+@app.put("/items/{item_id}", response_model=ItemResponse)
+def update_item(item_id: int, item: Items, db: Connection = Depends(get_db)):
+    cursor = db.cursor()
+    try:
+        if not cursor.execute("SELECT 1 FROM items WHERE item_id = ?", (item_id,)).fetchone():
+            raise HTTPException(status_code=404, detail="Item not found")
+        
+        cursor.execute("""
+            UPDATE items SET item_name=?, price=?, weight=?, photos=?, videos=?, description=?
+            WHERE item_id=?
+        """, (item.item_name, item.price, item.weight, item.photos, item.videos, item.description, item_id))
+        db.commit()
+        
+        updated = cursor.execute("SELECT * FROM items WHERE item_id=?", (item_id,)).fetchone()
+        return dict(updated)
+    finally:
+        cursor.close()
+        
+@app.delete("/items/{item_id}")
+def delete_item(item_id: int, db: Connection = Depends(get_db)):
+    cursor = db.cursor()
+    try:
+        if not cursor.execute("SELECT 1 FROM items WHERE item_id = ?", (item_id,)).fetchone():
+            raise HTTPException(status_code=404, detail="Item not found")
+        
+        cursor.execute("DELETE FROM items WHERE item_id = ?", (item_id,))
+        db.commit()
+        return {"message": "Item deleted successfully"}
     finally:
         cursor.close()

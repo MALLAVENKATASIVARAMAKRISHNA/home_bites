@@ -8,6 +8,7 @@ class Users(BaseModel):
     role: str
     address: str
     city: str
+    
 class UserResponse(BaseModel):
     user_id: int
     name: str
@@ -16,3 +17,20 @@ class UserResponse(BaseModel):
     role: str
     address: str
     city: str
+
+class Items(BaseModel):
+    item_name: str
+    price: int
+    weight: str
+    photos: str
+    videos: str
+    description: str
+
+class ItemResponse(BaseModel):
+    item_id: int
+    item_name: str
+    price: int
+    weight: str
+    photos: str
+    videos: str
+    description: str
