@@ -8,3 +8,11 @@ class Users(BaseModel):
     role: str
     address: str
     city: str
+class UserResponse(BaseModel):
+    user_id: int
+    name: str
+    phone_number: int
+    email: str
+    role: str
+    address: str
+    city: str
