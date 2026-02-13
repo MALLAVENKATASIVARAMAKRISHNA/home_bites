@@ -189,3 +189,72 @@ def delete_item(item_id: int, db: Connection = Depends(get_db)):
         return {"message": "Item deleted successfully"}
     finally:
         cursor.close()
+
+@app.post("/orders/", status_code=201)
+def add_order(order: Orders, db: Connection = Depends(get_db)):
+    cursor = db.cursor()
+    try:
+        cursor.execute("""
+            INSERT INTO orders (user_id, amount, order_status, payment_status, payment_mode, order_date, delivery_date, address, city)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (order.user_id, order.amount, order.order_status, order.payment_status, order.payment_mode, 
+              order.order_date, order.delivery_date, order.address, order.city))
+        db.commit()
+        return {"message": "Order created successfully", "order_id": cursor.lastrowid}
+    except sqlite3.IntegrityError:
+        raise HTTPException(status_code=400, detail="User not found")
+    finally:
+        cursor.close()
+
+@app.get("/orders", response_model=List[OrderResponse])
+def get_orders(db: Connection = Depends(get_db)):
+    cursor = db.cursor()
+    try:
+        data = cursor.execute("SELECT * FROM orders").fetchall()
+        return [dict(row) for row in data]
+    finally:
+        cursor.close()
+
+@app.get("/orders/{order_id}", response_model=OrderResponse)
+def get_order(order_id: int, db: Connection = Depends(get_db)):
+    cursor = db.cursor()
+    try:
+        order = cursor.execute("SELECT * FROM orders WHERE order_id = ?", (order_id,)).fetchone()
+        if not order:
+            raise HTTPException(status_code=404, detail="Order not found")
+        return dict(order)
+    finally:
+        cursor.close()
+
+@app.put("/orders/{order_id}", response_model=OrderResponse)
+def update_order(order_id: int, order: Orders, db: Connection = Depends(get_db)):
+    cursor = db.cursor()
+    try:
+        if not cursor.execute("SELECT 1 FROM orders WHERE order_id = ?", (order_id,)).fetchone():
+            raise HTTPException(status_code=404, detail="Order not found")
+        
+        cursor.execute("""
+            UPDATE orders SET user_id=?, amount=?, order_status=?, payment_status=?, payment_mode=?, 
+            order_date=?, delivery_date=?, address=?, city=?
+            WHERE order_id=?
+        """, (order.user_id, order.amount, order.order_status, order.payment_status, order.payment_mode,
+              order.order_date, order.delivery_date, order.address, order.city, order_id))
+        db.commit()
+        
+        updated = cursor.execute("SELECT * FROM orders WHERE order_id=?", (order_id,)).fetchone()
+        return dict(updated)
+    finally:
+        cursor.close()
+
+@app.delete("/orders/{order_id}")
+def delete_order(order_id: int, db: Connection = Depends(get_db)):
+    cursor = db.cursor()
+    try:
+        if not cursor.execute("SELECT 1 FROM orders WHERE order_id = ?", (order_id,)).fetchone():
+            raise HTTPException(status_code=404, detail="Order not found")
+        
+        cursor.execute("DELETE FROM orders WHERE order_id = ?", (order_id,))
+        db.commit()
+        return {"message": "Order deleted successfully"}
+    finally:
+        cursor.close()

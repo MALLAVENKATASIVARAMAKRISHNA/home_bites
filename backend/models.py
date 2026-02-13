@@ -34,3 +34,26 @@ class ItemResponse(BaseModel):
     photos: str
     videos: str
     description: str
+
+class Orders(BaseModel):
+    user_id: int
+    amount: int
+    order_status: str
+    payment_status: str
+    payment_mode: str
+    order_date: str
+    delivery_date: str
+    address: str
+    city: str
+
+class OrderResponse(BaseModel):
+    order_id: int
+    user_id: int
+    amount: int
+    order_status: str
+    payment_status: str
+    payment_mode: str
+    order_date: str
+    delivery_date: str
+    address: str
+    city: str
