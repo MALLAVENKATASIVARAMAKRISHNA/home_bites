@@ -569,3 +569,22 @@ def search_items(name: str, db: Connection = Depends(get_db)):
         return [dict(row) for row in data]
     finally:
         cursor.close()
+
+@app.get("/items/paginated")
+def get_items_paginated(skip: int = 0, limit: int = 10, db: Connection = Depends(get_db)):
+    cursor = db.cursor()
+    try:
+        data = cursor.execute(
+            "SELECT * FROM items LIMIT ? OFFSET ?", 
+            (limit, skip)
+        ).fetchall()
+        total = cursor.execute("SELECT COUNT(*) as count FROM items").fetchone()["count"]
+        
+        return {
+            "items": [dict(row) for row in data],
+            "total": total,
+            "skip": skip,
+            "limit": limit
+        }
+    finally:
+        cursor.close()
