@@ -397,3 +397,55 @@ def admin_get_all_users(db: Connection = Depends(get_db), admin: dict = Depends(
         return [dict(row) for row in data]
     finally:
         cursor.close()
+
+@app.get("/users/search/")
+def search_users(name: Optional[str] = None, city: Optional[str] = None, db: Connection = Depends(get_db)):
+    cursor = db.cursor()
+    try:
+        query = "SELECT user_id, name, phone_number, email, role, address, city FROM users WHERE 1=1"
+        params = []
+        
+        if name:
+            query += " AND name LIKE ?"
+            params.append(f"%{name}%")
+        if city:
+            query += " AND city LIKE ?"
+            params.append(f"%{city}%")
+        
+        data = cursor.execute(query, params).fetchall()
+        return [dict(row) for row in data]
+    finally:
+        cursor.close()
+
+@app.get("/users/{user_id}/orders", response_model=List[OrderResponse])
+def get_user_orders(user_id: int, db: Connection = Depends(get_db)):
+    cursor = db.cursor()
+    try:
+        data = cursor.execute("SELECT * FROM orders WHERE user_id = ?", (user_id,)).fetchall()
+        return [dict(row) for row in data]
+    finally:
+        cursor.close()
+
+@app.get("/orders/status/{status}", response_model=List[OrderResponse])
+def get_orders_by_status(status: str, db: Connection = Depends(get_db)):
+    if status not in ['pending', 'confirmed', 'delivered', 'cancelled']:
+        raise HTTPException(status_code=400, detail="Invalid status")
+    
+    cursor = db.cursor()
+    try:
+        data = cursor.execute("SELECT * FROM orders WHERE order_status = ?", (status,)).fetchall()
+        return [dict(row) for row in data]
+    finally:
+        cursor.close()
+
+@app.get("/items/search/")
+def search_items(name: str, db: Connection = Depends(get_db)):
+    cursor = db.cursor()
+    try:
+        data = cursor.execute(
+            "SELECT * FROM items WHERE item_name LIKE ?", 
+            (f"%{name}%",)
+        ).fetchall()
+        return [dict(row) for row in data]
+    finally:
+        cursor.close()
