@@ -193,7 +193,7 @@ def delete_item(item_id: int, db: Connection = Depends(get_db), admin: dict = De
         cursor.close()
 
 @app.post("/orders/", status_code=201)
-def add_order(order: Orders, db: Connection = Depends(get_db)):
+def add_order(order: Orders, db: Connection = Depends(get_db), current_user: dict = Depends(get_current_user)):
     cursor = db.cursor()
     try:
         cursor.execute("""
@@ -209,7 +209,7 @@ def add_order(order: Orders, db: Connection = Depends(get_db)):
         cursor.close()
 
 @app.get("/orders", response_model=List[OrderResponse])
-def get_orders(db: Connection = Depends(get_db)):
+def get_orders(db: Connection = Depends(get_db), admin: dict = Depends(get_admin_user)):
     cursor = db.cursor()
     try:
         data = cursor.execute("SELECT * FROM orders").fetchall()
@@ -218,18 +218,22 @@ def get_orders(db: Connection = Depends(get_db)):
         cursor.close()
 
 @app.get("/orders/{order_id}", response_model=OrderResponse)
-def get_order(order_id: int, db: Connection = Depends(get_db)):
+def get_order(order_id: int, db: Connection = Depends(get_db), current_user: dict = Depends(get_current_user)):
     cursor = db.cursor()
     try:
         order = cursor.execute("SELECT * FROM orders WHERE order_id = ?", (order_id,)).fetchone()
         if not order:
             raise HTTPException(status_code=404, detail="Order not found")
+        
+        if order["user_id"] != current_user["user_id"] and current_user["role"] != "admin":
+            raise HTTPException(status_code=403, detail="Access forbidden")
+        
         return dict(order)
     finally:
         cursor.close()
 
 @app.put("/orders/{order_id}", response_model=OrderResponse)
-def update_order(order_id: int, order: Orders, db: Connection = Depends(get_db)):
+def update_order(order_id: int, order: Orders, db: Connection = Depends(get_db), admin: dict = Depends(get_admin_user)):
     cursor = db.cursor()
     try:
         if not cursor.execute("SELECT 1 FROM orders WHERE order_id = ?", (order_id,)).fetchone():
@@ -249,7 +253,7 @@ def update_order(order_id: int, order: Orders, db: Connection = Depends(get_db))
         cursor.close()
 
 @app.delete("/orders/{order_id}")
-def delete_order(order_id: int, db: Connection = Depends(get_db)):
+def delete_order(order_id: int, db: Connection = Depends(get_db), admin: dict = Depends(get_admin_user)):
     cursor = db.cursor()
     try:
         if not cursor.execute("SELECT 1 FROM orders WHERE order_id = ?", (order_id,)).fetchone():
