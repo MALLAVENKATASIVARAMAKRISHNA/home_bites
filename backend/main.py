@@ -129,7 +129,7 @@ def get_user_by_id(user_id: int, db: Connection = Depends(get_db), admin: dict =
         cursor.close()
 
 @app.post("/items/", status_code=201)
-def add_item(item: Items, db: Connection = Depends(get_db)):
+def add_item(item: Items, db: Connection = Depends(get_db), current_user: dict = Depends(get_current_user)):
     cursor = db.cursor()
     try:
         cursor.execute("""
@@ -162,7 +162,7 @@ def get_item(item_id: int, db: Connection = Depends(get_db)):
         cursor.close()
 
 @app.put("/items/{item_id}", response_model=ItemResponse)
-def update_item(item_id: int, item: Items, db: Connection = Depends(get_db)):
+def update_item(item_id: int, item: Items, db: Connection = Depends(get_db), current_user: dict = Depends(get_current_user)):
     cursor = db.cursor()
     try:
         if not cursor.execute("SELECT 1 FROM items WHERE item_id = ?", (item_id,)).fetchone():
@@ -178,9 +178,9 @@ def update_item(item_id: int, item: Items, db: Connection = Depends(get_db)):
         return dict(updated)
     finally:
         cursor.close()
-        
+
 @app.delete("/items/{item_id}")
-def delete_item(item_id: int, db: Connection = Depends(get_db)):
+def delete_item(item_id: int, db: Connection = Depends(get_db), admin: dict = Depends(get_admin_user)):
     cursor = db.cursor()
     try:
         if not cursor.execute("SELECT 1 FROM items WHERE item_id = ?", (item_id,)).fetchone():
