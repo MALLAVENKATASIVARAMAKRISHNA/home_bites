@@ -33,13 +33,14 @@ class Items(BaseModel):
     videos: str
     description: str
 
-class Items(BaseModel):
-    item_name: str = Field(..., min_length=2, max_length=200)
-    price: int = Field(..., gt=0)  # Greater than 0
-    weight: str = Field(..., min_length=1)
+class ItemResponse(BaseModel):
+    item_id: int
+    item_name: str
+    price: int
+    weight: str
     photos: str
     videos: str
-    description: str = Field(..., min_length=10)
+    description: str
 
 class Orders(BaseModel):
     user_id: int
