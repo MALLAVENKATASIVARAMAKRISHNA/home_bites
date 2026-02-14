@@ -266,7 +266,7 @@ def delete_order(order_id: int, db: Connection = Depends(get_db), admin: dict = 
         cursor.close()
 
 @app.post("/order-details/", status_code=201)
-def add_order_detail(detail: OrderDetails, db: Connection = Depends(get_db)):
+def add_order_detail(detail: OrderDetails, db: Connection = Depends(get_db), current_user: dict = Depends(get_current_user)):
     cursor = db.cursor()
     try:
         cursor.execute("""
@@ -281,7 +281,7 @@ def add_order_detail(detail: OrderDetails, db: Connection = Depends(get_db)):
         cursor.close()
 
 @app.get("/order-details", response_model=List[OrderDetailResponse])
-def get_order_details(db: Connection = Depends(get_db)):
+def get_order_details(db: Connection = Depends(get_db), admin: dict = Depends(get_admin_user)):
     cursor = db.cursor()
     try:
         data = cursor.execute("SELECT * FROM order_details").fetchall()
@@ -290,16 +290,23 @@ def get_order_details(db: Connection = Depends(get_db)):
         cursor.close()
 
 @app.get("/order-details/order/{order_id}", response_model=List[OrderDetailResponse])
-def get_order_details_by_order(order_id: int, db: Connection = Depends(get_db)):
+def get_order_details_by_order(order_id: int, db: Connection = Depends(get_db), current_user: dict = Depends(get_current_user)):
     cursor = db.cursor()
     try:
+        order = cursor.execute("SELECT user_id FROM orders WHERE order_id = ?", (order_id,)).fetchone()
+        if not order:
+            raise HTTPException(status_code=404, detail="Order not found")
+        
+        if order["user_id"] != current_user["user_id"] and current_user["role"] != "admin":
+            raise HTTPException(status_code=403, detail="Access forbidden")
+        
         data = cursor.execute("SELECT * FROM order_details WHERE order_id = ?", (order_id,)).fetchall()
         return [dict(row) for row in data]
     finally:
         cursor.close()
 
 @app.put("/order-details/{detail_id}", response_model=OrderDetailResponse)
-def update_order_detail(detail_id: int, detail: OrderDetails, db: Connection = Depends(get_db)):
+def update_order_detail(detail_id: int, detail: OrderDetails, db: Connection = Depends(get_db), admin: dict = Depends(get_admin_user)):
     cursor = db.cursor()
     try:
         if not cursor.execute("SELECT 1 FROM order_details WHERE order_detail_id = ?", (detail_id,)).fetchone():
@@ -317,7 +324,7 @@ def update_order_detail(detail_id: int, detail: OrderDetails, db: Connection = D
         cursor.close()
 
 @app.delete("/order-details/{detail_id}")
-def delete_order_detail(detail_id: int, db: Connection = Depends(get_db)):
+def delete_order_detail(detail_id: int, db: Connection = Depends(get_db), admin: dict = Depends(get_admin_user)):
     cursor = db.cursor()
     try:
         if not cursor.execute("SELECT 1 FROM order_details WHERE order_detail_id = ?", (detail_id,)).fetchone():
