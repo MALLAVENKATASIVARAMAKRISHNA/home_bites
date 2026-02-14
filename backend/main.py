@@ -11,6 +11,7 @@ from datetime import timedelta
 from fastapi.responses import JSONResponse
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.exceptions import RequestValidationError
 
 app = FastAPI()
 
