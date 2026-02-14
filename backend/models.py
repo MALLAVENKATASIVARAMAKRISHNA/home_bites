@@ -1,13 +1,19 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr, validator, Field
 
 class Users(BaseModel):
-    name: str
-    phone_number: int
-    email: str
-    password: str
+    name: str = Field(..., min_length=2, max_length=100)
+    phone_number: int = Field(..., ge=1000000000, le=9999999999)  # 10 digit number
+    email: EmailStr
+    password: str = Field(..., min_length=8)
     role: str
-    address: str
-    city: str
+    address: str = Field(..., min_length=5)
+    city: str = Field(..., min_length=2)
+    
+    @validator('role')
+    def validate_role(cls, v):
+        if v not in ['admin', 'user']:
+            raise ValueError('Role must be either admin or user')
+        return v
     
 class UserResponse(BaseModel):
     user_id: int
@@ -26,25 +32,42 @@ class Items(BaseModel):
     videos: str
     description: str
 
-class ItemResponse(BaseModel):
-    item_id: int
-    item_name: str
-    price: int
-    weight: str
+class Items(BaseModel):
+    item_name: str = Field(..., min_length=2, max_length=200)
+    price: int = Field(..., gt=0)  # Greater than 0
+    weight: str = Field(..., min_length=1)
     photos: str
     videos: str
-    description: str
+    description: str = Field(..., min_length=10)
 
 class Orders(BaseModel):
     user_id: int
-    amount: int
+    amount: int = Field(..., ge=0)
     order_status: str
     payment_status: str
     payment_mode: str
     order_date: str
     delivery_date: str
-    address: str
-    city: str
+    address: str = Field(..., min_length=5)
+    city: str = Field(..., min_length=2)
+    
+    @validator('order_status')
+    def validate_order_status(cls, v):
+        if v not in ['pending', 'confirmed', 'delivered', 'cancelled']:
+            raise ValueError('Invalid order status')
+        return v
+    
+    @validator('payment_status')
+    def validate_payment_status(cls, v):
+        if v not in ['pending', 'paid', 'failed']:
+            raise ValueError('Invalid payment status')
+        return v
+    
+    @validator('payment_mode')
+    def validate_payment_mode(cls, v):
+        if v not in ['cash', 'upi', 'card']:
+            raise ValueError('Invalid payment mode')
+        return v
 
 class OrderResponse(BaseModel):
     order_id: int
@@ -61,8 +84,8 @@ class OrderResponse(BaseModel):
 class OrderDetails(BaseModel):
     order_id: int
     item_id: int
-    quantity: int
-    price: int
+    quantity: int = Field(..., gt=0)
+    price: int = Field(..., ge=0)
 
 class OrderDetailResponse(BaseModel):
     order_detail_id: int
