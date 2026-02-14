@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException, Depends
 from database import create_users, get_db_connection, get_db
-from models import Users, UserResponse
-from typing import Any, List
+from models import Users, UserResponse, Items, ItemResponse, Orders, OrderResponse, OrderDetails, OrderDetailResponse, CreateOrder, OrderItem
+from typing import Any, List, Optional
 Connection = Any
 import sqlite3
 import hashlib
@@ -262,6 +262,84 @@ def delete_order(order_id: int, db: Connection = Depends(get_db), admin: dict = 
         cursor.execute("DELETE FROM orders WHERE order_id = ?", (order_id,))
         db.commit()
         return {"message": "Order deleted successfully"}
+    finally:
+        cursor.close()
+
+@app.post("/orders/complete", status_code=201)
+def create_complete_order(order: CreateOrder, db: Connection = Depends(get_db), current_user: dict = Depends(get_current_user)):
+    """
+    Create an order with all items in a single request
+    """
+    cursor = db.cursor()
+    try:
+        total_amount = sum(item.price * item.quantity for item in order.items)
+        
+        cursor.execute("""
+            INSERT INTO orders (user_id, amount, order_status, payment_status, payment_mode, 
+                              order_date, delivery_date, address, city)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (order.user_id, total_amount, order.order_status, order.payment_status, 
+              order.payment_mode, order.order_date, order.delivery_date, order.address, order.city))
+        
+        order_id = cursor.lastrowid
+        
+        for item in order.items:
+            cursor.execute("""
+                INSERT INTO order_details (order_id, item_id, quantity, price)
+                VALUES (?, ?, ?, ?)
+            """, (order_id, item.item_id, item.quantity, item.price))
+        
+        db.commit()
+        return {
+            "message": "Order created successfully",
+            "order_id": order_id,
+            "total_amount": total_amount,
+            "items_count": len(order.items)
+        }
+        
+    except sqlite3.IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=400, detail="Invalid user_id or item_id")
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+
+@app.get("/orders/{order_id}/complete")
+def get_complete_order(order_id: int, db: Connection = Depends(get_db), current_user: dict = Depends(get_current_user)):
+    """
+    Get order with all item details in one response
+    """
+    cursor = db.cursor()
+    try:
+        order = cursor.execute("SELECT * FROM orders WHERE order_id = ?", (order_id,)).fetchone()
+        if not order:
+            raise HTTPException(status_code=404, detail="Order not found")
+        
+        if order["user_id"] != current_user["user_id"] and current_user["role"] != "admin":
+            raise HTTPException(status_code=403, detail="Access forbidden")
+        
+        items = cursor.execute("""
+            SELECT 
+                od.order_detail_id,
+                od.item_id,
+                od.quantity,
+                od.price,
+                i.item_name,
+                i.description,
+                i.weight
+            FROM order_details od
+            JOIN items i ON od.item_id = i.item_id
+            WHERE od.order_id = ?
+        """, (order_id,)).fetchall()
+        
+        return {
+            "order": dict(order),
+            "items": [dict(item) for item in items],
+            "total_items": len(items)
+        }
+        
     finally:
         cursor.close()
 

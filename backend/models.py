@@ -1,4 +1,5 @@
 from pydantic import BaseModel, EmailStr, validator, Field
+from typing import List
 
 class Users(BaseModel):
     name: str = Field(..., min_length=2, max_length=100)
@@ -93,3 +94,19 @@ class OrderDetailResponse(BaseModel):
     item_id: int
     quantity: int
     price: int
+
+class OrderItem(BaseModel):
+    item_id: int
+    quantity: int
+    price: int
+
+class CreateOrder(BaseModel):
+    user_id: int
+    order_status: str
+    payment_status: str
+    payment_mode: str
+    order_date: str
+    delivery_date: str
+    address: str
+    city: str
+    items: List[OrderItem]
