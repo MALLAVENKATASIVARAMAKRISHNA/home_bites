@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException, Depends, Request, status
 from database import create_users, get_db_connection, get_db
 from models import Users, UserResponse, Items, ItemResponse, Orders, OrderResponse, OrderDetails, OrderDetailResponse, CreateOrder, OrderItem
 from typing import Any, List, Optional
@@ -8,9 +8,42 @@ import hashlib
 from auth import hash_password, verify_password, create_access_token, get_current_user, get_admin_user, ACCESS_TOKEN_EXPIRE_MINUTES
 from fastapi.security import OAuth2PasswordRequestForm
 from datetime import timedelta
+from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse
 
 app = FastAPI()
 
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content={
+            "detail": "Validation error",
+            "errors": exc.errors()
+        }
+    )
+
+@app.exception_handler(sqlite3.Error)
+async def sqlite_exception_handler(request: Request, exc: sqlite3.Error):
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content={
+            "detail": "Database error occurred",
+            "error": str(exc)
+        }
+    )
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content={
+            "detail": "An unexpected error occurred",
+            "error": str(exc),
+            "type": type(exc).__name__
+        }
+    )
 
 @app.on_event("startup")
 def startup():
