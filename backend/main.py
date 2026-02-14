@@ -258,3 +258,67 @@ def delete_order(order_id: int, db: Connection = Depends(get_db)):
         return {"message": "Order deleted successfully"}
     finally:
         cursor.close()
+
+@app.post("/order-details/", status_code=201)
+def add_order_detail(detail: OrderDetails, db: Connection = Depends(get_db)):
+    cursor = db.cursor()
+    try:
+        cursor.execute("""
+            INSERT INTO order_details (order_id, item_id, quantity, price)
+            VALUES (?, ?, ?, ?)
+        """, (detail.order_id, detail.item_id, detail.quantity, detail.price))
+        db.commit()
+        return {"message": "Order detail created successfully", "order_detail_id": cursor.lastrowid}
+    except sqlite3.IntegrityError:
+        raise HTTPException(status_code=400, detail="Order or Item not found")
+    finally:
+        cursor.close()
+
+@app.get("/order-details", response_model=List[OrderDetailResponse])
+def get_order_details(db: Connection = Depends(get_db)):
+    cursor = db.cursor()
+    try:
+        data = cursor.execute("SELECT * FROM order_details").fetchall()
+        return [dict(row) for row in data]
+    finally:
+        cursor.close()
+
+@app.get("/order-details/order/{order_id}", response_model=List[OrderDetailResponse])
+def get_order_details_by_order(order_id: int, db: Connection = Depends(get_db)):
+    cursor = db.cursor()
+    try:
+        data = cursor.execute("SELECT * FROM order_details WHERE order_id = ?", (order_id,)).fetchall()
+        return [dict(row) for row in data]
+    finally:
+        cursor.close()
+
+@app.put("/order-details/{detail_id}", response_model=OrderDetailResponse)
+def update_order_detail(detail_id: int, detail: OrderDetails, db: Connection = Depends(get_db)):
+    cursor = db.cursor()
+    try:
+        if not cursor.execute("SELECT 1 FROM order_details WHERE order_detail_id = ?", (detail_id,)).fetchone():
+            raise HTTPException(status_code=404, detail="Order detail not found")
+        
+        cursor.execute("""
+            UPDATE order_details SET order_id=?, item_id=?, quantity=?, price=?
+            WHERE order_detail_id=?
+        """, (detail.order_id, detail.item_id, detail.quantity, detail.price, detail_id))
+        db.commit()
+        
+        updated = cursor.execute("SELECT * FROM order_details WHERE order_detail_id=?", (detail_id,)).fetchone()
+        return dict(updated)
+    finally:
+        cursor.close()
+
+@app.delete("/order-details/{detail_id}")
+def delete_order_detail(detail_id: int, db: Connection = Depends(get_db)):
+    cursor = db.cursor()
+    try:
+        if not cursor.execute("SELECT 1 FROM order_details WHERE order_detail_id = ?", (detail_id,)).fetchone():
+            raise HTTPException(status_code=404, detail="Order detail not found")
+        
+        cursor.execute("DELETE FROM order_details WHERE order_detail_id = ?", (detail_id,))
+        db.commit()
+        return {"message": "Order detail deleted successfully"}
+    finally:
+        cursor.close()

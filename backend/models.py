@@ -57,3 +57,16 @@ class OrderResponse(BaseModel):
     delivery_date: str
     address: str
     city: str
+
+class OrderDetails(BaseModel):
+    order_id: int
+    item_id: int
+    quantity: int
+    price: int
+
+class OrderDetailResponse(BaseModel):
+    order_detail_id: int
+    order_id: int
+    item_id: int
+    quantity: int
+    price: int
