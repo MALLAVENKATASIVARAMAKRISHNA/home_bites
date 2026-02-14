@@ -5,6 +5,9 @@ from typing import Any, List
 Connection = Any
 import sqlite3
 import hashlib
+from auth import hash_password, verify_password, create_access_token, get_current_user, get_admin_user, ACCESS_TOKEN_EXPIRE_MINUTES
+from fastapi.security import OAuth2PasswordRequestForm
+from datetime import timedelta
 
 app = FastAPI()
 
@@ -56,36 +59,37 @@ def add_user(user: Users):
         cursor.close()
         conn.close()
 
-@app.get("/users", response_model= List[UserResponse])
-def get_user(db: Connection = Depends(get_db)):
+@app.get("/users", response_model=List[UserResponse])
+def get_users(db: Connection = Depends(get_db), admin: dict = Depends(get_admin_user)):
     cursor = db.cursor()
-    data = cursor.execute("select * from users").fetchall()
-    cursor.close()
-    return [dict(row) for row in data]
+    try:
+        data = cursor.execute("""
+            SELECT user_id, name, phone_number, email, role, address, city 
+            FROM users
+        """).fetchall()
+        return [dict(row) for row in data]
+    finally:
+        cursor.close()
 
 @app.put("/users/{user_id}", response_model=UserResponse)
-def update_user(user_id: int, user: Users, db: Connection = Depends(get_db)):
+def update_user(user_id: int, user: Users, db: Connection = Depends(get_db), admin: dict = Depends(get_admin_user)):
     cursor = db.cursor()
-    
     try:
         if not cursor.execute("SELECT 1 FROM users WHERE user_id = ?", (user_id,)).fetchone():
             raise HTTPException(status_code=404, detail="User not found")
         
-        hashed_password = hashlib.sha256(user.password.encode()).hexdigest()
+        hashed_password = hash_password(user.password)
         cursor.execute("""
             UPDATE users SET name=?, phone_number=?, email=?, password=?, role=?, address=?, city=?
             WHERE user_id=?
         """, (user.name, user.phone_number, user.email, hashed_password, user.role, user.address, user.city, user_id))
-        
         db.commit()
         
         updated = cursor.execute("""
             SELECT user_id, name, phone_number, email, role, address, city 
             FROM users WHERE user_id=?
         """, (user_id,)).fetchone()
-        
         return dict(updated)
-
     except sqlite3.IntegrityError:
         db.rollback()
         raise HTTPException(status_code=400, detail="Phone number already exists")
@@ -98,7 +102,7 @@ def update_user(user_id: int, user: Users, db: Connection = Depends(get_db)):
         cursor.close()
 
 @app.delete("/users/{user_id}")
-def delete_user(user_id: int, db: Connection = Depends(get_db)):
+def delete_user(user_id: int, db: Connection = Depends(get_db), admin: dict = Depends(get_admin_user)):
     cursor = db.cursor()
     try:
         if not cursor.execute("SELECT 1 FROM users WHERE user_id = ?", (user_id,)).fetchone():
@@ -111,17 +115,15 @@ def delete_user(user_id: int, db: Connection = Depends(get_db)):
         cursor.close()
 
 @app.get("/users/{user_id}", response_model=UserResponse)
-def get_user_by_id(user_id: int, db: Connection = Depends(get_db)):
+def get_user_by_id(user_id: int, db: Connection = Depends(get_db), admin: dict = Depends(get_admin_user)):
     cursor = db.cursor()
     try:
         user = cursor.execute("""
             SELECT user_id, name, phone_number, email, role, address, city 
             FROM users WHERE user_id = ?
         """, (user_id,)).fetchone()
-        
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
-        
         return dict(user)
     finally:
         cursor.close()
@@ -320,5 +322,67 @@ def delete_order_detail(detail_id: int, db: Connection = Depends(get_db)):
         cursor.execute("DELETE FROM order_details WHERE order_detail_id = ?", (detail_id,))
         db.commit()
         return {"message": "Order detail deleted successfully"}
+    finally:
+        cursor.close()
+
+@app.post("/register", status_code=201)
+def register(user: Users, db: Connection = Depends(get_db)):
+    cursor = db.cursor()
+    try:
+        hashed_password = hash_password(user.password)
+        cursor.execute("""
+            INSERT INTO users (name, phone_number, email, password, role, address, city)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, (user.name, user.phone_number, user.email, hashed_password, user.role, user.address, user.city))
+        db.commit()
+        return {"message": "User registered successfully", "user_id": cursor.lastrowid}
+    except sqlite3.IntegrityError:
+        raise HTTPException(status_code=400, detail="Phone number already exists")
+    finally:
+        cursor.close()
+
+@app.post("/login")
+def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Connection = Depends(get_db)):
+    cursor = db.cursor()
+    try:
+        user = cursor.execute(
+            "SELECT * FROM users WHERE email = ?", 
+            (form_data.username,)
+        ).fetchone()
+        
+        if not user or not verify_password(form_data.password, user["password"]):
+            raise HTTPException(status_code=401, detail="Incorrect email or password")
+        
+        access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        access_token = create_access_token(
+            data={"sub": str(user["user_id"])}, expires_delta=access_token_expires
+        )
+        
+        return {
+            "access_token": access_token,
+            "token_type": "bearer",
+            "user": {
+                "user_id": user["user_id"],
+                "name": user["name"],
+                "email": user["email"],
+                "role": user["role"]
+            }
+        }
+    finally:
+        cursor.close()
+
+@app.get("/me", response_model=UserResponse)
+def get_current_user_profile(current_user: dict = Depends(get_current_user)):
+    return current_user
+
+@app.get("/admin/users", response_model=List[UserResponse])
+def admin_get_all_users(db: Connection = Depends(get_db), admin: dict = Depends(get_admin_user)):
+    cursor = db.cursor()
+    try:
+        data = cursor.execute("""
+            SELECT user_id, name, phone_number, email, role, address, city 
+            FROM users
+        """).fetchall()
+        return [dict(row) for row in data]
     finally:
         cursor.close()
