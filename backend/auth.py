@@ -5,10 +5,11 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from typing import Optional
 import sqlite3
+import os
 from database import get_db_connection
 
 # Configuration
-SECRET_KEY = "your-secret-key-here-change-in-production"  # Change this!
+SECRET_KEY = os.getenv("SECRET_KEY", "change-this-in-production")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 

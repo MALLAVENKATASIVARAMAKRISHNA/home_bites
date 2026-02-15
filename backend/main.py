@@ -4,7 +4,6 @@ from models import Users, UserResponse, Items, ItemResponse, Orders, OrderRespon
 from typing import Any, List, Optional
 Connection = Any
 import sqlite3
-import hashlib
 from auth import hash_password, verify_password, create_access_token, get_current_user, get_admin_user, ACCESS_TOKEN_EXPIRE_MINUTES
 from fastapi.security import OAuth2PasswordRequestForm
 from datetime import timedelta
@@ -70,7 +69,7 @@ def add_user(user: Users):
     
     try:
         # Hash the password before storing (security best practice)
-        hashed_password = hashlib.sha256(str(user.password).encode()).hexdigest()
+        hashed_password = hash_password(user.password)
         
         cursor.execute("""
             INSERT INTO users (name, phone_number, email, password, role, address, city)
@@ -172,7 +171,7 @@ def get_user_by_id(user_id: int, db: Connection = Depends(get_db), admin: dict =
         cursor.close()
 
 @app.post("/items/", status_code=201)
-def add_item(item: Items, db: Connection = Depends(get_db), current_user: dict = Depends(get_current_user)):
+def add_item(item: Items, db: Connection = Depends(get_db), admin: dict = Depends(get_admin_user)):
     cursor = db.cursor()
     try:
         cursor.execute("""
@@ -205,7 +204,7 @@ def get_item(item_id: int, db: Connection = Depends(get_db)):
         cursor.close()
 
 @app.put("/items/{item_id}", response_model=ItemResponse)
-def update_item(item_id: int, item: Items, db: Connection = Depends(get_db), current_user: dict = Depends(get_current_user)):
+def update_item(item_id: int, item: Items, db: Connection = Depends(get_db), admin: dict = Depends(get_admin_user)):
     cursor = db.cursor()
     try:
         if not cursor.execute("SELECT 1 FROM items WHERE item_id = ?", (item_id,)).fetchone():
