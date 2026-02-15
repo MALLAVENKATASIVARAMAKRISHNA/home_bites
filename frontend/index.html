@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Home Bites | Order Home Food</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <!-- Hero Section -->
+  <header class="hero">
+    <div class="hero-content">
+      <div class="topbar">
+        <div class="brand">
+          <img src="./assets/logo.png" alt="Home Bites logo" />
+          <span>Home Bites</span>
+        </div>
+        <div class="top-links">
+          <button class="link-btn" onclick="openLoginModal()">Login</button>
+          <button class="link-btn signup-btn" onclick="openSignupModal()">Sign up</button>
+        </div>
+      </div>
+
+      <h1>Discover the best home-made food near you</h1>
+      <p>Fresh meals, snacks, sweets, and daily specials prepared in home kitchens, delivered with care.</p>
+
+      <div class="search-shell">
+        <input type="text" placeholder="Enter your area or city" aria-label="Location" />
+        <button type="button" onclick="openSignupModal()">Start Ordering</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <section class="section">
+      <h2>Popular Categories</h2>
+      <div class="grid">
+        <article class="tile">
+          <h3>Daily Meals</h3>
+          <p>Simple and healthy lunch and dinner made fresh every day.</p>
+        </article>
+        <article class="tile">
+          <h3>Breakfast</h3>
+          <p>Hot idli, dosa, poha, upma and more to start your day right.</p>
+        </article>
+        <article class="tile">
+          <h3>Snacks</h3>
+          <p>Evening bites and tea-time favorites from trusted home cooks.</p>
+        </article>
+        <article class="tile">
+          <h3>Sweets</h3>
+          <p>Traditional festive sweets and homemade desserts on order.</p>
+        </article>
+      </div>
+
+      <div class="cta-box">
+        <div class="cta-text">New here? Create your account and start ordering in minutes.</div>
+        <div class="cta-actions">
+          <button class="btn primary" onclick="openSignupModal()">Create Account</button>
+          <button class="btn" onclick="openLoginModal()">Login</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Login Modal -->
+  <div id="loginModal" class="modal">
+    <div class="modal-overlay" onclick="closeLoginModal()"></div>
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeLoginModal()" aria-label="Close">&times;</button>
+      
+      <div class="modal-header">
+        <div class="modal-icon">🍱</div>
+        <h2>Login</h2>
+        <p class="modal-subtitle">or <span class="link" onclick="switchToSignup()">create an account</span></p>
+      </div>
+
+      <form id="loginForm" class="modal-form">
+        <div class="form-group">
+          <input 
+            type="email" 
+            id="loginEmail" 
+            placeholder="Email" 
+            required 
+            autocomplete="email"
+          />
+        </div>
+
+        <div class="form-group">
+          <input 
+            type="password" 
+            id="loginPassword" 
+            placeholder="Password" 
+            required 
+            autocomplete="current-password"
+          />
+        </div>
+
+        <button type="submit" class="modal-btn" id="loginBtn">LOGIN</button>
+        
+        <p class="modal-footer">
+          By clicking on Login, I accept the <span class="link">Terms & Conditions</span> & <span class="link">Privacy Policy</span>
+        </p>
+      </form>
+
+      <div id="loginMessage" class="alert"></div>
+    </div>
+  </div>
+
+  <!-- Signup Modal -->
+  <div id="signupModal" class="modal">
+    <div class="modal-overlay" onclick="closeSignupModal()"></div>
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeSignupModal()" aria-label="Close">&times;</button>
+      
+      <div class="modal-header">
+        <div class="modal-icon">🍱</div>
+        <h2>Sign up</h2>
+        <p class="modal-subtitle">or <span class="link" onclick="switchToLogin()">login to your account</span></p>
+      </div>
+
+      <form id="signupForm" class="modal-form">
+        <div class="form-group">
+          <input 
+            type="tel" 
+            id="signupPhone" 
+            placeholder="Phone number" 
+            pattern="[0-9]{10}" 
+            required 
+            autocomplete="tel"
+          />
+        </div>
+
+        <div class="form-group">
+          <input 
+            type="text" 
+            id="signupName" 
+            placeholder="Name" 
+            required 
+            autocomplete="name"
+          />
+        </div>
+
+        <div class="form-group">
+          <input 
+            type="email" 
+            id="signupEmail" 
+            placeholder="Email" 
+            required 
+            autocomplete="email"
+          />
+        </div>
+
+        <div class="form-group">
+          <input 
+            type="password" 
+            id="signupPassword" 
+            placeholder="Password (min 8 characters)" 
+            minlength="8" 
+            required 
+            autocomplete="new-password"
+          />
+        </div>
+
+        <div class="form-group">
+          <input 
+            type="text" 
+            id="signupAddress" 
+            placeholder="Address" 
+            required 
+            autocomplete="street-address"
+          />
+        </div>
+
+        <div class="form-group">
+          <input 
+            type="text" 
+            id="signupCity" 
+            placeholder="City" 
+            required 
+            autocomplete="address-level2"
+          />
+        </div>
+
+        <button type="submit" class="modal-btn" id="signupBtn">CONTINUE</button>
+        
+        <p class="modal-footer">
+          By creating an account, I accept the <span class="link">Terms & Conditions</span> & <span class="link">Privacy Policy</span>
+        </p>
+      </form>
+
+      <div id="signupMessage" class="alert"></div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="./config.js"></script>
+  <script src="./ui.js"></script>
+  <script>
+    // Modal Control Functions
+    function openLoginModal() {
+      document.getElementById('loginModal').classList.add('active');
+      document.body.style.overflow = 'hidden';
+      document.getElementById('loginEmail').focus();
+    }
+
+    function closeLoginModal() {
+      document.getElementById('loginModal').classList.remove('active');
+      document.body.style.overflow = 'auto';
+      clearAlert(document.getElementById('loginMessage'));
+    }
+
+    function openSignupModal() {
+      document.getElementById('signupModal').classList.add('active');
+      document.body.style.overflow = 'hidden';
+      document.getElementById('signupPhone').focus();
+    }
+
+    function closeSignupModal() {
+      document.getElementById('signupModal').classList.remove('active');
+      document.body.style.overflow = 'auto';
+      clearAlert(document.getElementById('signupMessage'));
+    }
+
+    function switchToSignup() {
+      closeLoginModal();
+      setTimeout(openSignupModal, 200);
+    }
+
+    function switchToLogin() {
+      closeSignupModal();
+      setTimeout(openLoginModal, 200);
+    }
+
+    // Close modals on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeLoginModal();
+        closeSignupModal();
+      }
+    });
+
+    // Login Form Handler
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const message = document.getElementById('loginMessage');
+      const loginBtn = document.getElementById('loginBtn');
+      clearAlert(message);
+
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+
+      const body = new URLSearchParams();
+      body.append('username', email);
+      body.append('password', password);
+
+      try {
+        setButtonLoading(loginBtn, 'LOGGING IN...', true);
+
+        const res = await fetch(`${API_BASE_URL}/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: body.toString()
+        });
+
+        const data = await res.json();
+        
+        if (!res.ok) {
+          throw new Error(data.detail || 'Login failed');
+        }
+
+        // Save token and user info
+        localStorage.setItem('access_token', data.access_token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        
+        setAlert(message, 'success', 'Login successful! Redirecting...');
+        
+        // Redirect to dashboard
+        setTimeout(() => {
+          window.location.href = './dashboard.html';
+        }, 1000);
+
+      } catch (err) {
+        setAlert(message, 'error', err.message || 'Login failed');
+      } finally {
+        setButtonLoading(loginBtn, 'LOGIN', false);
+      }
+    });
+
+    // Signup Form Handler
+    document.getElementById('signupForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const message = document.getElementById('signupMessage');
+      const signupBtn = document.getElementById('signupBtn');
+      clearAlert(message);
+
+      const payload = {
+        name: document.getElementById('signupName').value.trim(),
+        phone_number: Number(document.getElementById('signupPhone').value.trim()),
+        email: document.getElementById('signupEmail').value.trim(),
+        password: document.getElementById('signupPassword').value,
+        role: 'user',
+        address: document.getElementById('signupAddress').value.trim(),
+        city: document.getElementById('signupCity').value.trim()
+      };
+
+      try {
+        setButtonLoading(signupBtn, 'CREATING...', true);
+
+        const res = await fetch(`${API_BASE_URL}/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        
+        if (!res.ok) {
+          throw new Error(data.detail || 'Registration failed');
+        }
+
+        setAlert(message, 'success', `Account created successfully! User ID: ${data.user_id}. Please login.`);
+        document.getElementById('signupForm').reset();
+        
+        // Switch to login after 2 seconds
+        setTimeout(() => {
+          switchToLogin();
+        }, 2000);
+
+      } catch (err) {
+        setAlert(message, 'error', err.message || 'Registration failed');
+      } finally {
+        setButtonLoading(signupBtn, 'CONTINUE', false);
+      }
+    });
+  </script>
+</body>
+</html>
