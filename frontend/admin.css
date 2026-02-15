@@ -376,6 +376,22 @@
   border-color: var(--brand-main);
 }
 
+.form-group select {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #d4d5d9;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  background: #fff;
+  cursor: pointer;
+}
+
+.form-group select:focus {
+  outline: none;
+  border-color: var(--brand-main);
+}
+
 /* Order Details */
 .order-details {
   padding: 20px 0;

@@ -123,6 +123,14 @@ async function loadItems() {
     const res = await fetch(`${API_BASE_URL}/items`);
     const items = await res.json();
 
+    if (!res.ok) {
+      throw new Error(items.detail || 'Failed to load items');
+    }
+
+    if (!Array.isArray(items)) {
+      throw new Error('Invalid items response from server');
+    }
+
     if (items.length === 0) {
       container.innerHTML = `
         <div class="empty-state">
@@ -152,7 +160,7 @@ async function loadItems() {
               <td>${escapeHtml(item.item_name)}</td>
               <td>₹${item.price}</td>
               <td>${escapeHtml(item.weight)}</td>
-              <td>${escapeHtml(item.description.substring(0, 50))}...</td>
+              <td>${escapeHtml((item.description || '').substring(0, 50))}...</td>
               <td>
                 <button class="action-btn delete" onclick="deleteItem(${item.item_id})">Delete</button>
               </td>
@@ -288,14 +296,32 @@ function filterOrders() {
 function openAddItemModal() {
   document.getElementById('addItemModal').classList.add('active');
   document.body.style.overflow = 'hidden';
+  updateItemMeasureInput();
 }
 
 function closeAddItemModal() {
   document.getElementById('addItemModal').classList.remove('active');
   document.body.style.overflow = 'auto';
   document.getElementById('addItemForm').reset();
+  updateItemMeasureInput();
   clearAlert(document.getElementById('addItemMessage'));
 }
+
+function updateItemMeasureInput() {
+  const type = document.getElementById('itemMeasureType').value;
+  const label = document.getElementById('itemWeightLabel');
+  const input = document.getElementById('itemWeight');
+
+  if (type === 'pieces') {
+    label.textContent = 'Pieces';
+    input.placeholder = '12';
+  } else {
+    label.textContent = 'Weight';
+    input.placeholder = '500g';
+  }
+}
+
+document.getElementById('itemMeasureType').addEventListener('change', updateItemMeasureInput);
 
 // Add Item Form Handler
 document.getElementById('addItemForm').addEventListener('submit', async (e) => {
@@ -307,7 +333,14 @@ document.getElementById('addItemForm').addEventListener('submit', async (e) => {
   const payload = {
     item_name: document.getElementById('itemName').value.trim(),
     price: Number(document.getElementById('itemPrice').value),
-    weight: document.getElementById('itemWeight').value.trim(),
+    weight: (() => {
+      const measureType = document.getElementById('itemMeasureType').value;
+      const value = document.getElementById('itemWeight').value.trim();
+      if (measureType === 'pieces') {
+        return /\bpiece/.test(value.toLowerCase()) ? value : `${value} pieces`;
+      }
+      return value;
+    })(),
     description: document.getElementById('itemDescription').value.trim(),
     photos: document.getElementById('itemPhotos').value.trim() || '',
     videos: document.getElementById('itemVideos').value.trim() || ''

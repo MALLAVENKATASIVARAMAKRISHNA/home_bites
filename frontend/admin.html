@@ -157,9 +157,17 @@
             <input type="number" id="itemPrice" placeholder="250" min="1" required />
           </div>
           <div class="form-group">
-            <label for="itemWeight">Weight</label>
-            <input type="text" id="itemWeight" placeholder="500g" required />
+            <label for="itemMeasureType">Measure By</label>
+            <select id="itemMeasureType" required>
+              <option value="weight" selected>Weight</option>
+              <option value="pieces">Pieces</option>
+            </select>
           </div>
+        </div>
+
+        <div class="form-group">
+          <label for="itemWeight" id="itemWeightLabel">Weight</label>
+            <input type="text" id="itemWeight" placeholder="500g" required />
         </div>
 
         <div class="form-group">
