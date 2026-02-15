@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard - Home Bites</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css" />
+  <link rel="stylesheet" href="./admin.css" />
+</head>
+<body>
+  <div class="admin-dashboard">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="brand">
+          <img src="./assets/logo.png" alt="Home Bites logo" />
+          <span>Home Bites Admin</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button class="nav-item active" data-tab="overview" onclick="switchTab('overview')">
+          <span class="icon">📊</span>
+          <span>Overview</span>
+        </button>
+        <button class="nav-item" data-tab="items" onclick="switchTab('items')">
+          <span class="icon">🍱</span>
+          <span>Items</span>
+        </button>
+        <button class="nav-item" data-tab="users" onclick="switchTab('users')">
+          <span class="icon">👥</span>
+          <span>Users</span>
+        </button>
+        <button class="nav-item" data-tab="orders" onclick="switchTab('orders')">
+          <span class="icon">📦</span>
+          <span>Orders</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="admin-info">
+          <span id="adminName">Admin</span>
+          <small id="adminEmail">admin@homebites.com</small>
+        </div>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <header class="content-header">
+        <h1 id="pageTitle">Dashboard Overview</h1>
+      </header>
+
+      <div class="content-body">
+        <!-- Overview Tab -->
+        <div id="overview-tab" class="tab-content active">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon">🍱</div>
+              <div class="stat-info">
+                <h3 id="totalItems">0</h3>
+                <p>Total Items</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">👥</div>
+              <div class="stat-info">
+                <h3 id="totalUsers">0</h3>
+                <p>Total Users</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">📦</div>
+              <div class="stat-info">
+                <h3 id="totalOrders">0</h3>
+                <p>Total Orders</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">⏳</div>
+              <div class="stat-info">
+                <h3 id="pendingOrders">0</h3>
+                <p>Pending Orders</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="recent-section">
+            <h2>Recent Orders</h2>
+            <div id="recentOrders" class="table-container">
+              <p class="loading">Loading...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Items Tab -->
+        <div id="items-tab" class="tab-content">
+          <div class="tab-header">
+            <button class="btn primary" onclick="openAddItemModal()">+ Add New Item</button>
+          </div>
+
+          <div id="itemsTable" class="table-container">
+            <p class="loading">Loading items...</p>
+          </div>
+        </div>
+
+        <!-- Users Tab -->
+        <div id="users-tab" class="tab-content">
+          <div id="usersTable" class="table-container">
+            <p class="loading">Loading users...</p>
+          </div>
+        </div>
+
+        <!-- Orders Tab -->
+        <div id="orders-tab" class="tab-content">
+          <div class="filter-bar">
+            <select id="orderStatusFilter" onchange="filterOrders()">
+              <option value="">All Orders</option>
+              <option value="pending">Pending</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="delivered">Delivered</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+
+          <div id="ordersTable" class="table-container">
+            <p class="loading">Loading orders...</p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Add Item Modal -->
+  <div id="addItemModal" class="modal">
+    <div class="modal-overlay" onclick="closeAddItemModal()"></div>
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeAddItemModal()">&times;</button>
+      
+      <div class="modal-header">
+        <h2>Add New Item</h2>
+      </div>
+
+      <form id="addItemForm" class="modal-form">
+        <div class="form-group">
+          <label for="itemName">Item Name</label>
+          <input type="text" id="itemName" placeholder="Bobbatlu" required />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="itemPrice">Price (₹)</label>
+            <input type="number" id="itemPrice" placeholder="250" min="1" required />
+          </div>
+          <div class="form-group">
+            <label for="itemWeight">Weight</label>
+            <input type="text" id="itemWeight" placeholder="500g" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="itemDescription">Description</label>
+          <textarea id="itemDescription" rows="3" placeholder="Traditional sweet..." required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="itemPhotos">Photos URL</label>
+          <input type="text" id="itemPhotos" placeholder="bobbatlu.jpg" />
+        </div>
+
+        <div class="form-group">
+          <label for="itemVideos">Videos URL</label>
+          <input type="text" id="itemVideos" placeholder="bobbatlu.mp4" />
+        </div>
+
+        <button type="submit" class="modal-btn" id="addItemBtn">Add Item</button>
+      </form>
+
+      <div id="addItemMessage" class="alert"></div>
+    </div>
+  </div>
+
+  <!-- Order Details Modal -->
+  <div id="orderDetailsModal" class="modal">
+    <div class="modal-overlay" onclick="closeOrderDetailsModal()"></div>
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeOrderDetailsModal()">&times;</button>
+      
+      <div class="modal-header">
+        <h2>Order Details</h2>
+      </div>
+
+      <div id="orderDetailsContent" class="order-details">
+        <p class="loading">Loading...</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="./config.js"></script>
+  <script src="./ui.js"></script>
+  <script src="./admin.js"></script>
+</body>
+</html>
