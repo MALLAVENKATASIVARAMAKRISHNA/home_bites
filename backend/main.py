@@ -496,7 +496,10 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Connection = Dep
                 "user_id": user["user_id"],
                 "name": user["name"],
                 "email": user["email"],
-                "role": user["role"]
+                "role": user["role"],
+                "phone_number": user["phone_number"],
+                "address": user["address"],
+                "city": user["city"]
             }
         }
     finally:
