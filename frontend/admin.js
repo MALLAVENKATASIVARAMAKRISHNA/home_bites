@@ -18,6 +18,13 @@ function logout() {
   window.location.href = './index.html';
 }
 
+function fetchFresh(url, options = {}) {
+  return fetch(url, {
+    cache: 'no-store',
+    ...options
+  });
+}
+
 // Tab Switching
 function switchTab(tabName) {
   // Update nav items
@@ -51,11 +58,11 @@ function switchTab(tabName) {
 async function loadOverviewStats() {
   try {
     const [itemsRes, usersRes, ordersRes] = await Promise.all([
-      fetch(`${API_BASE_URL}/items`),
-      fetch(`${API_BASE_URL}/users`, {
+      fetchFresh(`${API_BASE_URL}/items`),
+      fetchFresh(`${API_BASE_URL}/users`, {
         headers: { 'Authorization': `Bearer ${token}` }
       }),
-      fetch(`${API_BASE_URL}/orders`, {
+      fetchFresh(`${API_BASE_URL}/orders`, {
         headers: { 'Authorization': `Bearer ${token}` }
       })
     ]);
@@ -120,7 +127,7 @@ async function loadItems() {
   container.innerHTML = '<p class="loading">Loading items...</p>';
 
   try {
-    const res = await fetch(`${API_BASE_URL}/items`);
+    const res = await fetchFresh(`${API_BASE_URL}/items`);
     const items = await res.json();
 
     if (!res.ok) {
@@ -182,7 +189,7 @@ async function loadUsers() {
   container.innerHTML = '<p class="loading">Loading users...</p>';
 
   try {
-    const res = await fetch(`${API_BASE_URL}/users`, {
+    const res = await fetchFresh(`${API_BASE_URL}/users`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     const users = await res.json();
@@ -228,7 +235,7 @@ async function loadOrders() {
   container.innerHTML = '<p class="loading">Loading orders...</p>';
 
   try {
-    const res = await fetch(`${API_BASE_URL}/orders`, {
+    const res = await fetchFresh(`${API_BASE_URL}/orders`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     allOrders = await res.json();
@@ -489,7 +496,7 @@ async function viewOrderDetails(orderId) {
   container.innerHTML = '<p class="loading">Loading order details...</p>';
 
   try {
-    const res = await fetch(`${API_BASE_URL}/orders/${orderId}/complete`, {
+    const res = await fetchFresh(`${API_BASE_URL}/orders/${orderId}/complete`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
 
