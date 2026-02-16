@@ -296,16 +296,19 @@ function displayOrders(orders) {
 }
 
 async function updateOrderStatus(orderId) {
+  const ordersMessage = document.getElementById('ordersMessage');
+  clearAlert(ordersMessage);
+
   const order = allOrders.find(o => o.order_id === orderId);
   if (!order) {
-    alert('Order not found');
+    setAlert(ordersMessage, 'error', 'Order not found');
     return;
   }
 
   const orderStatusEl = document.getElementById(`orderStatus-${orderId}`);
   const paymentStatusEl = document.getElementById(`paymentStatus-${orderId}`);
   if (!orderStatusEl || !paymentStatusEl) {
-    alert('Unable to read selected status values');
+    setAlert(ordersMessage, 'error', 'Unable to read selected status values');
     return;
   }
 
@@ -349,9 +352,9 @@ async function updateOrderStatus(orderId) {
     }
 
     loadOverviewStats();
-    alert(`Order #${orderId} updated successfully`);
+    setAlert(document.getElementById('ordersMessage'), 'success', `Order #${orderId} updated successfully`);
   } catch (err) {
-    alert(`Error: ${err.message}`);
+    setAlert(document.getElementById('ordersMessage'), 'error', err.message || 'Failed to update order');
   }
 }
 
