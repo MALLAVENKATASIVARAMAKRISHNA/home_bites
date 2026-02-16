@@ -3,7 +3,6 @@ const token = localStorage.getItem('access_token');
 const user = JSON.parse(localStorage.getItem('user') || '{}');
 
 if (!token || user.role !== 'admin') {
-  alert('Admin access required!');
   window.location.href = './index.html';
 }
 
@@ -124,6 +123,9 @@ function loadRecentOrders(orders) {
 // Load Items
 async function loadItems() {
   const container = document.getElementById('itemsTable');
+  const itemsMessage = document.getElementById('itemsMessage');
+  clearAlert(itemsMessage);
+  deleteItem.pendingId = null;
   container.innerHTML = '<p class="loading">Loading items...</p>';
 
   try {
@@ -466,7 +468,14 @@ document.getElementById('addItemForm').addEventListener('submit', async (e) => {
 
 // Delete Item
 async function deleteItem(itemId) {
-  if (!confirm('Are you sure you want to delete this item?')) return;
+  const itemsMessage = document.getElementById('itemsMessage');
+  clearAlert(itemsMessage);
+
+  if (deleteItem.pendingId !== itemId) {
+    deleteItem.pendingId = itemId;
+    setAlert(itemsMessage, 'error', `Click Delete again to confirm removing item #${itemId}.`);
+    return;
+  }
 
   try {
     const res = await fetch(`${API_BASE_URL}/items/${itemId}`, {
@@ -478,12 +487,14 @@ async function deleteItem(itemId) {
       throw new Error('Failed to delete item');
     }
 
-    alert('Item deleted successfully!');
+    deleteItem.pendingId = null;
+    setAlert(itemsMessage, 'success', 'Item deleted successfully.');
     loadItems();
     loadOverviewStats();
 
   } catch (err) {
-    alert('Error: ' + err.message);
+    deleteItem.pendingId = null;
+    setAlert(itemsMessage, 'error', err.message || 'Failed to delete item');
   }
 }
 

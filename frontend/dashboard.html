@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./styles.css" />
-  <link rel="stylesheet" href="./dashboard.css?v=2" />
+  <link rel="stylesheet" href="./dashboard.css?v=3" />
 </head>
 <body>
   <div class="dashboard order-dashboard">
@@ -420,12 +420,14 @@
       }
 
       if (!user.user_id) {
-        alert('User session is incomplete. Please login again.');
+        cartErrorEl.textContent = 'User session is incomplete. Please login again.';
+        cartErrorEl.style.display = 'block';
         return;
       }
 
       if (!user.address || !user.city) {
-        alert('Address/City missing in profile. Please update your profile and login again.');
+        cartErrorEl.textContent = 'Address/City missing in profile. Please update your profile and login again.';
+        cartErrorEl.style.display = 'block';
         return;
       }
 
@@ -463,8 +465,6 @@
 
         const data = await res.json();
         if (!res.ok) throw new Error(data.detail || 'Order failed');
-
-        alert(`Order placed successfully! Order ID: ${data.order_id}`);
         lastPlacedOrderId = data.order_id;
         saveOrderRecord({
           order_id: data.order_id,
@@ -491,7 +491,8 @@
         renderItems();
         renderCart();
       } catch (err) {
-        alert(`Could not place order: ${err.message}`);
+        cartErrorEl.textContent = `Could not place order: ${err.message}`;
+        cartErrorEl.style.display = 'block';
       } finally {
         setButtonLoading(placeOrderBtn, 'Place Order', false);
       }
