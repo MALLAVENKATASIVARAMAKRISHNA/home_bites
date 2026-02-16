@@ -456,10 +456,47 @@
   gap: 10px;
 }
 
+.orders-page-panel {
+  margin-top: 14px;
+  background: #fff;
+  border: 1px solid #eaecf0;
+  border-radius: 16px;
+  padding: 16px;
+}
+
+.order-page-search-note p {
+  margin: 0;
+  color: #667085;
+  font-size: 0.9rem;
+}
+
 .orders-empty {
   color: #667085;
   text-align: center;
   padding: 20px 0;
+}
+
+.orders-empty-page {
+  border: 1px dashed #d0d5dd;
+  border-radius: 14px;
+  padding: 22px;
+  text-align: center;
+}
+
+.orders-empty-page h3 {
+  margin: 0 0 8px;
+}
+
+.orders-empty-page p {
+  margin: 0 0 14px;
+  color: #667085;
+}
+
+.small-logout {
+  margin: 0;
+  width: auto;
+  padding: 9px 12px;
+  border-radius: 12px;
 }
 
 .order-history-card {

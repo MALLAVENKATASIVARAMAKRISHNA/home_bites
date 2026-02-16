@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./styles.css" />
-  <link rel="stylesheet" href="./dashboard.css?v=1" />
+  <link rel="stylesheet" href="./dashboard.css?v=2" />
 </head>
 <body>
   <div class="dashboard order-dashboard">
@@ -103,17 +103,6 @@
     </main>
   </div>
 
-  <div id="ordersModal" class="modal">
-    <div class="modal-overlay" onclick="closeOrdersModal()"></div>
-    <div class="modal-content">
-      <button class="modal-close" onclick="closeOrdersModal()">&times;</button>
-      <div class="modal-header">
-        <h2>My Orders</h2>
-      </div>
-      <div id="ordersContent" class="orders-content"></div>
-    </div>
-  </div>
-
   <script src="./config.js"></script>
   <script src="./ui.js"></script>
   <script>
@@ -184,30 +173,6 @@
       localStorage.setItem(getOrdersStorageKey(), JSON.stringify(orders.slice(0, 30)));
     }
 
-    function renderOrdersModal() {
-      const orders = getSavedOrders();
-      const container = document.getElementById('ordersContent');
-
-      if (!orders.length) {
-        container.innerHTML = '<p class="orders-empty">No orders placed yet.</p>';
-        return;
-      }
-
-      container.innerHTML = orders.map(order => `
-        <article class="order-history-card">
-          <div class="order-history-head">
-            <strong>Order #${order.order_id}</strong>
-            <span>${escapeHtml(order.order_status || 'pending')}</span>
-          </div>
-          <p><b>Date:</b> ${escapeHtml(order.order_date || '-')}</p>
-          <p><b>Amount:</b> ${formatCurrency(order.total_amount || 0)}</p>
-          <p><b>Payment:</b> ${escapeHtml(order.payment_mode || '-')}</p>
-          <p><b>Items:</b> ${Number(order.items_count || 0)}</p>
-          <p><b>Delivery:</b> ${escapeHtml(order.delivery_date || '-')}</p>
-        </article>
-      `).join('');
-    }
-
     function toggleProfileMenu() {
       const menu = document.getElementById('profileMenu');
       const btn = document.getElementById('profileBtn');
@@ -232,10 +197,7 @@
     });
 
     document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape') {
-        closeProfileMenu();
-        closeOrdersModal();
-      }
+      if (event.key === 'Escape') closeProfileMenu();
     });
 
     async function hydrateProfileDetails() {
@@ -508,14 +470,7 @@
 
     function showMyOrders() {
       closeProfileMenu();
-      renderOrdersModal();
-      document.getElementById('ordersModal').classList.add('active');
-      document.body.style.overflow = 'hidden';
-    }
-
-    function closeOrdersModal() {
-      document.getElementById('ordersModal').classList.remove('active');
-      document.body.style.overflow = 'auto';
+      window.location.href = './my-orders.html';
     }
 
     async function init() {
