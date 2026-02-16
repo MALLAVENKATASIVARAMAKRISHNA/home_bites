@@ -26,10 +26,6 @@
       </div>
 
       <div class="dash-actions">
-        <button id="cartQuickBtn" class="cart-quick-btn" type="button" onclick="scrollToCart()">
-          Cart <span id="quickCartCount">0</span>
-        </button>
-
         <div class="order-profile-wrap">
           <button
             id="profileBtn"
@@ -75,32 +71,42 @@
           <div id="loadingMsg" class="loading-block">Loading items...</div>
           <div id="itemsGrid" class="food-grid" style="display: none;"></div>
         </section>
-
-        <aside id="cartPanel" class="cart-panel">
-          <div class="panel-head">
-            <h2>Your Cart</h2>
-            <span id="cartCount">0 items</span>
-          </div>
-
-          <div id="cartEmpty" class="cart-empty">No items in cart yet.</div>
-          <div id="cartItems" class="cart-items"></div>
-
-          <div class="cart-summary">
-            <div class="summary-row"><span>Subtotal</span><strong id="cartSubtotal">Rs 0</strong></div>
-
-            <label for="paymentMode">Payment Mode</label>
-            <select id="paymentMode">
-              <option value="cash">Cash</option>
-              <option value="upi">UPI</option>
-              <option value="card">Card</option>
-            </select>
-
-            <button id="placeOrderBtn" class="place-order-btn" type="button" onclick="placeOrder()">Place Order</button>
-            <p class="cart-note">Delivery address will use your profile details.</p>
-          </div>
-        </aside>
       </section>
     </main>
+  </div>
+
+  <button id="goToCartBtn" class="bottom-cart-btn" type="button" onclick="openCartDrawer()">
+    Go to Cart <span id="quickCartCount">0</span>
+  </button>
+
+  <div id="cartDrawer" class="cart-drawer" aria-hidden="true">
+    <div class="cart-drawer-overlay" onclick="closeCartDrawer()"></div>
+    <aside class="cart-panel drawer-panel">
+      <div class="panel-head">
+        <h2>Your Cart</h2>
+        <div class="cart-head-actions">
+          <span id="cartCount">0 items</span>
+          <button class="drawer-close-btn" type="button" onclick="closeCartDrawer()">Close</button>
+        </div>
+      </div>
+
+      <div id="cartEmpty" class="cart-empty">No items in cart yet.</div>
+      <div id="cartItems" class="cart-items"></div>
+
+      <div class="cart-summary">
+        <div class="summary-row"><span>Subtotal</span><strong id="cartSubtotal">Rs 0</strong></div>
+
+        <label for="paymentMode">Payment Mode</label>
+        <select id="paymentMode">
+          <option value="cash">Cash</option>
+          <option value="upi">UPI</option>
+          <option value="card">Card</option>
+        </select>
+
+        <button id="placeOrderBtn" class="place-order-btn" type="button" onclick="placeOrder()">Place Order</button>
+        <p class="cart-note">Delivery address will use your profile details.</p>
+      </div>
+    </aside>
   </div>
 
   <script src="./config.js"></script>
@@ -197,7 +203,10 @@
     });
 
     document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape') closeProfileMenu();
+      if (event.key === 'Escape') {
+        closeProfileMenu();
+        closeCartDrawer();
+      }
     });
 
     async function hydrateProfileDetails() {
@@ -452,9 +461,18 @@
       }
     }
 
-    function scrollToCart() {
-      const cartPanel = document.getElementById('cartPanel');
-      if (cartPanel) cartPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    function openCartDrawer() {
+      const drawer = document.getElementById('cartDrawer');
+      drawer.classList.add('active');
+      drawer.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeCartDrawer() {
+      const drawer = document.getElementById('cartDrawer');
+      drawer.classList.remove('active');
+      drawer.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = 'auto';
     }
 
     document.getElementById('itemSearch').addEventListener('input', (event) => {

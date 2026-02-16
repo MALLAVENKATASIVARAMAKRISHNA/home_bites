@@ -218,10 +218,7 @@
 
 .order-layout {
   margin-top: 14px;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 360px;
-  gap: 16px;
-  align-items: start;
+  display: block;
 }
 
 .catalog-panel,
@@ -450,6 +447,73 @@
   font-size: 0.78rem;
 }
 
+.bottom-cart-btn {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  transform: none;
+  border: 0;
+  border-radius: 999px;
+  padding: 12px 18px;
+  background: linear-gradient(90deg, #111827, #1f2937);
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 12px 28px rgba(17, 24, 39, 0.35);
+  z-index: 120;
+}
+
+.bottom-cart-btn span {
+  margin-left: 6px;
+  color: #f59e0b;
+}
+
+.cart-drawer {
+  position: fixed;
+  inset: 0;
+  display: none;
+  z-index: 210;
+}
+
+.cart-drawer.active {
+  display: block;
+}
+
+.cart-drawer-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(16, 24, 40, 0.5);
+}
+
+.drawer-panel {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: min(420px, 92vw);
+  border-radius: 0;
+  overflow-y: auto;
+}
+
+.cart-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.drawer-close-btn {
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  background: #fff;
+  padding: 6px 9px;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
 .orders-content {
   padding-top: 8px;
   display: grid;
@@ -535,12 +599,8 @@
     justify-content: space-between;
   }
 
-  .order-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .cart-panel {
-    position: static;
+  .drawer-panel {
+    width: min(420px, 96vw);
   }
 }
 
