@@ -6,7 +6,7 @@ Connection = Any
 import sqlite3
 from auth import hash_password, verify_password, create_access_token, get_current_user, get_admin_user, ACCESS_TOKEN_EXPIRE_MINUTES
 from fastapi.security import OAuth2PasswordRequestForm
-from datetime import timedelta
+from datetime import timedelta, datetime, date
 from fastapi.responses import JSONResponse
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -291,6 +291,43 @@ def update_order(order_id: int, order: Orders, db: Connection = Depends(get_db),
         
         updated = cursor.execute("SELECT * FROM orders WHERE order_id=?", (order_id,)).fetchone()
         return dict(updated)
+    finally:
+        cursor.close()
+
+@app.post("/orders/{order_id}/cancel")
+def cancel_order(order_id: int, db: Connection = Depends(get_db), current_user: dict = Depends(get_current_user)):
+    """
+    Allow a user to cancel their own order within 1 day of order_date.
+    """
+    cursor = db.cursor()
+    try:
+        order = cursor.execute("SELECT * FROM orders WHERE order_id = ?", (order_id,)).fetchone()
+        if not order:
+            raise HTTPException(status_code=404, detail="Order not found")
+
+        if order["user_id"] != current_user["user_id"]:
+            raise HTTPException(status_code=403, detail="You can cancel only your own orders")
+
+        if order["order_status"] in ("delivered", "cancelled"):
+            raise HTTPException(status_code=400, detail=f"Order already {order['order_status']}")
+
+        try:
+            order_date = datetime.strptime(order["order_date"], "%Y-%m-%d").date()
+        except Exception:
+            raise HTTPException(status_code=400, detail="Invalid order_date format on order")
+
+        today = date.today()
+        if today > (order_date + timedelta(days=1)):
+            raise HTTPException(status_code=400, detail="Cancellation window expired (allowed within 1 day of order date)")
+
+        cursor.execute("UPDATE orders SET order_status = ? WHERE order_id = ?", ("cancelled", order_id))
+        db.commit()
+
+        updated = cursor.execute("SELECT * FROM orders WHERE order_id = ?", (order_id,)).fetchone()
+        return {
+            "message": "Order cancelled successfully",
+            "order": dict(updated)
+        }
     finally:
         cursor.close()
 

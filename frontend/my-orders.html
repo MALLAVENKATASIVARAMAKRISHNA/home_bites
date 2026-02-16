@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./styles.css" />
-  <link rel="stylesheet" href="./dashboard.css?v=3" />
+  <link rel="stylesheet" href="./dashboard.css?v=4" />
 </head>
 <body>
   <div class="dashboard order-dashboard">
@@ -43,12 +43,14 @@
           <span id="ordersMeta">0 orders</span>
         </div>
 
+        <div id="ordersPageMessage" class="alert"></div>
         <div id="ordersContent" class="orders-content"></div>
       </section>
     </main>
   </div>
 
   <script src="./config.js"></script>
+  <script src="./ui.js"></script>
   <script>
     const token = localStorage.getItem('access_token');
     const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -141,6 +143,21 @@
       return text || '-';
     }
 
+    function canCancelOrder(order) {
+      const status = String(order.order_status || '').toLowerCase();
+      if (status === 'cancelled' || status === 'delivered') return false;
+
+      try {
+        const orderDate = new Date(`${order.order_date}T00:00:00`);
+        if (Number.isNaN(orderDate.getTime())) return false;
+        const lastAllowed = new Date(orderDate.getTime() + (24 * 60 * 60 * 1000));
+        const now = new Date();
+        return now <= lastAllowed;
+      } catch (err) {
+        return false;
+      }
+    }
+
     async function handleOrderCardClick(event) {
       const card = event.target.closest('.order-history-card');
       if (!card) return;
@@ -226,6 +243,9 @@
             </div>
             <h4>Items</h4>
             ${renderOrderItems(order)}
+            ${canCancelOrder(order) ? `
+              <button type="button" class="order-cancel-btn" onclick="cancelOrder(${order.order_id}, event)">Cancel Order</button>
+            ` : ''}
           </div>
         </article>
       `).join('');
@@ -233,6 +253,30 @@
       container.querySelectorAll('.order-history-card').forEach(card => {
         card.addEventListener('click', handleOrderCardClick);
       });
+    }
+
+    async function cancelOrder(orderId, evt) {
+      if (evt) evt.stopPropagation();
+      const pageMessage = document.getElementById('ordersPageMessage');
+      clearAlert(pageMessage);
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/orders/${orderId}/cancel`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.detail || 'Failed to cancel order');
+        }
+
+        setAlert(pageMessage, 'success', `Order #${orderId} cancelled successfully`);
+        ordersCache = await loadOrdersFromBackend();
+        activeOrderIndex = null;
+        renderOrdersPage();
+      } catch (err) {
+        setAlert(pageMessage, 'error', err.message || 'Failed to cancel order');
+      }
     }
 
     function goToDashboard() {
