@@ -92,6 +92,7 @@
 
       <div id="cartEmpty" class="cart-empty">No items in cart yet.</div>
       <div id="cartItems" class="cart-items"></div>
+      <div id="cartError" class="cart-inline-error" style="display: none;"></div>
 
       <div class="cart-summary">
         <div class="summary-row"><span>Subtotal</span><strong id="cartSubtotal">Rs 0</strong></div>
@@ -334,6 +335,7 @@
       const entries = Object.values(cart);
       const cartItemsEl = document.getElementById('cartItems');
       const cartEmptyEl = document.getElementById('cartEmpty');
+      const cartErrorEl = document.getElementById('cartError');
 
       const totalItems = entries.reduce((sum, entry) => sum + entry.quantity, 0);
       const subtotal = entries.reduce((sum, entry) => sum + (entry.item.price * entry.quantity), 0);
@@ -349,6 +351,8 @@
       }
 
       cartEmptyEl.style.display = 'none';
+      cartErrorEl.style.display = 'none';
+      cartErrorEl.textContent = '';
       cartItemsEl.innerHTML = entries.map(({ item, quantity }) => `
         <div class="cart-line">
           <div>
@@ -389,9 +393,11 @@
     async function placeOrder() {
       const placeOrderBtn = document.getElementById('placeOrderBtn');
       const entries = Object.values(cart);
+      const cartErrorEl = document.getElementById('cartError');
 
       if (entries.length === 0) {
-        alert('Add at least one item to place an order.');
+        cartErrorEl.textContent = 'Add at least one item to place an order.';
+        cartErrorEl.style.display = 'block';
         return;
       }
 
