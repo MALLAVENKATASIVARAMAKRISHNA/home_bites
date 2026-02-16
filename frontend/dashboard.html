@@ -93,6 +93,10 @@
       <div id="cartEmpty" class="cart-empty">No items in cart yet.</div>
       <div id="cartItems" class="cart-items"></div>
       <div id="cartError" class="cart-inline-error" style="display: none;"></div>
+      <div id="orderSuccessAction" class="order-success-action" style="display: none;">
+        <p id="orderSuccessText"></p>
+        <button type="button" class="view-orders-btn" onclick="showMyOrders()">View My Orders</button>
+      </div>
 
       <div class="cart-summary">
         <div class="summary-row"><span>Subtotal</span><strong id="cartSubtotal">Rs 0</strong></div>
@@ -124,6 +128,7 @@
     let selectedCategory = 'All';
     let searchText = '';
     const cart = {};
+    let lastPlacedOrderId = null;
 
     function escapeHtml(text) {
       const div = document.createElement('div');
@@ -269,6 +274,7 @@
     function addToCart(itemId) {
       const item = allItems.find(i => i.item_id === itemId);
       if (!item) return;
+      lastPlacedOrderId = null;
 
       if (!cart[itemId]) {
         cart[itemId] = { item, quantity: 1 };
@@ -282,6 +288,7 @@
 
     function decrementFromCart(itemId) {
       if (!cart[itemId]) return;
+      lastPlacedOrderId = null;
       cart[itemId].quantity -= 1;
       if (cart[itemId].quantity <= 0) delete cart[itemId];
       renderItems();
@@ -336,6 +343,8 @@
       const cartItemsEl = document.getElementById('cartItems');
       const cartEmptyEl = document.getElementById('cartEmpty');
       const cartErrorEl = document.getElementById('cartError');
+      const orderSuccessEl = document.getElementById('orderSuccessAction');
+      const orderSuccessTextEl = document.getElementById('orderSuccessText');
 
       const totalItems = entries.reduce((sum, entry) => sum + entry.quantity, 0);
       const subtotal = entries.reduce((sum, entry) => sum + (entry.item.price * entry.quantity), 0);
@@ -347,12 +356,21 @@
       if (entries.length === 0) {
         cartEmptyEl.style.display = 'block';
         cartItemsEl.innerHTML = '';
+        if (lastPlacedOrderId) {
+          orderSuccessTextEl.textContent = `Order #${lastPlacedOrderId} placed successfully.`;
+          orderSuccessEl.style.display = 'block';
+        } else {
+          orderSuccessEl.style.display = 'none';
+          orderSuccessTextEl.textContent = '';
+        }
         return;
       }
 
       cartEmptyEl.style.display = 'none';
       cartErrorEl.style.display = 'none';
       cartErrorEl.textContent = '';
+      orderSuccessEl.style.display = 'none';
+      orderSuccessTextEl.textContent = '';
       cartItemsEl.innerHTML = entries.map(({ item, quantity }) => `
         <div class="cart-line">
           <div>
@@ -447,6 +465,7 @@
         if (!res.ok) throw new Error(data.detail || 'Order failed');
 
         alert(`Order placed successfully! Order ID: ${data.order_id}`);
+        lastPlacedOrderId = data.order_id;
         saveOrderRecord({
           order_id: data.order_id,
           order_status: payload.order_status,

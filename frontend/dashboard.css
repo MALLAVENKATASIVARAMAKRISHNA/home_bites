@@ -381,6 +381,33 @@
   font-weight: 600;
 }
 
+.order-success-action {
+  margin-top: 10px;
+  border: 1px solid #b7ebc6;
+  background: #e9f9ef;
+  color: #166534;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.order-success-action p {
+  margin: 0 0 8px;
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.view-orders-btn {
+  border: 0;
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: #166534;
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
 .cart-line {
   display: flex;
   align-items: center;
