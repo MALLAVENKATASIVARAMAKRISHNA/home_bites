@@ -266,6 +266,7 @@ function displayOrders(orders) {
           <th>Amount</th>
           <th>Status</th>
           <th>Payment</th>
+          <th>Delivery Date</th>
           <th>Date</th>
           <th>Actions</th>
         </tr>
@@ -290,6 +291,14 @@ function displayOrders(orders) {
                 <option value="paid" ${order.payment_status === 'paid' ? 'selected' : ''}>paid</option>
                 <option value="failed" ${order.payment_status === 'failed' ? 'selected' : ''}>failed</option>
               </select>
+            </td>
+            <td>
+              <input
+                id="deliveryDate-${order.order_id}"
+                class="status-select"
+                type="date"
+                value="${escapeHtml((order.delivery_date || '').slice(0, 10))}"
+              />
             </td>
             <td>${order.order_date}</td>
             <td>
@@ -316,10 +325,13 @@ async function updateOrderStatus(orderId) {
 
   const orderStatusEl = document.getElementById(`orderStatus-${orderId}`);
   const paymentStatusEl = document.getElementById(`paymentStatus-${orderId}`);
-  if (!orderStatusEl || !paymentStatusEl) {
-    setAlert(ordersMessage, 'error', 'Unable to read selected status values');
+  const deliveryDateEl = document.getElementById(`deliveryDate-${orderId}`);
+  if (!orderStatusEl || !paymentStatusEl || !deliveryDateEl) {
+    setAlert(ordersMessage, 'error', 'Unable to read selected order values');
     return;
   }
+
+  const selectedDeliveryDate = deliveryDateEl.value || order.delivery_date || order.order_date;
 
   const updatedPayload = {
     user_id: order.user_id,
@@ -328,7 +340,7 @@ async function updateOrderStatus(orderId) {
     payment_status: paymentStatusEl.value,
     payment_mode: order.payment_mode,
     order_date: order.order_date,
-    delivery_date: order.delivery_date,
+    delivery_date: selectedDeliveryDate,
     address: order.address,
     city: order.city
   };
