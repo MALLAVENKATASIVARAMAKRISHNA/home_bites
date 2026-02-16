@@ -52,6 +52,8 @@
   <script>
     const token = localStorage.getItem('access_token');
     const user = JSON.parse(localStorage.getItem('user') || '{}');
+    let activeOrderIndex = null;
+    let ordersCache = [];
 
     if (!token) {
       window.location.href = './index.html';
@@ -79,8 +81,42 @@
       }
     }
 
+    function renderOrderItems(order) {
+      if (!Array.isArray(order.items) || order.items.length === 0) {
+        return '<p class="order-item-empty">Detailed item list not available for this order.</p>';
+      }
+
+      return `
+        <div class="order-items-list">
+          ${order.items.map(item => `
+            <div class="order-item-row">
+              <div>
+                <strong>${escapeHtml(item.item_name || `Item #${item.item_id || '-'}`)}</strong>
+                <p>${Number(item.quantity || 0)} x ${formatCurrency(item.unit_price || 0)} ${item.weight ? `• ${escapeHtml(item.weight)}` : ''}</p>
+              </div>
+              <span>${formatCurrency(item.line_total || 0)}</span>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function getStatusText(value) {
+      const text = String(value || '').trim();
+      return text || '-';
+    }
+
+    function handleOrderCardClick(event) {
+      const card = event.target.closest('.order-history-card');
+      if (!card) return;
+      const index = Number(card.dataset.index);
+      activeOrderIndex = Number.isInteger(index) ? (activeOrderIndex === index ? null : index) : null;
+      renderOrdersPage();
+    }
+
     function renderOrdersPage() {
       const orders = getSavedOrders();
+      ordersCache = orders;
       const container = document.getElementById('ordersContent');
       document.getElementById('ordersMeta').textContent = `${orders.length} order${orders.length === 1 ? '' : 's'}`;
 
@@ -95,19 +131,37 @@
         return;
       }
 
-      container.innerHTML = orders.map(order => `
-        <article class="order-history-card">
+      container.innerHTML = orders.map((order, index) => `
+        <article class="order-history-card clickable ${activeOrderIndex === index ? 'active' : ''}" data-index="${index}">
           <div class="order-history-head">
             <strong>Order #${order.order_id}</strong>
-            <span>${escapeHtml(order.order_status || 'pending')}</span>
+            <span>${escapeHtml(getStatusText(order.order_status || 'pending'))}</span>
           </div>
           <p><b>Date:</b> ${escapeHtml(order.order_date || '-')}</p>
           <p><b>Amount:</b> ${formatCurrency(order.total_amount || 0)}</p>
           <p><b>Payment:</b> ${escapeHtml(order.payment_mode || '-')}</p>
           <p><b>Items:</b> ${Number(order.items_count || 0)}</p>
           <p><b>Delivery:</b> ${escapeHtml(order.delivery_date || '-')}</p>
+          <p class="view-order-note">Click to ${activeOrderIndex === index ? 'hide' : 'view'} full details</p>
+
+          <div class="order-history-details ${activeOrderIndex === index ? 'active' : ''}">
+            <div class="order-detail-grid">
+              <p><b>Order Status:</b> ${escapeHtml(getStatusText(order.order_status || 'pending'))}</p>
+              <p><b>Payment Status:</b> ${escapeHtml(getStatusText(order.payment_status || 'pending'))}</p>
+              <p><b>Order Date:</b> ${escapeHtml(order.order_date || '-')}</p>
+              <p><b>Delivery Date:</b> ${escapeHtml(order.delivery_date || '-')}</p>
+              <p><b>Address:</b> ${escapeHtml(order.address || '-')}</p>
+              <p><b>City:</b> ${escapeHtml(order.city || '-')}</p>
+            </div>
+            <h4>Items</h4>
+            ${renderOrderItems(order)}
+          </div>
         </article>
       `).join('');
+
+      container.querySelectorAll('.order-history-card').forEach(card => {
+        card.addEventListener('click', handleOrderCardClick);
+      });
     }
 
     function goToDashboard() {

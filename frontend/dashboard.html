@@ -444,11 +444,22 @@
         saveOrderRecord({
           order_id: data.order_id,
           order_status: payload.order_status,
+          payment_status: payload.payment_status,
           order_date: payload.order_date,
           delivery_date: payload.delivery_date,
           payment_mode: payload.payment_mode,
+          address: payload.address,
+          city: payload.city,
           items_count: payload.items.length,
-          total_amount: data.total_amount
+          total_amount: data.total_amount,
+          items: entries.map(({ item, quantity }) => ({
+            item_id: item.item_id,
+            item_name: item.item_name,
+            quantity,
+            unit_price: item.price,
+            line_total: item.price * quantity,
+            weight: item.weight || ''
+          }))
         });
 
         Object.keys(cart).forEach(key => delete cart[key]);
