@@ -81,6 +81,41 @@
       }
     }
 
+    function setSavedOrders(orders) {
+      localStorage.setItem(getOrdersStorageKey(), JSON.stringify(orders.slice(0, 50)));
+    }
+
+    function mergeOrders(remoteOrders, localOrders) {
+      const map = new Map();
+      localOrders.forEach(order => {
+        map.set(order.order_id, order);
+      });
+      remoteOrders.forEach(order => {
+        const existing = map.get(order.order_id) || {};
+        map.set(order.order_id, { ...existing, ...order });
+      });
+      return Array.from(map.values()).sort((a, b) => Number(b.order_id || 0) - Number(a.order_id || 0));
+    }
+
+    async function loadOrdersFromBackend() {
+      if (!user.user_id) return getSavedOrders();
+      const localOrders = getSavedOrders();
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/users/${user.user_id}/orders`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error('Failed to load orders');
+
+        const remoteOrders = await res.json();
+        const merged = mergeOrders(Array.isArray(remoteOrders) ? remoteOrders : [], localOrders);
+        setSavedOrders(merged);
+        return merged;
+      } catch (err) {
+        return localOrders;
+      }
+    }
+
     function renderOrderItems(order) {
       if (!Array.isArray(order.items) || order.items.length === 0) {
         return '<p class="order-item-empty">Detailed item list not available for this order.</p>';
@@ -106,17 +141,53 @@
       return text || '-';
     }
 
-    function handleOrderCardClick(event) {
+    async function handleOrderCardClick(event) {
       const card = event.target.closest('.order-history-card');
       if (!card) return;
       const index = Number(card.dataset.index);
-      activeOrderIndex = Number.isInteger(index) ? (activeOrderIndex === index ? null : index) : null;
+      if (!Number.isInteger(index)) return;
+
+      if (activeOrderIndex === index) {
+        activeOrderIndex = null;
+        renderOrdersPage();
+        return;
+      }
+
+      activeOrderIndex = index;
+      const selectedOrder = ordersCache[index];
+      if (selectedOrder && (!Array.isArray(selectedOrder.items) || selectedOrder.items.length === 0)) {
+        try {
+          const res = await fetch(`${API_BASE_URL}/orders/${selectedOrder.order_id}/complete`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          if (res.ok) {
+            const detail = await res.json();
+            const detailedItems = Array.isArray(detail.items) ? detail.items.map(item => ({
+              item_id: item.item_id,
+              item_name: item.item_name,
+              quantity: item.quantity,
+              unit_price: item.price,
+              line_total: Number(item.price || 0) * Number(item.quantity || 0),
+              weight: item.weight || ''
+            })) : [];
+            ordersCache[index] = {
+              ...selectedOrder,
+              ...detail.order,
+              items: detailedItems,
+              items_count: detailedItems.length || selectedOrder.items_count
+            };
+            setSavedOrders(ordersCache);
+          }
+        } catch (err) {
+          // Keep existing summary data if detail call fails
+        }
+      }
+
       renderOrdersPage();
     }
 
     function renderOrdersPage() {
-      const orders = getSavedOrders();
-      ordersCache = orders;
+      const orders = ordersCache;
       const container = document.getElementById('ordersContent');
       document.getElementById('ordersMeta').textContent = `${orders.length} order${orders.length === 1 ? '' : 's'}`;
 
@@ -174,7 +245,12 @@
       window.location.href = './index.html';
     }
 
-    renderOrdersPage();
+    async function init() {
+      ordersCache = await loadOrdersFromBackend();
+      renderOrdersPage();
+    }
+
+    init();
   </script>
 </body>
 </html>
