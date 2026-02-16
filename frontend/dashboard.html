@@ -8,120 +8,109 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./styles.css" />
+  <link rel="stylesheet" href="./dashboard.css?v=1" />
 </head>
 <body>
-  <div class="dashboard">
-    <nav class="nav">
-      <div class="brand">
+  <div class="dashboard order-dashboard">
+    <nav class="dash-nav">
+      <div class="dash-brand">
         <img src="./assets/logo.png" alt="Home Bites logo" />
-        <span>Home Bites</span>
+        <div>
+          <strong>Home Bites</strong>
+          <p>Order fresh home-cooked food</p>
+        </div>
       </div>
-      <div class="user-info">
-        <div class="profile-menu-wrapper">
-          <button id="profileBtn" class="profile-trigger-btn" type="button" aria-haspopup="true" aria-expanded="false" onclick="toggleProfileMenu()">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle>
-            </svg>
-            <span id="userName">Account</span>
-            <svg class="dropdown-arrow" width="10" height="6" viewBox="0 0 10 6" fill="currentColor">
-              <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
+
+      <div class="dash-search-wrap">
+        <input id="itemSearch" type="text" placeholder="Search for dishes, sweets, snacks..." aria-label="Search items" />
+      </div>
+
+      <div class="dash-actions">
+        <button id="cartQuickBtn" class="cart-quick-btn" type="button" onclick="scrollToCart()">
+          Cart <span id="quickCartCount">0</span>
+        </button>
+
+        <div class="order-profile-wrap">
+          <button
+            id="profileBtn"
+            class="order-profile-btn"
+            type="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+            onclick="toggleProfileMenu()"
+          >
+            <span id="profileInitial">U</span>
           </button>
-          
-          <div id="profileMenu" class="profile-dropdown-menu" role="menu" aria-hidden="true">
-            <button class="dropdown-menu-item" onclick="showMyProfile()">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                <circle cx="12" cy="7" r="4"></circle>
-              </svg>
-              <span>My Profile</span>
-            </button>
-            <button class="dropdown-menu-item" onclick="showMyOrders()">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                <line x1="3" y1="9" x2="21" y2="9"></line>
-                <line x1="9" y1="21" x2="9" y2="9"></line>
-              </svg>
-              <span>Orders</span>
-            </button>
-            <button class="dropdown-menu-item" onclick="logout()">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                <polyline points="16 17 21 12 16 7"></polyline>
-                <line x1="21" y1="12" x2="9" y2="12"></line>
-              </svg>
-              <span>Logout</span>
-            </button>
+
+          <div id="profileMenu" class="order-profile-menu" aria-hidden="true">
+            <h4>My Profile</h4>
+            <div class="profile-row"><span>Name</span><strong id="profileName">-</strong></div>
+            <div class="profile-row"><span>Email</span><strong id="profileEmail">-</strong></div>
+            <div class="profile-row"><span>Phone</span><strong id="profilePhone">-</strong></div>
+            <div class="profile-row"><span>Address</span><strong id="profileAddress">-</strong></div>
+            <div class="profile-row"><span>City</span><strong id="profileCity">-</strong></div>
+            <div class="profile-row"><span>Role</span><strong id="profileRole">-</strong></div>
+            <button class="profile-orders-btn" type="button" onclick="showMyOrders()">My Orders</button>
+            <button class="profile-logout-btn" type="button" onclick="logout()">Logout</button>
           </div>
         </div>
       </div>
     </nav>
 
-    <main class="dashboard-content">
-      <h1>Welcome to your Dashboard</h1>
-      <p>Browse our delicious home-cooked items and place your order</p>
+    <main class="order-main">
+      <section class="order-hero">
+        <h1>Craving something homemade?</h1>
+        <p>Pick your favorites, add to cart, and place your order in one step.</p>
+      </section>
 
-      <div id="loadingMsg" style="text-align: center; padding: 40px; color: #999;">
-        Loading items...
-      </div>
+      <section id="categoryChips" class="category-chips"></section>
 
-      <div id="itemsGrid" class="items-grid" style="display: none;"></div>
+      <section class="order-layout">
+        <section class="catalog-panel">
+          <div class="panel-head">
+            <h2>Available Items</h2>
+            <span id="itemsMeta">Loading...</span>
+          </div>
+
+          <div id="loadingMsg" class="loading-block">Loading items...</div>
+          <div id="itemsGrid" class="food-grid" style="display: none;"></div>
+        </section>
+
+        <aside id="cartPanel" class="cart-panel">
+          <div class="panel-head">
+            <h2>Your Cart</h2>
+            <span id="cartCount">0 items</span>
+          </div>
+
+          <div id="cartEmpty" class="cart-empty">No items in cart yet.</div>
+          <div id="cartItems" class="cart-items"></div>
+
+          <div class="cart-summary">
+            <div class="summary-row"><span>Subtotal</span><strong id="cartSubtotal">Rs 0</strong></div>
+
+            <label for="paymentMode">Payment Mode</label>
+            <select id="paymentMode">
+              <option value="cash">Cash</option>
+              <option value="upi">UPI</option>
+              <option value="card">Card</option>
+            </select>
+
+            <button id="placeOrderBtn" class="place-order-btn" type="button" onclick="placeOrder()">Place Order</button>
+            <p class="cart-note">Delivery address will use your profile details.</p>
+          </div>
+        </aside>
+      </section>
     </main>
-  </div>
-
-  <div id="profileModal" class="modal">
-    <div class="modal-overlay" onclick="closeProfileModal()"></div>
-    <div class="modal-content">
-      <button class="modal-close" onclick="closeProfileModal()">&times;</button>
-      
-      <div class="modal-header">
-        <div class="modal-icon">👤</div>
-        <h2>My Profile</h2>
-      </div>
-
-      <div class="profile-details">
-        <div class="profile-field">
-          <span class="label">Name</span>
-          <span id="modalProfileName" class="value">-</span>
-        </div>
-        <div class="profile-field">
-          <span class="label">Email</span>
-          <span id="modalProfileEmail" class="value">-</span>
-        </div>
-        <div class="profile-field">
-          <span class="label">Phone Number</span>
-          <span id="modalProfilePhone" class="value">-</span>
-        </div>
-        <div class="profile-field">
-          <span class="label">Address</span>
-          <span id="modalProfileAddress" class="value">-</span>
-        </div>
-        <div class="profile-field">
-          <span class="label">City</span>
-          <span id="modalProfileCity" class="value">-</span>
-        </div>
-        <div class="profile-field">
-          <span class="label">Role</span>
-          <span id="modalProfileRole" class="value">-</span>
-        </div>
-      </div>
-    </div>
   </div>
 
   <div id="ordersModal" class="modal">
     <div class="modal-overlay" onclick="closeOrdersModal()"></div>
     <div class="modal-content">
       <button class="modal-close" onclick="closeOrdersModal()">&times;</button>
-      
       <div class="modal-header">
-        <div class="modal-icon">📦</div>
         <h2>My Orders</h2>
       </div>
-
-      <div id="ordersContent" class="orders-list">
-        <p class="loading">Loading your orders...</p>
-      </div>
+      <div id="ordersContent" class="orders-content"></div>
     </div>
   </div>
 
@@ -135,13 +124,21 @@
       window.location.href = './index.html';
     }
 
-    const name = (user.name || 'Account').trim();
-    document.getElementById('userName').textContent = name || 'Account';
+    let allItems = [];
+    let selectedCategory = 'All';
+    let searchText = '';
+    const cart = {};
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text ?? '';
+      return div.innerHTML;
+    }
 
     function formatValue(value) {
       if (value === null || value === undefined) return '-';
       const text = String(value).trim();
-      return text ? text : '-';
+      return text || '-';
     }
 
     function formatRole(role) {
@@ -150,52 +147,85 @@
       return value.charAt(0).toUpperCase() + value.slice(1);
     }
 
-    function renderProfileDetails() {
-      document.getElementById('modalProfileName').textContent = formatValue(user.name);
-      document.getElementById('modalProfileEmail').textContent = formatValue(user.email);
-      document.getElementById('modalProfilePhone').textContent = formatValue(user.phone_number);
-      document.getElementById('modalProfileAddress').textContent = formatValue(user.address);
-      document.getElementById('modalProfileCity').textContent = formatValue(user.city);
-      document.getElementById('modalProfileRole').textContent = formatRole(user.role);
+    function formatCurrency(amount) {
+      return `Rs ${Number(amount || 0)}`;
     }
 
-    async function hydrateProfileDetails() {
-      const missingProfileData = !user.phone_number || !user.address || !user.city;
-      if (!missingProfileData) return;
+    function getUserInitial() {
+      const name = (user.name || '').trim();
+      return name ? name.charAt(0).toUpperCase() : 'U';
+    }
 
+    function renderProfile() {
+      document.getElementById('profileInitial').textContent = getUserInitial();
+      document.getElementById('profileName').textContent = formatValue(user.name);
+      document.getElementById('profileEmail').textContent = formatValue(user.email);
+      document.getElementById('profilePhone').textContent = formatValue(user.phone_number);
+      document.getElementById('profileAddress').textContent = formatValue(user.address);
+      document.getElementById('profileCity').textContent = formatValue(user.city);
+      document.getElementById('profileRole').textContent = formatRole(user.role);
+    }
+
+    function getOrdersStorageKey() {
+      return `home_bites_orders_${user.user_id || 'guest'}`;
+    }
+
+    function getSavedOrders() {
       try {
-        const res = await fetch(`${API_BASE_URL}/me`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-
-        if (!res.ok) return;
-        const profile = await res.json();
-        user = { ...user, ...profile };
-        localStorage.setItem('user', JSON.stringify(user));
-        document.getElementById('userName').textContent = formatValue(user.name) === '-' ? 'Account' : user.name;
+        return JSON.parse(localStorage.getItem(getOrdersStorageKey()) || '[]');
       } catch (err) {
-        console.warn('Could not refresh profile details:', err);
+        return [];
       }
+    }
+
+    function saveOrderRecord(orderRecord) {
+      const orders = getSavedOrders();
+      orders.unshift(orderRecord);
+      localStorage.setItem(getOrdersStorageKey(), JSON.stringify(orders.slice(0, 30)));
+    }
+
+    function renderOrdersModal() {
+      const orders = getSavedOrders();
+      const container = document.getElementById('ordersContent');
+
+      if (!orders.length) {
+        container.innerHTML = '<p class="orders-empty">No orders placed yet.</p>';
+        return;
+      }
+
+      container.innerHTML = orders.map(order => `
+        <article class="order-history-card">
+          <div class="order-history-head">
+            <strong>Order #${order.order_id}</strong>
+            <span>${escapeHtml(order.order_status || 'pending')}</span>
+          </div>
+          <p><b>Date:</b> ${escapeHtml(order.order_date || '-')}</p>
+          <p><b>Amount:</b> ${formatCurrency(order.total_amount || 0)}</p>
+          <p><b>Payment:</b> ${escapeHtml(order.payment_mode || '-')}</p>
+          <p><b>Items:</b> ${Number(order.items_count || 0)}</p>
+          <p><b>Delivery:</b> ${escapeHtml(order.delivery_date || '-')}</p>
+        </article>
+      `).join('');
     }
 
     function toggleProfileMenu() {
       const menu = document.getElementById('profileMenu');
-      const profileBtn = document.getElementById('profileBtn');
+      const btn = document.getElementById('profileBtn');
       const isOpen = menu.classList.toggle('active');
-      profileBtn.setAttribute('aria-expanded', String(isOpen));
+      btn.setAttribute('aria-expanded', String(isOpen));
       menu.setAttribute('aria-hidden', String(!isOpen));
     }
 
     function closeProfileMenu() {
       const menu = document.getElementById('profileMenu');
-      const profileBtn = document.getElementById('profileBtn');
+      const btn = document.getElementById('profileBtn');
       menu.classList.remove('active');
-      profileBtn.setAttribute('aria-expanded', 'false');
+      btn.setAttribute('aria-expanded', 'false');
       menu.setAttribute('aria-hidden', 'true');
     }
 
     document.addEventListener('click', (event) => {
-      const wrapper = document.querySelector('.profile-menu-wrapper');
+      const wrapper = document.querySelector('.order-profile-wrap');
       if (wrapper && !wrapper.contains(event.target)) {
         closeProfileMenu();
       }
@@ -204,105 +234,163 @@
     document.addEventListener('keydown', (event) => {
       if (event.key === 'Escape') {
         closeProfileMenu();
-        closeProfileModal();
         closeOrdersModal();
       }
     });
 
-    function showMyProfile() {
-      closeProfileMenu();
-      document.getElementById('profileModal').classList.add('active');
-      document.body.style.overflow = 'hidden';
-      renderProfileDetails();
-    }
-
-    function closeProfileModal() {
-      document.getElementById('profileModal').classList.remove('active');
-      document.body.style.overflow = 'auto';
-    }
-
-    function showMyOrders() {
-      closeProfileMenu();
-      document.getElementById('ordersModal').classList.add('active');
-      document.body.style.overflow = 'hidden';
-      loadMyOrders();
-    }
-
-    function closeOrdersModal() {
-      document.getElementById('ordersModal').classList.remove('active');
-      document.body.style.overflow = 'auto';
-    }
-
-    async function loadMyOrders() {
-      const container = document.getElementById('ordersContent');
-      container.innerHTML = '<p class="loading">Loading your orders...</p>';
+    async function hydrateProfileDetails() {
+      const missingProfileData = !user.phone_number || !user.address || !user.city;
+      if (!missingProfileData) return;
 
       try {
-        const res = await fetch(`${API_BASE_URL}/users/${user.user_id}/orders`, {
-          headers: { 'Authorization': `Bearer ${token}` }
+        const res = await fetch(`${API_BASE_URL}/me`, {
+          headers: { Authorization: `Bearer ${token}` }
         });
 
-        if (!res.ok) {
-          throw new Error('Failed to load orders');
-        }
-
-        const orders = await res.json();
-
-        if (orders.length === 0) {
-          container.innerHTML = `
-            <div class="empty-state">
-              <div class="empty-icon">📦</div>
-              <p>No orders yet</p>
-              <small>Start ordering delicious home-cooked food!</small>
-            </div>
-          `;
-          return;
-        }
-
-        const html = orders.map(order => `
-          <div class="order-card">
-            <div class="order-header">
-              <span class="order-id">Order #${order.order_id}</span>
-              <span class="order-status status-badge ${order.order_status}">${order.order_status}</span>
-            </div>
-            <div class="order-details">
-              <div class="order-detail-row">
-                <span class="detail-label">Amount:</span>
-                <span class="detail-value">₹${order.amount}</span>
-              </div>
-              <div class="order-detail-row">
-                <span class="detail-label">Payment:</span>
-                <span class="detail-value">
-                  <span class="status-badge ${order.payment_status}">${order.payment_status}</span>
-                </span>
-              </div>
-              <div class="order-detail-row">
-                <span class="detail-label">Order Date:</span>
-                <span class="detail-value">${order.order_date}</span>
-              </div>
-              <div class="order-detail-row">
-                <span class="detail-label">Delivery Date:</span>
-                <span class="detail-value">${order.delivery_date || 'Not set'}</span>
-              </div>
-              <div class="order-detail-row">
-                <span class="detail-label">Address:</span>
-                <span class="detail-value">${escapeHtml(order.address)}, ${escapeHtml(order.city)}</span>
-              </div>
-            </div>
-          </div>
-        `).join('');
-
-        container.innerHTML = html;
-
+        if (!res.ok) return;
+        const profile = await res.json();
+        user = { ...user, ...profile };
+        localStorage.setItem('user', JSON.stringify(user));
       } catch (err) {
-        container.innerHTML = `<p style="color: var(--danger); text-align: center; padding: 20px;">Error: ${err.message}</p>`;
+        console.warn('Could not refresh profile details:', err);
       }
     }
 
-    function logout() {
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('user');
-      window.location.href = './index.html';
+    function categorizeItem(item) {
+      const text = `${item.item_name || ''} ${item.description || ''}`.toLowerCase();
+      if (text.includes('sweet') || text.includes('laddu') || text.includes('halwa')) return 'Sweets';
+      if (text.includes('snack') || text.includes('mixture') || text.includes('murukku')) return 'Snacks';
+      if (text.includes('meal') || text.includes('rice') || text.includes('curry')) return 'Meals';
+      return 'Specials';
+    }
+
+    function renderCategoryChips(items) {
+      const chipsWrap = document.getElementById('categoryChips');
+      const categories = ['All', ...Array.from(new Set(items.map(categorizeItem)))];
+      chipsWrap.innerHTML = categories
+        .map(cat => `<button type="button" class="chip ${cat === selectedCategory ? 'active' : ''}" data-cat="${escapeHtml(cat)}">${escapeHtml(cat)}</button>`)
+        .join('');
+
+      chipsWrap.querySelectorAll('.chip').forEach(btn => {
+        btn.addEventListener('click', () => {
+          selectedCategory = btn.dataset.cat || 'All';
+          renderCategoryChips(allItems);
+          renderItems();
+        });
+      });
+    }
+
+    function getFilteredItems() {
+      return allItems.filter(item => {
+        const categoryOk = selectedCategory === 'All' || categorizeItem(item) === selectedCategory;
+        const query = searchText.trim().toLowerCase();
+        const text = `${item.item_name || ''} ${item.description || ''} ${item.weight || ''}`.toLowerCase();
+        const searchOk = !query || text.includes(query);
+        return categoryOk && searchOk;
+      });
+    }
+
+    function getItemQuantity(itemId) {
+      return cart[itemId]?.quantity || 0;
+    }
+
+    function addToCart(itemId) {
+      const item = allItems.find(i => i.item_id === itemId);
+      if (!item) return;
+
+      if (!cart[itemId]) {
+        cart[itemId] = { item, quantity: 1 };
+      } else {
+        cart[itemId].quantity += 1;
+      }
+
+      renderItems();
+      renderCart();
+    }
+
+    function decrementFromCart(itemId) {
+      if (!cart[itemId]) return;
+      cart[itemId].quantity -= 1;
+      if (cart[itemId].quantity <= 0) delete cart[itemId];
+      renderItems();
+      renderCart();
+    }
+
+    function renderItems() {
+      const itemsGrid = document.getElementById('itemsGrid');
+      const filteredItems = getFilteredItems();
+      document.getElementById('itemsMeta').textContent = `${filteredItems.length} items`;
+
+      if (filteredItems.length === 0) {
+        itemsGrid.innerHTML = '<p class="empty-grid">No items found for this filter.</p>';
+        return;
+      }
+
+      itemsGrid.innerHTML = filteredItems.map(item => {
+        const qty = getItemQuantity(item.item_id);
+        return `
+          <article class="food-card">
+            <div class="food-top">
+              <div class="food-badge">${escapeHtml(categorizeItem(item))}</div>
+              <h3>${escapeHtml(item.item_name)}</h3>
+              <p>${escapeHtml(item.description || 'Freshly prepared homemade food.')}</p>
+            </div>
+
+            <div class="food-bottom">
+              <div>
+                <span class="food-meta">${escapeHtml(item.weight || 'Standard')}</span>
+                <strong>${formatCurrency(item.price)}</strong>
+              </div>
+
+              <div class="food-actions">
+                ${qty === 0 ? `
+                  <button type="button" class="add-btn" onclick="addToCart(${item.item_id})">Add</button>
+                ` : `
+                  <div class="qty-stepper">
+                    <button type="button" onclick="decrementFromCart(${item.item_id})">-</button>
+                    <span>${qty}</span>
+                    <button type="button" onclick="addToCart(${item.item_id})">+</button>
+                  </div>
+                `}
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function renderCart() {
+      const entries = Object.values(cart);
+      const cartItemsEl = document.getElementById('cartItems');
+      const cartEmptyEl = document.getElementById('cartEmpty');
+
+      const totalItems = entries.reduce((sum, entry) => sum + entry.quantity, 0);
+      const subtotal = entries.reduce((sum, entry) => sum + (entry.item.price * entry.quantity), 0);
+
+      document.getElementById('cartCount').textContent = `${totalItems} item${totalItems === 1 ? '' : 's'}`;
+      document.getElementById('quickCartCount').textContent = String(totalItems);
+      document.getElementById('cartSubtotal').textContent = formatCurrency(subtotal);
+
+      if (entries.length === 0) {
+        cartEmptyEl.style.display = 'block';
+        cartItemsEl.innerHTML = '';
+        return;
+      }
+
+      cartEmptyEl.style.display = 'none';
+      cartItemsEl.innerHTML = entries.map(({ item, quantity }) => `
+        <div class="cart-line">
+          <div>
+            <h4>${escapeHtml(item.item_name)}</h4>
+            <p>${quantity} x ${formatCurrency(item.price)}</p>
+          </div>
+          <div class="qty-stepper">
+            <button type="button" onclick="decrementFromCart(${item.item_id})">-</button>
+            <span>${quantity}</span>
+            <button type="button" onclick="addToCart(${item.item_id})">+</button>
+          </div>
+        </div>
+      `).join('');
     }
 
     async function loadItems() {
@@ -311,44 +399,133 @@
 
       try {
         const res = await fetch(`${API_BASE_URL}/items`);
-        
-        if (!res.ok) {
-          throw new Error('Failed to load items');
-        }
+        if (!res.ok) throw new Error('Failed to load items');
 
         const items = await res.json();
-        
+        allItems = Array.isArray(items) ? items : [];
+
         loadingMsg.style.display = 'none';
         itemsGrid.style.display = 'grid';
 
-        if (items.length === 0) {
-          itemsGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #999;">No items available yet.</p>';
-          return;
-        }
-
-        itemsGrid.innerHTML = items.map(item => `
-          <div class="item-card">
-            <h3>${escapeHtml(item.item_name)}</h3>
-            <p>${escapeHtml(item.description)}</p>
-            <span class="weight">${escapeHtml(item.weight)}</span>
-            <p class="price">₹${item.price}</p>
-          </div>
-        `).join('');
-
+        renderCategoryChips(allItems);
+        renderItems();
       } catch (err) {
         loadingMsg.innerHTML = `<span style="color: var(--danger);">Error: ${err.message}</span>`;
         console.error('Failed to load items:', err);
       }
     }
 
-    function escapeHtml(text) {
-      const div = document.createElement('div');
-      div.textContent = text;
-      return div.innerHTML;
+    async function placeOrder() {
+      const placeOrderBtn = document.getElementById('placeOrderBtn');
+      const entries = Object.values(cart);
+
+      if (entries.length === 0) {
+        alert('Add at least one item to place an order.');
+        return;
+      }
+
+      if (!user.user_id) {
+        alert('User session is incomplete. Please login again.');
+        return;
+      }
+
+      if (!user.address || !user.city) {
+        alert('Address/City missing in profile. Please update your profile and login again.');
+        return;
+      }
+
+      const today = new Date();
+      const orderDate = today.toISOString().slice(0, 10);
+      const deliveryDate = new Date(today.getTime() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+
+      const payload = {
+        user_id: user.user_id,
+        order_status: 'pending',
+        payment_status: 'pending',
+        payment_mode: document.getElementById('paymentMode').value,
+        order_date: orderDate,
+        delivery_date: deliveryDate,
+        address: String(user.address || '').trim(),
+        city: String(user.city || '').trim(),
+        items: entries.map(({ item, quantity }) => ({
+          item_id: item.item_id,
+          quantity,
+          price: item.price
+        }))
+      };
+
+      try {
+        setButtonLoading(placeOrderBtn, 'Placing Order...', true);
+
+        const res = await fetch(`${API_BASE_URL}/orders/complete`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Order failed');
+
+        alert(`Order placed successfully! Order ID: ${data.order_id}`);
+        saveOrderRecord({
+          order_id: data.order_id,
+          order_status: payload.order_status,
+          order_date: payload.order_date,
+          delivery_date: payload.delivery_date,
+          payment_mode: payload.payment_mode,
+          items_count: payload.items.length,
+          total_amount: data.total_amount
+        });
+
+        Object.keys(cart).forEach(key => delete cart[key]);
+        renderItems();
+        renderCart();
+      } catch (err) {
+        alert(`Could not place order: ${err.message}`);
+      } finally {
+        setButtonLoading(placeOrderBtn, 'Place Order', false);
+      }
     }
 
-    hydrateProfileDetails().then(renderProfileDetails);
-    loadItems();
+    function scrollToCart() {
+      const cartPanel = document.getElementById('cartPanel');
+      if (cartPanel) cartPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    document.getElementById('itemSearch').addEventListener('input', (event) => {
+      searchText = event.target.value || '';
+      renderItems();
+    });
+
+    function logout() {
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('user');
+      window.location.href = './index.html';
+    }
+
+    function showMyOrders() {
+      closeProfileMenu();
+      renderOrdersModal();
+      document.getElementById('ordersModal').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeOrdersModal() {
+      document.getElementById('ordersModal').classList.remove('active');
+      document.body.style.overflow = 'auto';
+    }
+
+    async function init() {
+      await hydrateProfileDetails();
+      renderProfile();
+      renderCart();
+      await loadItems();
+    }
+
+    init();
   </script>
 </body>
 </html>
