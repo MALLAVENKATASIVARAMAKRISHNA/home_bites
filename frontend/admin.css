@@ -329,6 +329,17 @@
   background: #f5c2c7;
 }
 
+.status-select {
+  width: 100%;
+  min-width: 120px;
+  padding: 6px 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.85rem;
+  background: #fff;
+}
+
 /* Filter Bar */
 .filter-bar {
   margin-bottom: 16px;

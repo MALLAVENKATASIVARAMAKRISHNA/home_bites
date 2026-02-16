@@ -267,11 +267,25 @@ function displayOrders(orders) {
             <td>#${order.order_id}</td>
             <td>${order.user_id}</td>
             <td>₹${order.amount}</td>
-            <td><span class="status-badge ${order.order_status}">${order.order_status}</span></td>
-            <td><span class="status-badge ${order.payment_status}">${order.payment_status}</span></td>
+            <td>
+              <select id="orderStatus-${order.order_id}" class="status-select">
+                <option value="pending" ${order.order_status === 'pending' ? 'selected' : ''}>pending</option>
+                <option value="confirmed" ${order.order_status === 'confirmed' ? 'selected' : ''}>confirmed</option>
+                <option value="delivered" ${order.order_status === 'delivered' ? 'selected' : ''}>delivered</option>
+                <option value="cancelled" ${order.order_status === 'cancelled' ? 'selected' : ''}>cancelled</option>
+              </select>
+            </td>
+            <td>
+              <select id="paymentStatus-${order.order_id}" class="status-select">
+                <option value="pending" ${order.payment_status === 'pending' ? 'selected' : ''}>pending</option>
+                <option value="paid" ${order.payment_status === 'paid' ? 'selected' : ''}>paid</option>
+                <option value="failed" ${order.payment_status === 'failed' ? 'selected' : ''}>failed</option>
+              </select>
+            </td>
             <td>${order.order_date}</td>
             <td>
               <button class="action-btn view" onclick="viewOrderDetails(${order.order_id})">View</button>
+              <button class="action-btn edit" onclick="updateOrderStatus(${order.order_id})">Update</button>
             </td>
           </tr>
         `).join('')}
@@ -279,6 +293,66 @@ function displayOrders(orders) {
     </table>
   `;
   container.innerHTML = html;
+}
+
+async function updateOrderStatus(orderId) {
+  const order = allOrders.find(o => o.order_id === orderId);
+  if (!order) {
+    alert('Order not found');
+    return;
+  }
+
+  const orderStatusEl = document.getElementById(`orderStatus-${orderId}`);
+  const paymentStatusEl = document.getElementById(`paymentStatus-${orderId}`);
+  if (!orderStatusEl || !paymentStatusEl) {
+    alert('Unable to read selected status values');
+    return;
+  }
+
+  const updatedPayload = {
+    user_id: order.user_id,
+    amount: order.amount,
+    order_status: orderStatusEl.value,
+    payment_status: paymentStatusEl.value,
+    payment_mode: order.payment_mode,
+    order_date: order.order_date,
+    delivery_date: order.delivery_date,
+    address: order.address,
+    city: order.city
+  };
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/orders/${orderId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(updatedPayload)
+    });
+
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.detail || 'Failed to update order');
+    }
+
+    const idx = allOrders.findIndex(o => o.order_id === orderId);
+    if (idx >= 0) {
+      allOrders[idx] = data;
+    }
+
+    const activeFilter = document.getElementById('orderStatusFilter').value;
+    if (!activeFilter) {
+      displayOrders(allOrders);
+    } else {
+      displayOrders(allOrders.filter(o => o.order_status === activeFilter));
+    }
+
+    loadOverviewStats();
+    alert(`Order #${orderId} updated successfully`);
+  } catch (err) {
+    alert(`Error: ${err.message}`);
+  }
 }
 
 function filterOrders() {
