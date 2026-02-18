@@ -81,6 +81,23 @@ body {
   border: 2px solid rgba(255, 255, 255, 0.6);
 }
 
+.brand-home-btn {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.brand-home-btn:focus-visible {
+  outline: 2px solid var(--brand-main);
+  outline-offset: 4px;
+  border-radius: 10px;
+}
+
 .top-links {
   display: flex;
   gap: 10px;

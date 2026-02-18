@@ -13,13 +13,13 @@
 <body>
   <div class="dashboard order-dashboard">
     <nav class="dash-nav">
-      <div class="dash-brand">
+      <button class="dash-brand brand-home-btn" type="button" onclick="goToRoleDashboard()" aria-label="Go to dashboard">
         <img src="./assets/logo.png" alt="Home Bites logo" />
         <div>
           <strong>Home Bites</strong>
           <p>Order fresh home-cooked food</p>
         </div>
-      </div>
+      </button>
 
       <div class="dash-search-wrap">
         <input id="itemSearch" type="text" placeholder="Search for dishes, sweets, snacks..." aria-label="Search items" />
@@ -146,6 +146,11 @@
       const value = formatValue(role);
       if (value === '-') return value;
       return value.charAt(0).toUpperCase() + value.slice(1);
+    }
+
+    function goToRoleDashboard() {
+      const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+      window.location.href = currentUser.role === 'admin' ? './admin.html' : './dashboard.html';
     }
 
     function formatCurrency(amount) {

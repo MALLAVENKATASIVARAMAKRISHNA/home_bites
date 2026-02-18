@@ -13,13 +13,13 @@
 <body>
   <div class="dashboard order-dashboard">
     <nav class="dash-nav">
-      <div class="dash-brand">
+      <button class="dash-brand brand-home-btn" type="button" onclick="goToRoleDashboard()" aria-label="Go to dashboard">
         <img src="./assets/logo.png" alt="Home Bites logo" />
         <div>
           <strong>Home Bites</strong>
           <p>Order history</p>
         </div>
-      </div>
+      </button>
 
       <div class="dash-search-wrap order-page-search-note">
         <p>Your recent placed orders are shown below.</p>
@@ -281,6 +281,11 @@
 
     function goToDashboard() {
       window.location.href = './dashboard.html';
+    }
+
+    function goToRoleDashboard() {
+      const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+      window.location.href = currentUser.role === 'admin' ? './admin.html' : './dashboard.html';
     }
 
     function logout() {
