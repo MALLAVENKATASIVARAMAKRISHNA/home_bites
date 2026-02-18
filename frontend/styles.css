@@ -82,14 +82,27 @@ body {
 }
 
 .brand-home-btn {
-  border: 0;
-  background: transparent;
-  padding: 0;
+  border: 1px solid rgba(15, 118, 110, 0.16);
+  background: linear-gradient(180deg, #ffffff 0%, #f4fbfa 100%);
+  padding: 8px 12px;
   margin: 0;
   font: inherit;
   color: inherit;
   text-align: left;
   cursor: pointer;
+  border-radius: 14px;
+  box-shadow: 0 8px 22px rgba(15, 118, 110, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.brand-home-btn:hover {
+  transform: translateY(-1px);
+  border-color: rgba(15, 118, 110, 0.35);
+  box-shadow: 0 12px 26px rgba(15, 118, 110, 0.16);
+}
+
+.brand-home-btn:active {
+  transform: translateY(0);
 }
 
 .brand-home-btn:focus-visible {
