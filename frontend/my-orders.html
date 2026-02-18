@@ -77,22 +77,40 @@
 
     function getSavedOrders() {
       try {
-        return JSON.parse(localStorage.getItem(getOrdersStorageKey()) || '[]');
+        const parsed = JSON.parse(localStorage.getItem(getOrdersStorageKey()) || '[]');
+        return normalizeOrders(Array.isArray(parsed) ? parsed : []);
       } catch (err) {
         return [];
       }
     }
 
     function setSavedOrders(orders) {
-      localStorage.setItem(getOrdersStorageKey(), JSON.stringify(orders.slice(0, 50)));
+      localStorage.setItem(getOrdersStorageKey(), JSON.stringify(normalizeOrders(orders).slice(0, 50)));
+    }
+
+    function normalizeOrder(order) {
+      const normalized = { ...(order || {}) };
+      normalized.order_id = Number(normalized.order_id || 0);
+      normalized.total_amount = Number(normalized.total_amount ?? normalized.amount ?? 0);
+      normalized.amount = Number(normalized.amount ?? normalized.total_amount ?? 0);
+      const summaryCount = Number(normalized.items_count ?? 0);
+      const detailsCount = Array.isArray(normalized.items) ? normalized.items.length : 0;
+      normalized.items_count = Math.max(summaryCount, detailsCount);
+      return normalized;
+    }
+
+    function normalizeOrders(orders) {
+      return (orders || [])
+        .map(normalizeOrder)
+        .filter(order => Number.isFinite(order.order_id) && order.order_id > 0);
     }
 
     function mergeOrders(remoteOrders, localOrders) {
       const map = new Map();
-      localOrders.forEach(order => {
+      normalizeOrders(localOrders).forEach(order => {
         map.set(order.order_id, order);
       });
-      remoteOrders.forEach(order => {
+      normalizeOrders(remoteOrders).forEach(order => {
         const existing = map.get(order.order_id) || {};
         map.set(order.order_id, { ...existing, ...order });
       });
@@ -105,6 +123,7 @@
 
       try {
         const res = await fetch(`${API_BASE_URL}/users/${user.user_id}/orders`, {
+          cache: 'no-store',
           headers: { Authorization: `Bearer ${token}` }
         });
         if (!res.ok) throw new Error('Failed to load orders');
@@ -156,6 +175,12 @@
       } catch (err) {
         return false;
       }
+    }
+
+    function getOrderItemsCount(order) {
+      const detailsCount = Array.isArray(order.items) ? order.items.length : 0;
+      const summaryCount = Number(order.items_count ?? 0);
+      return Math.max(detailsCount, summaryCount);
     }
 
     async function handleOrderCardClick(event) {
@@ -226,9 +251,9 @@
             <span>${escapeHtml(getStatusText(order.order_status || 'pending'))}</span>
           </div>
           <p><b>Date:</b> ${escapeHtml(order.order_date || '-')}</p>
-          <p><b>Amount:</b> ${formatCurrency(order.total_amount || 0)}</p>
+          <p><b>Amount:</b> ${formatCurrency(order.total_amount ?? order.amount ?? 0)}</p>
           <p><b>Payment:</b> ${escapeHtml(order.payment_mode || '-')}</p>
-          <p><b>Items:</b> ${Number(order.items_count || 0)}</p>
+          <p><b>Items:</b> ${getOrderItemsCount(order)}</p>
           <p><b>Delivery:</b> ${escapeHtml(order.delivery_date || '-')}</p>
           <p class="view-order-note">Click to ${activeOrderIndex === index ? 'hide' : 'view'} full details</p>
 
@@ -295,6 +320,8 @@
     }
 
     async function init() {
+      ordersCache = getSavedOrders();
+      renderOrdersPage();
       ordersCache = await loadOrdersFromBackend();
       renderOrdersPage();
     }

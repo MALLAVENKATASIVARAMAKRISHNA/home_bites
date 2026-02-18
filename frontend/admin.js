@@ -486,7 +486,7 @@ document.getElementById('addItemForm').addEventListener('submit', async (e) => {
       if (measureType === 'pieces') {
         return /\bpiece/.test(value.toLowerCase()) ? value : `${value} pieces`;
       }
-      return value;
+      return /^\d+(\.\d+)?$/.test(value) ? `${value}g` : value;
     })(),
     description: document.getElementById('itemDescription').value.trim(),
     photos: document.getElementById('itemPhotos').value.trim() || '',

@@ -157,6 +157,12 @@
       return `Rs ${Number(amount || 0)}`;
     }
 
+    function formatItemMeasure(value) {
+      const text = String(value || '').trim();
+      if (!text) return 'Standard';
+      return /^\d+(\.\d+)?$/.test(text) ? `${text}g` : text;
+    }
+
     function getItemPhotoSrc(item) {
       const file = String(item.photos || '').trim();
       if (!file) return './assets/logo.png';
@@ -341,7 +347,7 @@
 
             <div class="food-bottom">
               <div>
-                <span class="food-meta">${escapeHtml(item.weight || 'Standard')}</span>
+                <span class="food-meta">${escapeHtml(formatItemMeasure(item.weight))}</span>
                 <strong>${formatCurrency(item.price)}</strong>
               </div>
 
