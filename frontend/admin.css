@@ -537,3 +537,74 @@
     padding: 10px 12px;
   }
 }
+
+/* Dribbble-inspired theme overrides */
+.admin-dashboard {
+  background:
+    radial-gradient(circle at 8% 0%, rgba(243, 198, 35, 0.18), transparent 30%),
+    radial-gradient(circle at 90% 12%, rgba(15, 107, 79, 0.1), transparent 26%),
+    #f4f8f3;
+}
+
+.sidebar {
+  background: linear-gradient(180deg, #ffffff, #f4f9f6);
+  border-right: 1px solid #dce8e1;
+}
+
+.sidebar-header,
+.sidebar-footer {
+  border-color: #dce8e1;
+}
+
+.nav-item {
+  border-radius: 0 12px 12px 0;
+  margin: 2px 10px 2px 0;
+}
+
+.nav-item.active {
+  color: #0f6b4f;
+  border-left-color: #0f6b4f;
+  background: linear-gradient(90deg, rgba(15, 107, 79, 0.14), rgba(255, 255, 255, 0.85));
+}
+
+.sidebar-footer .logout-btn {
+  color: #25300a;
+  background: linear-gradient(90deg, #f3c623, #ffd85b);
+}
+
+.sidebar-footer .logout-btn:hover {
+  filter: brightness(1.02);
+  background: linear-gradient(90deg, #ffd85b, #f3c623);
+}
+
+.content-header {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid #dce8e1;
+}
+
+.stat-card,
+.recent-section,
+.table-container {
+  border: 1px solid #dce8e1;
+  border-radius: 18px;
+  box-shadow: 0 12px 28px rgba(10, 63, 47, 0.08);
+}
+
+.stat-info h3 {
+  color: #0f6b4f;
+}
+
+.data-table thead {
+  background: #eef6f1;
+}
+
+.action-btn.delete {
+  background: #fce1e4;
+  color: #9f1239;
+}
+
+.btn.primary {
+  color: #25300a;
+  background: linear-gradient(90deg, #f3c623, #ffd85b);
+}
