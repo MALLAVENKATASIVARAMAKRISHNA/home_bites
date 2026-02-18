@@ -1,6 +1,8 @@
 // Check if user is admin
 const token = localStorage.getItem('access_token');
 const user = JSON.parse(localStorage.getItem('user') || '{}');
+let itemsCache = [];
+let editingItemId = null;
 
 if (!token || user.role !== 'admin') {
   window.location.href = './index.html';
@@ -139,6 +141,7 @@ async function loadItems() {
     if (!Array.isArray(items)) {
       throw new Error('Invalid items response from server');
     }
+    itemsCache = items;
 
     if (items.length === 0) {
       container.innerHTML = `
@@ -171,6 +174,7 @@ async function loadItems() {
               <td>${escapeHtml(item.weight)}</td>
               <td>${escapeHtml((item.description || '').substring(0, 50))}...</td>
               <td>
+                <button class="action-btn edit" onclick="openEditItemModal(${item.item_id})">Edit</button>
                 <button class="action-btn delete" onclick="deleteItem(${item.item_id})">Delete</button>
               </td>
             </tr>
@@ -392,15 +396,23 @@ function filterOrders() {
 
 // Add Item Modal
 function openAddItemModal() {
+  editingItemId = null;
+  document.getElementById('itemModalTitle').textContent = 'Add New Item';
+  document.getElementById('addItemBtn').textContent = 'Add Item';
   document.getElementById('addItemModal').classList.add('active');
   document.body.style.overflow = 'hidden';
+  document.getElementById('addItemForm').reset();
   updateItemMeasureInput();
+  clearAlert(document.getElementById('addItemMessage'));
 }
 
 function closeAddItemModal() {
+  editingItemId = null;
   document.getElementById('addItemModal').classList.remove('active');
   document.body.style.overflow = 'auto';
   document.getElementById('addItemForm').reset();
+  document.getElementById('itemModalTitle').textContent = 'Add New Item';
+  document.getElementById('addItemBtn').textContent = 'Add Item';
   updateItemMeasureInput();
   clearAlert(document.getElementById('addItemMessage'));
 }
@@ -421,11 +433,48 @@ function updateItemMeasureInput() {
 
 document.getElementById('itemMeasureType').addEventListener('change', updateItemMeasureInput);
 
+function inferMeasureType(weightValue) {
+  const text = String(weightValue || '').toLowerCase();
+  return text.includes('piece') ? 'pieces' : 'weight';
+}
+
+function openEditItemModal(itemId) {
+  const item = itemsCache.find((entry) => entry.item_id === itemId);
+  const itemsMessage = document.getElementById('itemsMessage');
+  clearAlert(itemsMessage);
+
+  if (!item) {
+    setAlert(itemsMessage, 'error', `Unable to find item #${itemId}. Please refresh and try again.`);
+    return;
+  }
+
+  editingItemId = itemId;
+  document.getElementById('itemModalTitle').textContent = `Edit Item #${itemId}`;
+  document.getElementById('addItemBtn').textContent = 'Update Item';
+
+  document.getElementById('itemName').value = item.item_name || '';
+  document.getElementById('itemPrice').value = Number(item.price || 0);
+
+  const measureType = inferMeasureType(item.weight);
+  document.getElementById('itemMeasureType').value = measureType;
+  updateItemMeasureInput();
+  document.getElementById('itemWeight').value = item.weight || '';
+
+  document.getElementById('itemDescription').value = item.description || '';
+  document.getElementById('itemPhotos').value = item.photos || '';
+  document.getElementById('itemVideos').value = item.videos || '';
+
+  document.getElementById('addItemModal').classList.add('active');
+  document.body.style.overflow = 'hidden';
+  clearAlert(document.getElementById('addItemMessage'));
+}
+
 // Add Item Form Handler
 document.getElementById('addItemForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const message = document.getElementById('addItemMessage');
   const btn = document.getElementById('addItemBtn');
+  const isEditMode = editingItemId !== null;
   clearAlert(message);
 
   const payload = {
@@ -445,10 +494,13 @@ document.getElementById('addItemForm').addEventListener('submit', async (e) => {
   };
 
   try {
-    setButtonLoading(btn, 'Adding...', true);
+    setButtonLoading(btn, isEditMode ? 'Updating...' : 'Adding...', true);
 
-    const res = await fetch(`${API_BASE_URL}/items/`, {
-      method: 'POST',
+    const endpoint = isEditMode ? `${API_BASE_URL}/items/${editingItemId}` : `${API_BASE_URL}/items/`;
+    const method = isEditMode ? 'PUT' : 'POST';
+
+    const res = await fetch(endpoint, {
+      method,
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
@@ -459,10 +511,10 @@ document.getElementById('addItemForm').addEventListener('submit', async (e) => {
     const data = await res.json();
 
     if (!res.ok) {
-      throw new Error(data.detail || 'Failed to add item');
+      throw new Error(data.detail || (isEditMode ? 'Failed to update item' : 'Failed to add item'));
     }
 
-    setAlert(message, 'success', 'Item added successfully!');
+    setAlert(message, 'success', isEditMode ? 'Item updated successfully!' : 'Item added successfully!');
     document.getElementById('addItemForm').reset();
     
     setTimeout(() => {
@@ -474,7 +526,7 @@ document.getElementById('addItemForm').addEventListener('submit', async (e) => {
   } catch (err) {
     setAlert(message, 'error', err.message);
   } finally {
-    setButtonLoading(btn, 'Add Item', false);
+    setButtonLoading(btn, isEditMode ? 'Update Item' : 'Add Item', false);
   }
 });
 

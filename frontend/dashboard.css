@@ -270,6 +270,22 @@
   gap: 12px;
 }
 
+.food-image-wrap {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #eef6f1;
+  border: 1px solid #dce8e1;
+}
+
+.food-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
 .food-badge {
   display: inline-flex;
   border-radius: 999px;
