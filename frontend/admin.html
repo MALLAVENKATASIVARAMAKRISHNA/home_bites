@@ -1,255 +1,461 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Dashboard - Home Bites</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="./styles.css" />
-  <link rel="stylesheet" href="./admin.css?v=5" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home Bites — Admin Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --orange: #FF4500;
+  --orange-light: #FF6B35;
+  --orange-pale: #FFF1EC;
+  --green: #27AE60;
+  --green-pale: #EDFBF3;
+  --blue: #2F80ED;
+  --yellow: #F2C94C;
+  --bg: #F7F4F1;
+  --sidebar-bg: #FFFCF9;
+  --card: #FFFFFF;
+  --text: #1A1A1A;
+  --text-light: #999;
+  --border: #EDE8E0;
+  --sidebar-w: 220px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  min-height: 100vh;
+}
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 28px 0;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+}
+.sidebar-logo {
+  padding: 0 24px 28px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 24px;
+}
+.sidebar-logo .brand {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--orange);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sidebar-logo .brand-sub {
+  font-size: 11px;
+  color: var(--text-light);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.sidebar-section { padding: 0 16px; margin-bottom: 8px; }
+.sidebar-section-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-light);
+  padding: 0 8px;
+  margin-bottom: 6px;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--text-light);
+  font-weight: 500;
+  font-size: 14px;
+  margin-bottom: 2px;
+  text-decoration: none;
+}
+.nav-item.active { background: var(--orange); color: #fff; }
+.nav-item:hover { background: var(--orange-pale); color: var(--orange); }
+.nav-icon { width: 22px; text-align: center; }
+.sidebar-footer { margin-top: auto; padding: 16px; }
+.upgrade-card {
+  background: linear-gradient(135deg, var(--orange), var(--orange-light));
+  border-radius: 16px;
+  padding: 16px;
+  text-align: center;
+  color: white;
+}
+.upgrade-card .uc-icon { font-size: 32px; margin-bottom: 8px; }
+.upgrade-card .uc-title { font-weight: 700; font-size: 13px; margin-bottom: 4px; }
+.upgrade-card .uc-desc { font-size: 11px; opacity: 0.8; margin-bottom: 12px; }
+.btn-upgrade {
+  background: white;
+  color: var(--orange);
+  border: none;
+  padding: 8px 20px;
+  border-radius: 100px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.btn-upgrade:hover { transform: scale(1.04); }
+.main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; }
+.topbar {
+  background: white;
+  border-bottom: 1px solid var(--border);
+  padding: 16px 32px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+.search-box { flex: 1; max-width: 360px; display: flex; align-items: center; gap: 10px; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 10px 16px; }
+.search-box input { border: none; background: none; width: 100%; font-family: inherit; font-size: 14px; }
+.topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 16px; }
+.topbar-icon { width: 38px; height: 38px; border-radius: 10px; background: var(--bg); display:flex;align-items:center;justify-content:center; cursor:pointer; }
+.topbar-user { display:flex;align-items:center;gap:10px; }
+.user-avatar { width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--orange),var(--orange-light));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700; }
+.content { padding: 28px 32px; }
+.page-header { display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px; }
+.page-title { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 900; }
+.page-sub { font-size: 13px; color: var(--text-light); }
+.tabs { display:flex; gap:4px; background: var(--bg); border-radius:12px; padding:4px; margin-bottom:24px; }
+.tab { padding:8px 20px; border-radius:9px; font-size:14px; font-weight:500; cursor:pointer; color: var(--text-light); background:none; border:none; }
+.tab.active { background:white; color:var(--orange); box-shadow:0 2px 8px rgba(0,0,0,0.08); }
+.tab-content { display:none; }
+.tab-content.active { display:block; }
+.stat-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px; }
+.stat-card { background:white; border-radius:18px; padding:20px; box-shadow:0 2px 12px rgba(0,0,0,0.04); }
+.stat-card-row { display:flex;align-items:center;gap:12px;margin-bottom:10px; }
+.stat-icon { width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px; }
+.stat-value { font-family:'Playfair Display',serif;font-size:26px;font-weight:900; }
+.grid-2, .grid-3 { display:grid; gap:16px; margin-bottom:24px; }
+.grid-2 { grid-template-columns:1.6fr 1fr; }
+.grid-3 { grid-template-columns:repeat(3,1fr); }
+.card { background:white;border-radius:18px;padding:22px;box-shadow:0 2px 12px rgba(0,0,0,0.04); }
+.table-container { margin-top:16px; }
+.data-table { width:100%; border-collapse:collapse; font-size:13px; }
+.data-table th, .data-table td { padding:12px; border-bottom:1px solid var(--border); text-align:left; }
+.status-badge { padding:4px 10px; border-radius:100px; font-size:11px; text-transform:capitalize; }
+.status-select { padding:6px 8px; border-radius:6px; border:1px solid var(--border); }
+.action-btn {
+  border: none;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.action-btn.edit { background: var(--orange-pale); color: var(--orange); }
+.action-btn.delete { background: #ffdede; color: #c93b3b; }
+.action-btn.view { background: #f0f0f0; color: var(--text); }
+.action-btn:hover { opacity: 0.9; }
+.modal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 32px 16px;
+}
+.modal.active { display: flex; }
+.modal-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 10, 10, 0.55);
+  backdrop-filter: blur(4px);
+}
+.modal-content {
+  position: relative;
+  background: #fff;
+  border-radius: 26px;
+  padding: 32px;
+  max-width: 520px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+}
+.modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  font-size: 18px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+.alert { margin-top:14px; padding:12px 14px; border-radius:10px; font-weight:600; display:none; }
+.alert.show { display:block; }
+.alert.success { background:#d4edda; color:#157347; }
+.alert.error { background:#f8d7da; color:#b42318; }
+.btn { padding:10px 18px; border-radius:12px; border:0; font-weight:600; cursor:pointer; }
+.btn.primary { background:linear-gradient(135deg,var(--orange),var(--orange-light)); color:#fff; }
+.btn.secondary { background:#fff; border:1px solid var(--border); color:var(--text); }
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 12px;
+}
+.modal-form label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+.modal-form input,
+.modal-form textarea,
+.modal-form select {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  padding: 10px 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  background: #fffdfb;
+}
+.modal-form input:focus,
+.modal-form textarea:focus,
+.modal-form select:focus {
+  border-color: var(--orange);
+  box-shadow: 0 0 0 3px rgba(255, 69, 0, 0.1);
+}
+.modal-form textarea { resize: vertical; min-height: 70px; }
+.modal-actions {
+  margin-top: 8px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.modal-actions .btn { padding: 10px 22px; }
+.modal-header-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  margin-bottom: 6px;
+}
+@media (max-width:1024px) {
+  .stat-grid { grid-template-columns: repeat(2,1fr); }
+  .grid-2 { grid-template-columns: 1fr; }
+  .grid-3 { grid-template-columns: repeat(2,1fr); }
+  .sidebar { width: 200px; }
+}
+@media (max-width:768px) {
+  .sidebar { position: fixed; left:-240px; transition:left 0.3s; }
+  .sidebar.active { left:0; }
+  .main { margin-left:0; }
+}
+</style>
 </head>
 <body>
-  <div class="admin-dashboard">
-    <!-- Sidebar Navigation -->
-    <aside class="sidebar">
-      <div class="sidebar-header">
-        <button class="brand brand-home-btn" type="button" onclick="switchTab('overview')" aria-label="Go to overview">
-          <img src="./assets/logo.png" alt="Home Bites logo" />
-          <span>Home Bites Admin</span>
-        </button>
-      </div>
-
-      <nav class="sidebar-nav">
-        <button class="nav-item active" data-tab="overview" onclick="switchTab('overview')">
-          <span class="icon">📊</span>
-          <span>Overview</span>
-        </button>
-        <button class="nav-item" data-tab="items" onclick="switchTab('items')">
-          <span class="icon">🍱</span>
-          <span>Items</span>
-        </button>
-        <button class="nav-item" data-tab="users" onclick="switchTab('users')">
-          <span class="icon">👥</span>
-          <span>Users</span>
-        </button>
-        <button class="nav-item" data-tab="orders" onclick="switchTab('orders')">
-          <span class="icon">📦</span>
-          <span>Orders</span>
-        </button>
-      </nav>
-
-      <div class="sidebar-footer">
-        <div class="admin-info">
-          <span id="adminName">Admin</span>
-          <small id="adminEmail">admin@homebites.com</small>
-        </div>
-        <button class="logout-btn" onclick="logout()">Logout</button>
-      </div>
-    </aside>
-
-    <!-- Main Content Area -->
-    <main class="main-content">
-      <header class="content-header">
-        <h1 id="pageTitle">Dashboard Overview</h1>
-      </header>
-
-      <div class="content-body">
-        <!-- Overview Tab -->
-        <div id="overview-tab" class="tab-content active">
-          <div class="stats-grid">
-            <div class="stat-card">
-              <div class="stat-icon">🍱</div>
-              <div class="stat-info">
-                <h3 id="totalItems">0</h3>
-                <p>Total Items</p>
-              </div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-icon">👥</div>
-              <div class="stat-info">
-                <h3 id="totalUsers">0</h3>
-                <p>Total Users</p>
-              </div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-icon">📦</div>
-              <div class="stat-info">
-                <h3 id="totalOrders">0</h3>
-                <p>Total Orders</p>
-              </div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-icon">⏳</div>
-              <div class="stat-info">
-                <h3 id="pendingOrders">0</h3>
-                <p>Pending Orders</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="recent-section">
-            <h2>Recent Orders</h2>
-            <div id="recentOrders" class="table-container">
-              <p class="loading">Loading...</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Items Tab -->
-        <div id="items-tab" class="tab-content">
-          <div class="tab-header">
-            <button class="btn primary" onclick="openAddItemModal()">+ Add New Item</button>
-          </div>
-
-          <div id="itemsMessage" class="alert"></div>
-
-          <div id="itemsTable" class="table-container">
-            <p class="loading">Loading items...</p>
-          </div>
-        </div>
-
-        <!-- Users Tab -->
-        <div id="users-tab" class="tab-content">
-          <div id="usersTable" class="table-container">
-            <p class="loading">Loading users...</p>
-          </div>
-        </div>
-
-        <!-- Orders Tab -->
-        <div id="orders-tab" class="tab-content">
-          <div class="filter-bar">
-            <select id="orderStatusFilter" onchange="filterOrders()">
-              <option value="">All Orders</option>
-              <option value="pending">Pending</option>
-              <option value="confirmed">Confirmed</option>
-              <option value="delivered">Delivered</option>
-              <option value="cancelled">Cancelled</option>
-            </select>
-          </div>
-
-          <div id="ordersMessage" class="alert"></div>
-
-          <div id="ordersTable" class="table-container">
-            <p class="loading">Loading orders...</p>
-          </div>
-        </div>
-      </div>
-    </main>
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="brand">🍽 Home Bites</div>
+    <div class="brand-sub">Super Admin</div>
   </div>
-
-  <!-- Add Item Modal -->
-  <div id="addItemModal" class="modal">
-    <div class="modal-overlay" onclick="closeAddItemModal()"></div>
-    <div class="modal-content">
-      <button class="modal-close" onclick="closeAddItemModal()">&times;</button>
-      
-      <div class="modal-header">
-        <h2 id="itemModalTitle">Add New Item</h2>
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Menu</div>
+    <a href="#" class="nav-item active" data-tab="overview" onclick="switchTab('overview')">
+      <span class="nav-icon">📊</span> Overview
+    </a>
+    <a href="#" class="nav-item" data-tab="items" onclick="switchTab('items')">
+      <span class="nav-icon">🍱</span> Items
+    </a>
+    <a href="#" class="nav-item" data-tab="users" onclick="switchTab('users')">
+      <span class="nav-icon">👥</span> Users
+    </a>
+    <a href="#" class="nav-item" data-tab="orders" onclick="switchTab('orders')">
+      <span class="nav-icon">📦</span> Orders
+      <span class="nav-badge">9</span>
+    </a>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Accounts</div>
+    <a href="#" class="nav-item" onclick="logout()">
+      <span class="nav-icon">↩️</span> Logout
+    </a>
+  </div>
+  <div class="sidebar-footer">
+    <div class="upgrade-card">
+      <div class="uc-icon">🚀</div>
+      <div class="uc-title">Need Premium Stats?</div>
+      <div class="uc-desc">Upgrade for deeper insights and automation.</div>
+      <button class="btn-upgrade">Upgrade</button>
+    </div>
+  </div>
+</aside>
+<div class="main">
+  <header class="topbar">
+    <div class="search-box"><span>🔍</span><input type="text" placeholder="Search orders, customers..."></div>
+    <div class="topbar-actions">
+      <div class="topbar-icon">🔔</div>
+      <div class="topbar-icon">📌</div>
+      <div class="topbar-user">
+        <div class="user-avatar" id="adminAvatar">HB</div>
+        <div class="user-info">
+          <div class="user-name" id="adminName">Admin</div>
+          <div class="user-email" id="adminEmail">homebites@03112003.xyz</div>
+        </div>
       </div>
-
-      <form id="addItemForm" class="modal-form">
-        <div class="form-group">
-          <label for="itemName">Item Name</label>
-          <input type="text" id="itemName" placeholder="Bobbatlu" required />
+    </div>
+  </header>
+  <div class="content">
+    <div class="page-header">
+      <div>
+        <div class="page-title" id="pageTitle">Dashboard Overview</div>
+        <div class="page-sub">Monitor orders, users, and items</div>
+      </div>
+      <div class="header-right">
+        <div class="btn secondary" onclick="switchTab('overview')">Refresh</div>
+      </div>
+    </div>
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('overview')">Overview</button>
+      <button class="tab" onclick="switchTab('items')">Items</button>
+      <button class="tab" onclick="switchTab('users')">Users</button>
+      <button class="tab" onclick="switchTab('orders')">Orders</button>
+    </div>
+    <div id="overview-tab" class="tab-content active">
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-card-top"><span class="stat-card-label">Available Dish</span><span class="stat-chevron">▾</span></div>
+          <div class="stat-card-row"><div class="stat-icon orange">🍽</div><div class="stat-value" id="totalItems">0</div></div>
+          <span class="status-badge badge-orange">Live</span>
         </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label for="itemPrice">Price (₹)</label>
-            <input type="number" id="itemPrice" placeholder="250" min="1" required />
+        <div class="stat-card">
+          <div class="stat-card-top"><span class="stat-card-label">Total Order</span><span class="stat-chevron">▾</span></div>
+          <div class="stat-card-row"><div class="stat-icon blue">📦</div><div class="stat-value" id="totalOrders">0</div></div>
+          <span class="status-badge badge-green">Active</span>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-top"><span class="stat-card-label">Total Users</span><span class="stat-chevron">▾</span></div>
+          <div class="stat-card-row"><div class="stat-icon green">👥</div><div class="stat-value" id="totalUsers">0</div></div>
+          <span class="status-badge badge-green">Members</span>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-top"><span class="stat-card-label">Pending Orders</span><span class="stat-chevron">▾</span></div>
+          <div class="stat-card-row"><div class="stat-icon purple">⏳</div><div class="stat-value" id="pendingOrders">0</div></div>
+          <span class="status-badge badge-orange">Need Action</span>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Revenue</div><span class="card-more">⚙</span></div>
+          <div class="chart-wrap"><canvas id="revenueChart"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Performance</div><span class="card-more">···</span></div>
+          <div class="perf-wrap">
+            <div class="donut-wrap"><canvas id="perfChart"></canvas><div class="donut-center"><div class="donut-label">Total Count</div><div class="donut-value">2,375</div></div></div>
+            <div class="perf-legend"><div class="legend-item"><div class="legend-dot" style="background:#FF4500"></div>Revenue</div><div class="legend-item"><div class="legend-dot" style="background:#F2C94C"></div>Target</div></div>
+            <div class="perf-desc">Push your customers to order frequently by updating menus.</div>
+            <div class="order-counts"><div class="oc-item orange"><div class="oc-num">28</div><div class="oc-label">Today's Orders</div></div><div class="oc-item green"><div class="oc-num">24</div><div class="oc-label">Completed</div></div><div class="oc-item red"><div class="oc-num">04</div><div class="oc-label">Pending</div></div></div>
           </div>
-          <div class="form-group">
-            <label for="itemMeasureType">Measure By</label>
-            <select id="itemMeasureType" required>
-              <option value="weight" selected>Weight</option>
-              <option value="pieces">Pieces</option>
-            </select>
-          </div>
         </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Recent Orders</div><span class="card-more">···</span></div>
+        <div id="recentOrders" class="order-list"></div>
+      </div>
+    </div>
+    <div id="items-tab" class="tab-content">
+      <div class="card-header" style="margin-bottom:12px"><div class="card-title">Manage Items</div><button class="btn primary" onclick="openAddItemModal()">+ Add Item</button></div>
+      <div id="itemsMessage" class="alert"></div>
+      <div id="itemsTable" class="table-container"></div>
+    </div>
+    <div id="users-tab" class="tab-content">
+      <div class="card">
+        <div class="card-header"><div class="card-title">Users</div></div>
+        <div id="usersTable" class="table-container"></div>
+      </div>
+    </div>
+    <div id="orders-tab" class="tab-content">
+      <div class="card">
+        <div class="card-header"><div class="card-title">Orders</div><div><select id="orderStatusFilter" class="status-select" onchange="filterOrders()"><option value="">All Orders</option><option value="pending">Pending</option><option value="confirmed">Confirmed</option><option value="delivered">Delivered</option><option value="cancelled">Cancelled</option></select></div></div>
+        <div id="ordersMessage" class="alert"></div>
+        <div id="ordersTable" class="table-container"></div>
+      </div>
+    </div>
+  </div>
+</div>
 
-        <div class="form-group">
-          <label for="itemWeight" id="itemWeightLabel">Weight</label>
-            <input type="text" id="itemWeight" placeholder="500g" required />
-        </div>
+<!-- Add Item Modal -->
+<div id="addItemModal" class="modal">
+  <div class="modal-overlay" onclick="closeAddItemModal()"></div>
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeAddItemModal()">&times;</button>
+    <div class="modal-header-title" id="itemModalTitle">Add New Item</div>
+    <form id="addItemForm" class="modal-form">
+      <label for="itemName">Item Name</label>
+      <input id="itemName" required />
 
-        <div class="form-group">
-          <label for="itemDescription">Description</label>
-          <textarea id="itemDescription" rows="3" placeholder="Traditional sweet..." required></textarea>
-        </div>
+      <label for="itemPrice">Price (₹)</label>
+      <input id="itemPrice" type="number" min="1" required />
 
-        <div class="form-group">
-          <label for="itemPhotos">Photos URL</label>
-          <input type="text" id="itemPhotos" placeholder="bobbatlu.jpg" />
-        </div>
+      <label id="itemWeightLabel" for="itemWeight">Weight</label>
+      <input id="itemWeight" placeholder="500g" required />
 
-        <div class="form-group">
-          <label for="itemVideos">Videos URL</label>
-          <input type="text" id="itemVideos" placeholder="bobbatlu.mp4" />
-        </div>
+      <label for="itemMeasureType">Measure</label>
+      <select id="itemMeasureType">
+        <option value="weight">Weight</option>
+        <option value="pieces">Pieces</option>
+      </select>
 
-        <button type="submit" class="modal-btn" id="addItemBtn">Add Item</button>
-      </form>
+      <label for="itemDescription">Description</label>
+      <textarea id="itemDescription" rows="3"></textarea>
 
+      <label for="itemPhotos">Photos URL</label>
+      <input id="itemPhotos" />
+
+      <label for="itemVideos">Videos URL</label>
+      <input id="itemVideos" />
+
+      <div class="modal-actions">
+        <button type="submit" id="addItemBtn" class="btn primary">Add Item</button>
+      </div>
       <div id="addItemMessage" class="alert"></div>
-    </div>
+    </form>
   </div>
+</div>
 
-  <!-- Order Details Modal -->
-  <div id="orderDetailsModal" class="modal">
-    <div class="modal-overlay" onclick="closeOrderDetailsModal()"></div>
-    <div class="modal-content">
-      <button class="modal-close" onclick="closeOrderDetailsModal()">&times;</button>
-      
-      <div class="modal-header">
-        <h2>Order Details</h2>
-      </div>
-
-      <div id="orderDetailsContent" class="order-details">
-        <p class="loading">Loading...</p>
-      </div>
-    </div>
+<!-- Order Details Modal -->
+<div id="orderDetailsModal" class="modal">
+  <div class="modal-overlay" onclick="closeOrderDetailsModal()"></div>
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeOrderDetailsModal()">&times;</button>
+    <div id="orderDetailsContent"></div>
   </div>
+</div>
 
-  <script src="./config.js"></script>
-  <script src="./ui.js"></script>
-  <script src="./admin.js?v=6"></script>
-  <style>
-    .hb-footer {
-      margin-top: 32px;
-      padding: 26px 18px 18px;
-      background: linear-gradient(145deg, #f3dcc5 0%, #f8f1e6 45%, #f0c38f 100%);
-      color: #3c2616;
-      border-top: 2px solid rgba(135, 72, 22, 0.18);
-    }
-    .hb-footer-contact {
-      text-align: center;
-      font-size: 14px;
-      margin: 10px 0 8px;
-    }
-
-    .hb-footer-contact a {
-      color: #7d260f;
-      text-decoration: none;
-      font-weight: 600;
-    }
-
-    .hb-footer-contact a:hover {
-      text-decoration: underline;
-    }
-
-    .hb-footer-copy {
-      margin: 0;
-      text-align: center;
-      font-size: 12px;
-      opacity: 0.85;
-    }
-
-  </style>
-  <footer class="hb-footer">
-    <p class="hb-footer-contact">Phone: <a href="tel:9014763361">9014763361</a> | Email: <a href="mailto:homebites@03112003.xyz">homebites@03112003.xyz</a></p>
-    <p class="hb-footer-copy">© 2026 Home Bites. All rights reserved.</p>
-  </footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="./config.js"></script>
+<script src="./ui.js"></script>
+<script>
+const ctx1 = document.getElementById('revenueChart')?.getContext('2d');
+if (ctx1) new Chart(ctx1,{type:'bar',data:{labels:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],datasets:[{label:'Revenue',data:[22000,18000,28000,35000,30000,42000,38000,45000,32000,40000,36000,50000],backgroundColor:'rgba(255,69,0,0.85)',borderRadius:6,barPercentage:0.5},{label:'Target',data:[28000,25000,32000,30000,36000,38000,42000,40000,38000,44000,40000,46000],backgroundColor:'rgba(255,180,150,0.3)',borderRadius:6,barPercentage:0.5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{size:11,family:'DM Sans'},color:'#999'}},y:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{font:{size:11,family:'DM Sans'},color:'#999',callback:v=>'$'+(v/1000)+'k'}}}}});
+const ctx2 = document.getElementById('perfChart')?.getContext('2d');
+if (ctx2) new Chart(ctx2,{type:'doughnut',data:{datasets:[{data:[74,26],backgroundColor:['#FF4500','#F2C94C'],borderWidth:0,hoverOffset:4}]},options:{responsive:true,maintainAspectRatio:true,cutout:'72%',plugins:{legend:{display:false},tooltip:{enabled:false}}}});
+</script>
+<script src="./admin.js"></script>
 </body>
 </html>
