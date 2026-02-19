@@ -356,8 +356,8 @@ h1 {
   z-index: 1000;
   display: none;
   align-items: center;
-  justify-content: flex-end;
-  padding: 0;
+  justify-content: center;
+  padding: 24px 16px;
 }
 
 .modal.active {
@@ -370,7 +370,9 @@ h1 {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(40, 44, 63, 0.8);
+  background:
+    radial-gradient(circle at 20% 15%, rgba(243, 198, 35, 0.12), transparent 35%),
+    rgba(9, 34, 26, 0.68);
   backdrop-filter: blur(4px);
   animation: fadeIn 0.3s ease;
 }
@@ -386,11 +388,13 @@ h1 {
 
 .modal-content {
   position: relative;
-  background: #fff;
-  width: min(420px, 100%);
-  height: 100%;
-  padding: 32px 28px;
-  box-shadow: -8px 0 24px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(180deg, #ffffff 0%, #f8fcfa 100%);
+  border: 1px solid #d9e8df;
+  width: min(460px, 100%);
+  max-height: calc(100vh - 48px);
+  border-radius: 22px;
+  padding: 30px 26px;
+  box-shadow: 0 24px 60px rgba(10, 55, 42, 0.3);
   overflow-y: auto;
   animation: slideIn 0.3s ease;
   z-index: 1;
@@ -398,29 +402,36 @@ h1 {
 
 @keyframes slideIn {
   from {
-    transform: translateX(100%);
+    opacity: 0;
+    transform: translateY(14px) scale(0.98);
   }
   to {
-    transform: translateX(0);
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 
 .modal-close {
   position: absolute;
-  top: 16px;
-  right: 16px;
-  background: transparent;
-  border: 0;
-  font-size: 2rem;
+  top: 14px;
+  right: 14px;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid #dce8e1;
+  background: #fff;
+  font-size: 1.55rem;
   line-height: 1;
   cursor: pointer;
-  color: #999;
-  padding: 4px 8px;
-  transition: color 0.2s ease;
+  color: #526861;
+  padding: 2px;
+  transition: all 0.2s ease;
 }
 
 .modal-close:hover {
-  color: #333;
+  color: #17372d;
+  border-color: #b8cec3;
+  background: #f5faf7;
 }
 
 .modal-header {
@@ -436,17 +447,17 @@ h1 {
   margin: 0;
   font-size: 1.8rem;
   font-weight: 700;
-  color: #282c3f;
+  color: #17372d;
 }
 
 .modal-subtitle {
   margin: 8px 0 0;
   font-size: 0.95rem;
-  color: #7e808c;
+  color: #5f7069;
 }
 
 .link {
-  color: #ff5200;
+  color: var(--brand-main);
   cursor: pointer;
   text-decoration: none;
   font-weight: 600;
@@ -454,7 +465,7 @@ h1 {
 }
 
 .link:hover {
-  color: #e04800;
+  color: var(--brand-dark);
   text-decoration: underline;
 }
 
@@ -471,29 +482,30 @@ h1 {
 .form-group input {
   width: 100%;
   padding: 14px 16px;
-  border: 1px solid #d4d5d9;
-  border-radius: 2px;
+  border: 1px solid #d3e3db;
+  border-radius: 12px;
   font-size: 1rem;
   font-family: inherit;
   outline: none;
-  transition: border-color 0.2s ease;
-  background: #fff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  background: #f8fcfa;
 }
 
 .form-group input:focus {
-  border-color: #ff5200;
+  border-color: var(--brand-main);
+  box-shadow: 0 0 0 3px rgba(15, 107, 79, 0.12);
 }
 
 .form-group input::placeholder {
-  color: #93959f;
+  color: #81938c;
 }
 
 .modal-btn {
   width: 100%;
   padding: 16px;
   border: 0;
-  border-radius: 2px;
-  background: #ff5200;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #0f6b4f, #0a4e3a);
   color: #fff;
   font-size: 0.95rem;
   font-weight: 700;
@@ -502,11 +514,11 @@ h1 {
   font-family: inherit;
   text-transform: uppercase;
   letter-spacing: 1px;
-  transition: background 0.2s ease;
+  transition: filter 0.2s ease;
 }
 
 .modal-btn:hover {
-  background: #e04800;
+  filter: brightness(1.08);
 }
 
 .modal-btn:disabled {
@@ -517,7 +529,7 @@ h1 {
 .modal-footer {
   margin-top: 16px;
   font-size: 0.8rem;
-  color: #7e808c;
+  color: #6b7d76;
   line-height: 1.5;
 }
 
