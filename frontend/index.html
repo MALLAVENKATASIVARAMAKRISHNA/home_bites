@@ -3,376 +3,440 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Home Bites | Order Home Food</title>
+  <title>Home Bites</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./styles.css" />
-</head>
-<body>
-  <!-- Hero Section -->
-  <header class="hero">
-    <div class="hero-content">
-      <div class="topbar">
-        <div class="brand">
-          <img src="./assets/logo.png" alt="Home Bites logo" />
-          <span>Home Bites</span>
-        </div>
-        <div class="top-links">
-          <button class="link-btn" onclick="openLoginModal()">Login</button>
-          <button class="link-btn signup-btn" onclick="openSignupModal()">Sign up</button>
-        </div>
-      </div>
-
-      <div class="hero-grid">
-        <div class="hero-copy">
-          <h1>Satisfy your hunger the delicious way</h1>
-          <p>Fresh snacks, sweets, and daily specials prepared in home kitchens, delivered with care.</p>
-
-          <div class="search-shell">
-            <input type="text" placeholder="Enter your area or city" aria-label="Location" />
-            <button type="button" onclick="openSignupModal()">Start Ordering</button>
-          </div>
-        </div>
-
-        <aside class="hero-preview" aria-label="Featured menu preview">
-          <h3>Featured Picks</h3>
-          <div class="preview-grid">
-            <article class="preview-card">
-              <strong>Classic Bobbatlu</strong>
-              <span>Andhra sweet</span>
-              <p>Rs 180</p>
-            </article>
-            <article class="preview-card">
-              <strong>Crispy Mixture</strong>
-              <span>Spicy snack</span>
-              <p>Rs 120</p>
-            </article>
-            <article class="preview-card">
-              <strong>Ghee Laddu Box</strong>
-              <span>Festive special</span>
-              <p>Rs 240</p>
-            </article>
-            <article class="preview-card">
-              <strong>Daily Meal Combo</strong>
-              <span>Home-style meal</span>
-              <p>Rs 160</p>
-            </article>
-          </div>
-        </aside>
-      </div>
-    </div>
-  </header>
-
-  <!-- Main Content -->
-  <main>
-    <section class="section">
-      <h2>Popular Items</h2>
-      <div class="grid">
-        <article class="tile">
-          <h3>Bobbatlu</h3>
-          <p>Traditional Andhra sweet stuffed with sugar and chana dal</p>
-        </article>
-        <article class="tile">
-          <h3>Sunnundalu</h3>
-          <p>Healthy laddus made from urad dal with jaggery and sugar</p>
-        </article>
-        <article class="tile">
-          <h3>Mixture</h3>
-          <p>Crispy homemade spicy mixture snack</p>
-        </article>
-        <article class="tile">
-          <h3>Laddu</h3>
-          <p>Classic homemade laddus prepared with ghee and sugar</p>
-        </article>
-      </div>
-
-      <div class="cta-box">
-        <div class="cta-text">New here? Create your account and start ordering in minutes.</div>
-        <div class="cta-actions">
-          <button class="btn primary" onclick="openSignupModal()">Create Account</button>
-          <button class="btn" onclick="openLoginModal()">Login</button>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <!-- Login Modal -->
-  <div id="loginModal" class="modal">
-    <div class="modal-overlay" onclick="closeLoginModal()"></div>
-    <div class="modal-content">
-      <button class="modal-close" onclick="closeLoginModal()" aria-label="Close">&times;</button>
-      
-      <div class="modal-header">
-        <div class="modal-icon">🍱</div>
-        <h2>Login</h2>
-        <p class="modal-subtitle">or <span class="link" onclick="switchToSignup()">create an account</span></p>
-      </div>
-
-      <form id="loginForm" class="modal-form">
-        <div class="form-group">
-          <input 
-            type="email" 
-            id="loginEmail" 
-            placeholder="Email" 
-            required 
-            autocomplete="email"
-          />
-        </div>
-
-        <div class="form-group">
-          <input 
-            type="password" 
-            id="loginPassword" 
-            placeholder="Password" 
-            required 
-            autocomplete="current-password"
-          />
-        </div>
-
-        <button type="submit" class="modal-btn" id="loginBtn">LOGIN</button>
-        
-        <p class="modal-footer">
-          By clicking on Login, I accept the <span class="link">Terms & Conditions</span> & <span class="link">Privacy Policy</span>
-        </p>
-      </form>
-
-      <div id="loginMessage" class="alert"></div>
-    </div>
-  </div>
-
-  <!-- Signup Modal -->
-  <div id="signupModal" class="modal">
-    <div class="modal-overlay" onclick="closeSignupModal()"></div>
-    <div class="modal-content">
-      <button class="modal-close" onclick="closeSignupModal()" aria-label="Close">&times;</button>
-      
-      <div class="modal-header">
-        <div class="modal-icon">🍱</div>
-        <h2>Sign up</h2>
-        <p class="modal-subtitle">or <span class="link" onclick="switchToLogin()">login to your account</span></p>
-      </div>
-
-      <form id="signupForm" class="modal-form">
-        <div class="form-group">
-          <input 
-            type="tel" 
-            id="signupPhone" 
-            placeholder="Phone number" 
-            pattern="[0-9]{10}" 
-            required 
-            autocomplete="tel"
-          />
-        </div>
-
-        <div class="form-group">
-          <input 
-            type="text" 
-            id="signupName" 
-            placeholder="Name" 
-            required 
-            autocomplete="name"
-          />
-        </div>
-
-        <div class="form-group">
-          <input 
-            type="email" 
-            id="signupEmail" 
-            placeholder="Email" 
-            required 
-            autocomplete="email"
-          />
-        </div>
-
-        <div class="form-group">
-          <input 
-            type="password" 
-            id="signupPassword" 
-            placeholder="Password (min 8 characters)" 
-            minlength="8" 
-            required 
-            autocomplete="new-password"
-          />
-        </div>
-
-        <div class="form-group">
-          <input 
-            type="text" 
-            id="signupAddress" 
-            placeholder="Address" 
-            required 
-            autocomplete="street-address"
-          />
-        </div>
-
-        <div class="form-group">
-          <input 
-            type="text" 
-            id="signupCity" 
-            placeholder="City" 
-            required 
-            autocomplete="address-level2"
-          />
-        </div>
-
-        <button type="submit" class="modal-btn" id="signupBtn">CONTINUE</button>
-        
-        <p class="modal-footer">
-          By creating an account, I accept the <span class="link">Terms & Conditions</span> & <span class="link">Privacy Policy</span>
-        </p>
-      </form>
-
-      <div id="signupMessage" class="alert"></div>
-    </div>
-  </div>
-
-  <!-- Scripts -->
-  <script src="./config.js"></script>
-  <script src="./ui.js"></script>
-  <script>
-    // Modal Control Functions
-    function openLoginModal() {
-      document.getElementById('loginModal').classList.add('active');
-      document.body.style.overflow = 'hidden';
-      document.getElementById('loginEmail').focus();
-    }
-
-    function closeLoginModal() {
-      document.getElementById('loginModal').classList.remove('active');
-      document.body.style.overflow = 'auto';
-      clearAlert(document.getElementById('loginMessage'));
-    }
-
-    function openSignupModal() {
-      document.getElementById('signupModal').classList.add('active');
-      document.body.style.overflow = 'hidden';
-      document.getElementById('signupPhone').focus();
-    }
-
-    function closeSignupModal() {
-      document.getElementById('signupModal').classList.remove('active');
-      document.body.style.overflow = 'auto';
-      clearAlert(document.getElementById('signupMessage'));
-    }
-
-    function switchToSignup() {
-      closeLoginModal();
-      setTimeout(openSignupModal, 200);
-    }
-
-    function switchToLogin() {
-      closeSignupModal();
-      setTimeout(openLoginModal, 200);
-    }
-
-    // Close modals on Escape key
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        closeLoginModal();
-        closeSignupModal();
-      }
-    });
-
-    // Login Form Handler
-    document.getElementById('loginForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const message = document.getElementById('loginMessage');
-      const loginBtn = document.getElementById('loginBtn');
-      clearAlert(message);
-
-      const email = document.getElementById('loginEmail').value.trim();
-      const password = document.getElementById('loginPassword').value;
-
-      const body = new URLSearchParams();
-      body.append('username', email);
-      body.append('password', password);
-
-      try {
-        setButtonLoading(loginBtn, 'LOGGING IN...', true);
-
-        const res = await fetch(`${API_BASE_URL}/login`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: body.toString()
-        });
-
-        const data = await res.json();
-        
-        if (!res.ok) {
-          throw new Error(data.detail || 'Login failed');
-        }
-
-        // Save token and user info
-        localStorage.setItem('access_token', data.access_token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        
-        setAlert(message, 'success', 'Login successful! Redirecting...');
-        
-        // Redirect based on role
-        setTimeout(() => {
-          if (data.user && data.user.role === 'admin') {
-            window.location.href = './admin.html';
-          } else {
-            window.location.href = './dashboard.html';
-          }
-        }, 1000);
-
-      } catch (err) {
-        setAlert(message, 'error', err.message || 'Login failed');
-      } finally {
-        setButtonLoading(loginBtn, 'LOGIN', false);
-      }
-    });
-
-    // Signup Form Handler
-    document.getElementById('signupForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const message = document.getElementById('signupMessage');
-      const signupBtn = document.getElementById('signupBtn');
-      clearAlert(message);
-
-      const payload = {
-        name: document.getElementById('signupName').value.trim(),
-        phone_number: Number(document.getElementById('signupPhone').value.trim()),
-        email: document.getElementById('signupEmail').value.trim(),
-        password: document.getElementById('signupPassword').value,
-        role: 'user',
-        address: document.getElementById('signupAddress').value.trim(),
-        city: document.getElementById('signupCity').value.trim()
-      };
-
-      try {
-        setButtonLoading(signupBtn, 'CREATING...', true);
-
-        const res = await fetch(`${API_BASE_URL}/register`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-
-        const data = await res.json();
-        
-        if (!res.ok) {
-          throw new Error(data.detail || 'Registration failed');
-        }
-
-        setAlert(message, 'success', `Account created successfully! User ID: ${data.user_id}. Please login.`);
-        document.getElementById('signupForm').reset();
-        
-        // Switch to login after 2 seconds
-        setTimeout(() => {
-          switchToLogin();
-        }, 2000);
-
-      } catch (err) {
-        setAlert(message, 'error', err.message || 'Registration failed');
-      } finally {
-        setButtonLoading(signupBtn, 'CONTINUE', false);
-      }
-    });
-  </script>
+  <link rel="stylesheet" href="./dashboard.css?v=5" />
   <style>
+    .dash-login-btn {
+      border: 1px solid #d8dee8;
+      background: #fff;
+      color: #101828;
+      border-radius: 10px;
+      padding: 9px 13px;
+      font-family: inherit;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .dash-signup-btn {
+      border: 0;
+      background: linear-gradient(90deg, #ff6b35, #e8521a);
+      color: #fff;
+      border-radius: 10px;
+      padding: 10px 13px;
+      font-family: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .auth-overlay {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1300;
+      padding: 20px;
+    }
+
+    .auth-overlay.active {
+      display: flex;
+    }
+
+    .auth-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(14, 23, 30, 0.78);
+      backdrop-filter: blur(3px);
+    }
+
+    .auth-shell {
+      width: min(1080px, 100%);
+      max-height: calc(100vh - 40px);
+      background: #fff8f0;
+      border-radius: 22px;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 1.06fr 1fr;
+      position: relative;
+      z-index: 1;
+      box-shadow: 0 30px 70px rgba(0, 0, 0, 0.34);
+    }
+
+    .auth-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 5;
+      border: 1px solid rgba(255, 255, 255, 0.45);
+      background: rgba(0, 0, 0, 0.2);
+      color: #fff;
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    .auth-left {
+      background: linear-gradient(145deg, #1a120b 0%, #2d1b0e 50%, #3d2410 100%);
+      padding: 30px;
+      position: relative;
+      color: #fff;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .auth-left::before {
+      content: '';
+      position: absolute;
+      width: 420px;
+      height: 420px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 107, 53, 0.25) 0%, transparent 70%);
+      top: -120px;
+      left: -130px;
+      pointer-events: none;
+    }
+
+    .auth-left::after {
+      content: '';
+      position: absolute;
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 184, 48, 0.16) 0%, transparent 70%);
+      bottom: -110px;
+      right: -80px;
+      pointer-events: none;
+    }
+
+    .auth-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 1;
+    }
+
+    .auth-brand-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 11px;
+      display: grid;
+      place-items: center;
+      background: #ff6b35;
+      font-size: 21px;
+    }
+
+    .auth-brand-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 30px;
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -0.3px;
+    }
+
+    .auth-brand-name span {
+      color: #ff6b35;
+    }
+
+    .auth-hero {
+      z-index: 1;
+      display: grid;
+      place-items: center;
+    }
+
+    .auth-disc {
+      width: min(340px, 78%);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 50% 40%, rgba(255, 222, 180, 0.9), rgba(235, 132, 49, 0.95) 45%, rgba(148, 72, 15, 0.95) 72%),
+        radial-gradient(circle at 32% 18%, rgba(255, 255, 255, 0.23), transparent 44%);
+      position: relative;
+      box-shadow:
+        inset 0 -24px 56px rgba(81, 29, 8, 0.5),
+        0 24px 54px rgba(0, 0, 0, 0.38);
+      animation: floatDish 4.2s ease-in-out infinite;
+    }
+
+    .auth-disc::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      bottom: -22px;
+      transform: translateX(-50%);
+      width: 72%;
+      height: 22px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.34);
+      filter: blur(10px);
+    }
+
+    .auth-disc img {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 84px;
+      height: 84px;
+      border-radius: 18px;
+      object-fit: cover;
+      border: 3px solid rgba(255, 255, 255, 0.75);
+      background: #fff;
+    }
+
+    .auth-tagline {
+      z-index: 1;
+    }
+
+    .auth-tagline h2 {
+      margin: 0;
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(26px, 2.6vw, 38px);
+      line-height: 1.22;
+    }
+
+    .auth-tagline em {
+      font-style: normal;
+      color: #ff6b35;
+    }
+
+    .auth-tagline p {
+      margin: 10px 0 0;
+      color: rgba(255, 255, 255, 0.66);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .auth-right {
+      padding: 30px;
+      overflow-y: auto;
+      background: #fff8f0;
+      color: #1a120b;
+    }
+
+    .auth-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 107, 53, 0.12);
+      color: #ff6b35;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      margin-bottom: 14px;
+    }
+
+    .auth-title {
+      margin: 0;
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(30px, 2.7vw, 38px);
+      line-height: 1.14;
+    }
+
+    .auth-subtitle {
+      margin: 8px 0 16px;
+      color: #7a6f68;
+      font-size: 15px;
+    }
+
+    .auth-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      padding: 4px;
+      gap: 4px;
+      border: 1px solid #e9ddd4;
+      border-radius: 12px;
+      background: #f6ebe2;
+      margin-bottom: 16px;
+    }
+
+    .auth-tab {
+      border: 0;
+      border-radius: 9px;
+      padding: 10px;
+      background: transparent;
+      font-family: inherit;
+      font-weight: 700;
+      color: #7a6f68;
+      cursor: pointer;
+    }
+
+    .auth-tab.active {
+      background: #fff;
+      color: #1a120b;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+    }
+
+    .auth-view { display: none; }
+    .auth-view.active { display: block; }
+
+    .auth-group { margin-bottom: 12px; }
+
+    .auth-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 7px;
+    }
+
+    .auth-input-wrap {
+      position: relative;
+    }
+
+    .auth-input {
+      width: 100%;
+      padding: 13px 14px;
+      border: 1.5px solid #e8ddd5;
+      border-radius: 12px;
+      background: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .auth-input.has-icon {
+      padding-left: 38px;
+    }
+
+    .auth-input-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #92867e;
+      font-size: 13px;
+    }
+
+    .auth-input:focus {
+      border-color: #ff6b35;
+      box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.08);
+    }
+
+    .auth-eye {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      border: 0;
+      background: none;
+      color: #7a6f68;
+      font-weight: 700;
+      font-size: 12px;
+      padding: 6px;
+      cursor: pointer;
+      border-radius: 7px;
+    }
+
+    .auth-eye:hover {
+      color: #ff6b35;
+      background: rgba(255, 107, 53, 0.08);
+    }
+
+    .auth-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin: 2px 0 14px;
+    }
+
+    .remember-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      user-select: none;
+      color: #7a6f68;
+      font-size: 14px;
+    }
+
+    .remember-wrap input { display: none; }
+
+    .remember-mark {
+      width: 18px;
+      height: 18px;
+      border-radius: 5px;
+      border: 1.5px solid #d0c8c0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 12px;
+      line-height: 1;
+      transition: all 0.2s;
+    }
+
+    .auth-link {
+      color: #ff6b35;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .auth-link:hover {
+      opacity: 0.75;
+    }
+
+    .auth-submit {
+      width: 100%;
+      border: 0;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #ff6b35 0%, #e8521a 100%);
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      padding: 14px;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .auth-submit:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px rgba(255, 107, 53, 0.3);
+    }
+
+    .auth-submit:disabled {
+      cursor: not-allowed;
+      opacity: 0.7;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .auth-switch {
+      margin-top: 12px;
+      text-align: center;
+      color: #7a6f68;
+      font-size: 14px;
+    }
+
+    .auth-alert {
+      display: none;
+      margin-top: 12px;
+      padding: 11px 12px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .auth-alert.show { display: block; }
+    .auth-alert.success { background: #d4edda; color: #157347; border: 1px solid #c3e6cb; }
+    .auth-alert.error { background: #f8d7da; color: #b42318; border: 1px solid #f5c6cb; }
+
     .hb-footer {
       margin-top: 32px;
       padding: 26px 18px 18px;
@@ -403,10 +467,918 @@
       font-size: 12px;
       opacity: 0.85;
     }
+
+    @keyframes floatDish {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+
+    @media (max-width: 980px) {
+      .auth-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .auth-left {
+        min-height: 260px;
+      }
+
+      .auth-tagline h2 {
+        font-size: 28px;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .dash-nav {
+        grid-template-columns: 1fr;
+      }
+
+      .dash-actions {
+        justify-content: flex-end;
+      }
+
+      .auth-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
   </style>
+</head>
+<body>
+  <div class="dashboard order-dashboard">
+    <nav class="dash-nav">
+      <button class="dash-brand brand-home-btn" type="button" onclick="goToRoleDashboard()" aria-label="Go to dashboard">
+        <img src="./assets/logo.png" alt="Home Bites logo" />
+        <div>
+          <strong>Home Bites</strong>
+          <p>Order fresh home-cooked food</p>
+        </div>
+      </button>
+
+      <div class="dash-search-wrap">
+        <input id="itemSearch" type="text" placeholder="Search for dishes, sweets, snacks..." aria-label="Search items" />
+      </div>
+
+      <div class="dash-actions">
+        <button id="navLoginBtn" class="dash-login-btn" type="button" onclick="openAuthModal('login')">Login</button>
+        <button id="navSignupBtn" class="dash-signup-btn" type="button" onclick="openAuthModal('signup')">Sign up</button>
+
+        <div id="profileWrap" class="order-profile-wrap" style="display: none;">
+          <button
+            id="profileBtn"
+            class="order-profile-btn"
+            type="button"
+            aria-haspopup="true"
+            aria-expanded="false"
+            onclick="toggleProfileMenu()"
+          >
+            <span id="profileInitial">U</span>
+          </button>
+
+          <div id="profileMenu" class="order-profile-menu" aria-hidden="true">
+            <h4>My Profile</h4>
+            <div class="profile-row"><span>Name</span><strong id="profileName">-</strong></div>
+            <div class="profile-row"><span>Email</span><strong id="profileEmail">-</strong></div>
+            <div class="profile-row"><span>Phone</span><strong id="profilePhone">-</strong></div>
+            <div class="profile-row"><span>Address</span><strong id="profileAddress">-</strong></div>
+            <div class="profile-row"><span>City</span><strong id="profileCity">-</strong></div>
+            <div class="profile-row"><span>Role</span><strong id="profileRole">-</strong></div>
+            <button class="profile-orders-btn" type="button" onclick="showMyOrders()">My Orders</button>
+            <button class="profile-logout-btn" type="button" onclick="logout()">Logout</button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <main class="order-main">
+      <section class="order-hero">
+        <h1>Craving something homemade?</h1>
+        <p>Pick your favorites, add to cart, and place your order in one step.</p>
+      </section>
+
+      <section id="categoryChips" class="category-chips"></section>
+
+      <section class="order-layout">
+        <section class="catalog-panel">
+          <div class="panel-head">
+            <h2>Available Items</h2>
+            <span id="itemsMeta">Loading...</span>
+          </div>
+
+          <div id="loadingMsg" class="loading-block">Loading items...</div>
+          <div id="itemsGrid" class="food-grid" style="display: none;"></div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <button id="goToCartBtn" class="bottom-cart-btn" type="button" onclick="openCartDrawer()">
+    Go to Cart <span id="quickCartCount">0</span>
+  </button>
+
+  <div id="cartDrawer" class="cart-drawer" aria-hidden="true">
+    <div class="cart-drawer-overlay" onclick="closeCartDrawer()"></div>
+    <aside class="cart-panel drawer-panel">
+      <div class="panel-head">
+        <h2>Your Cart</h2>
+        <div class="cart-head-actions">
+          <span id="cartCount">0 items</span>
+          <button class="drawer-close-btn" type="button" onclick="closeCartDrawer()">Close</button>
+        </div>
+      </div>
+
+      <div id="cartEmpty" class="cart-empty">No items in cart yet.</div>
+      <div id="cartItems" class="cart-items"></div>
+      <div id="cartError" class="cart-inline-error" style="display: none;"></div>
+      <div id="orderSuccessAction" class="order-success-action" style="display: none;">
+        <p id="orderSuccessText"></p>
+        <button type="button" class="view-orders-btn" onclick="showMyOrders()">View My Orders</button>
+      </div>
+
+      <div class="cart-summary">
+        <div class="summary-row"><span>Subtotal</span><strong id="cartSubtotal">Rs 0</strong></div>
+
+        <label for="paymentMode">Payment Mode</label>
+        <select id="paymentMode">
+          <option value="cash">Cash</option>
+          <option value="upi">UPI</option>
+          <option value="card">Card</option>
+        </select>
+
+        <button id="placeOrderBtn" class="place-order-btn" type="button" onclick="placeOrder()">Place Order</button>
+        <p class="cart-note">Delivery address will use your profile details.</p>
+      </div>
+    </aside>
+  </div>
+
+  <div id="authOverlay" class="auth-overlay" aria-hidden="true">
+    <div class="auth-backdrop" onclick="closeAuthModal()"></div>
+    <div class="auth-shell" role="dialog" aria-modal="true" aria-label="Login and signup">
+      <button type="button" class="auth-close" onclick="closeAuthModal()" aria-label="Close">&times;</button>
+
+      <section class="auth-left" aria-hidden="true">
+        <div class="auth-brand">
+          <div class="auth-brand-icon">🍱</div>
+          <div class="auth-brand-name">Home <span>Bites</span></div>
+        </div>
+
+        <div class="auth-hero">
+          <div class="auth-disc">
+            <img src="./assets/logo.png" alt="" />
+          </div>
+        </div>
+
+        <div class="auth-tagline">
+          <h2>Delicious home food,<br />delivered <em>fast.</em></h2>
+          <p>Login and continue ordering your favorite snacks, sweets, and daily specials.</p>
+        </div>
+      </section>
+
+      <section class="auth-right">
+        <div class="auth-chip">Welcome</div>
+        <h2 class="auth-title">Sign in to your account</h2>
+        <p class="auth-subtitle">New here? Create an account in seconds.</p>
+
+        <div class="auth-tabs" role="tablist" aria-label="Auth forms">
+          <button id="authLoginTab" class="auth-tab active" type="button" onclick="switchAuthView('login')">Login</button>
+          <button id="authSignupTab" class="auth-tab" type="button" onclick="switchAuthView('signup')">Create Account</button>
+        </div>
+
+        <section id="authLoginView" class="auth-view active">
+          <form id="loginForm" novalidate>
+            <div class="auth-group">
+              <label for="loginEmail" class="auth-label">Email address</label>
+              <div class="auth-input-wrap">
+                <span class="auth-input-icon">@</span>
+                <input id="loginEmail" type="email" class="auth-input has-icon" placeholder="hello@example.com" required autocomplete="email" />
+              </div>
+            </div>
+
+            <div class="auth-group">
+              <label for="loginPassword" class="auth-label">Password</label>
+              <div class="auth-input-wrap">
+                <span class="auth-input-icon">*</span>
+                <input id="loginPassword" type="password" class="auth-input has-icon" placeholder="Enter your password" required autocomplete="current-password" />
+                <button type="button" class="auth-eye" data-target="loginPassword">SHOW</button>
+              </div>
+            </div>
+
+            <div class="auth-row">
+              <label class="remember-wrap" for="rememberMe">
+                <input id="rememberMe" type="checkbox" />
+                <span id="rememberMark" class="remember-mark"></span>
+                <span>Remember me</span>
+              </label>
+              <a href="#" class="auth-link" onclick="event.preventDefault();">Forgot password?</a>
+            </div>
+
+            <button id="loginBtn" type="submit" class="auth-submit">Sign In</button>
+            <p class="auth-switch">Don't have an account? <a class="auth-link" onclick="switchAuthView('signup')">Create one free</a></p>
+          </form>
+
+          <div id="loginMessage" class="auth-alert"></div>
+        </section>
+
+        <section id="authSignupView" class="auth-view">
+          <form id="signupForm" novalidate>
+            <div class="auth-group">
+              <label for="signupPhone" class="auth-label">Phone number</label>
+              <div class="auth-input-wrap">
+                <input id="signupPhone" type="tel" class="auth-input" placeholder="10-digit mobile number" pattern="[0-9]{10}" required autocomplete="tel" />
+              </div>
+            </div>
+
+            <div class="auth-group">
+              <label for="signupName" class="auth-label">Full name</label>
+              <div class="auth-input-wrap">
+                <input id="signupName" type="text" class="auth-input" placeholder="Your name" required autocomplete="name" />
+              </div>
+            </div>
+
+            <div class="auth-group">
+              <label for="signupEmail" class="auth-label">Email address</label>
+              <div class="auth-input-wrap">
+                <input id="signupEmail" type="email" class="auth-input" placeholder="hello@example.com" required autocomplete="email" />
+              </div>
+            </div>
+
+            <div class="auth-group">
+              <label for="signupPassword" class="auth-label">Password</label>
+              <div class="auth-input-wrap">
+                <input id="signupPassword" type="password" class="auth-input" placeholder="Minimum 8 characters" minlength="8" required autocomplete="new-password" />
+                <button type="button" class="auth-eye" data-target="signupPassword">SHOW</button>
+              </div>
+            </div>
+
+            <div class="auth-group">
+              <label for="signupAddress" class="auth-label">Address</label>
+              <div class="auth-input-wrap">
+                <input id="signupAddress" type="text" class="auth-input" placeholder="House no, street" required autocomplete="street-address" />
+              </div>
+            </div>
+
+            <div class="auth-group">
+              <label for="signupCity" class="auth-label">City</label>
+              <div class="auth-input-wrap">
+                <input id="signupCity" type="text" class="auth-input" placeholder="City" required autocomplete="address-level2" />
+              </div>
+            </div>
+
+            <button id="signupBtn" type="submit" class="auth-submit">Create Account</button>
+            <p class="auth-switch">Already have an account? <a class="auth-link" onclick="switchAuthView('login')">Login</a></p>
+          </form>
+
+          <div id="signupMessage" class="auth-alert"></div>
+        </section>
+      </section>
+    </div>
+  </div>
+
   <footer class="hb-footer">
     <p class="hb-footer-contact">Phone: <a href="tel:9014763361">9014763361</a> | Email: <a href="mailto:homebites@03112003.xyz">homebites@03112003.xyz</a></p>
     <p class="hb-footer-copy">© 2026 Home Bites. All rights reserved.</p>
   </footer>
+
+  <script src="./config.js"></script>
+  <script src="./ui.js"></script>
+  <script>
+    let token = localStorage.getItem('access_token');
+    let user = JSON.parse(localStorage.getItem('user') || '{}');
+
+    let allItems = [];
+    let selectedCategory = 'All';
+    let searchText = '';
+    const cart = {};
+    let lastPlacedOrderId = null;
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text ?? '';
+      return div.innerHTML;
+    }
+
+    function formatValue(value) {
+      if (value === null || value === undefined) return '-';
+      const text = String(value).trim();
+      return text || '-';
+    }
+
+    function formatRole(role) {
+      const value = formatValue(role);
+      if (value === '-') return value;
+      return value.charAt(0).toUpperCase() + value.slice(1);
+    }
+
+    function goToRoleDashboard() {
+      const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+      if (currentUser.role === 'admin') {
+        window.location.href = './admin.html';
+        return;
+      }
+      window.location.href = './index.html';
+    }
+
+    function formatCurrency(amount) {
+      return `Rs ${Number(amount || 0)}`;
+    }
+
+    function formatItemMeasure(value) {
+      const text = String(value || '').trim();
+      if (!text) return 'Standard';
+      return /^\d+(\.\d+)?$/.test(text) ? `${text}g` : text;
+    }
+
+    function getItemPhotoSrc(item) {
+      const file = String(item.photos || '').trim();
+      if (!file) return './assets/logo.png';
+      if (file.startsWith('http://') || file.startsWith('https://') || file.startsWith('./') || file.startsWith('/')) {
+        return file;
+      }
+      return `./assets/items/${file}`;
+    }
+
+    function getUserInitial() {
+      const name = (user.name || '').trim();
+      return name ? name.charAt(0).toUpperCase() : 'U';
+    }
+
+    function applyAuthState() {
+      const profileWrap = document.getElementById('profileWrap');
+      const loginBtn = document.getElementById('navLoginBtn');
+      const signupBtn = document.getElementById('navSignupBtn');
+
+      token = localStorage.getItem('access_token');
+      user = JSON.parse(localStorage.getItem('user') || '{}');
+
+      const loggedIn = Boolean(token && user && user.user_id);
+      profileWrap.style.display = loggedIn ? '' : 'none';
+      loginBtn.style.display = loggedIn ? 'none' : '';
+      signupBtn.style.display = loggedIn ? 'none' : '';
+
+      if (loggedIn) {
+        renderProfile();
+      } else {
+        closeProfileMenu();
+      }
+    }
+
+    function renderProfile() {
+      document.getElementById('profileInitial').textContent = getUserInitial();
+      document.getElementById('profileName').textContent = formatValue(user.name);
+      document.getElementById('profileEmail').textContent = formatValue(user.email);
+      document.getElementById('profilePhone').textContent = formatValue(user.phone_number);
+      document.getElementById('profileAddress').textContent = formatValue(user.address);
+      document.getElementById('profileCity').textContent = formatValue(user.city);
+      document.getElementById('profileRole').textContent = formatRole(user.role);
+    }
+
+    function getOrdersStorageKey() {
+      return `home_bites_orders_${user.user_id || 'guest'}`;
+    }
+
+    function getSavedOrders() {
+      try {
+        return JSON.parse(localStorage.getItem(getOrdersStorageKey()) || '[]');
+      } catch (err) {
+        return [];
+      }
+    }
+
+    function saveOrderRecord(orderRecord) {
+      const orders = getSavedOrders();
+      orders.unshift(orderRecord);
+      localStorage.setItem(getOrdersStorageKey(), JSON.stringify(orders.slice(0, 30)));
+    }
+
+    function toggleProfileMenu() {
+      const menu = document.getElementById('profileMenu');
+      const btn = document.getElementById('profileBtn');
+      const isOpen = menu.classList.toggle('active');
+      btn.setAttribute('aria-expanded', String(isOpen));
+      menu.setAttribute('aria-hidden', String(!isOpen));
+    }
+
+    function closeProfileMenu() {
+      const menu = document.getElementById('profileMenu');
+      const btn = document.getElementById('profileBtn');
+      menu.classList.remove('active');
+      btn.setAttribute('aria-expanded', 'false');
+      menu.setAttribute('aria-hidden', 'true');
+    }
+
+    function openAuthModal(view = 'login') {
+      switchAuthView(view);
+      const overlay = document.getElementById('authOverlay');
+      overlay.classList.add('active');
+      overlay.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeAuthModal() {
+      const overlay = document.getElementById('authOverlay');
+      overlay.classList.remove('active');
+      overlay.setAttribute('aria-hidden', 'true');
+      if (!document.getElementById('cartDrawer').classList.contains('active')) {
+        document.body.style.overflow = 'auto';
+      }
+      clearAlert(document.getElementById('loginMessage'));
+      clearAlert(document.getElementById('signupMessage'));
+    }
+
+    function switchAuthView(view) {
+      const showLogin = view === 'login';
+      const loginTab = document.getElementById('authLoginTab');
+      const signupTab = document.getElementById('authSignupTab');
+      const loginView = document.getElementById('authLoginView');
+      const signupView = document.getElementById('authSignupView');
+
+      loginTab.classList.toggle('active', showLogin);
+      signupTab.classList.toggle('active', !showLogin);
+      loginView.classList.toggle('active', showLogin);
+      signupView.classList.toggle('active', !showLogin);
+
+      setTimeout(() => {
+        const target = showLogin ? document.getElementById('loginEmail') : document.getElementById('signupPhone');
+        if (document.getElementById('authOverlay').classList.contains('active')) target.focus();
+      }, 20);
+    }
+
+    document.querySelectorAll('.auth-eye').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const input = document.getElementById(btn.dataset.target || '');
+        if (!input) return;
+        const hidden = input.type === 'password';
+        input.type = hidden ? 'text' : 'password';
+        btn.textContent = hidden ? 'HIDE' : 'SHOW';
+      });
+    });
+
+    const rememberInput = document.getElementById('rememberMe');
+    const rememberMark = document.getElementById('rememberMark');
+    rememberInput.addEventListener('change', () => {
+      if (rememberInput.checked) {
+        rememberMark.style.background = '#ff6b35';
+        rememberMark.style.borderColor = '#ff6b35';
+        rememberMark.textContent = '✓';
+      } else {
+        rememberMark.style.background = '';
+        rememberMark.style.borderColor = '';
+        rememberMark.textContent = '';
+      }
+    });
+
+    document.addEventListener('click', (event) => {
+      const wrapper = document.querySelector('.order-profile-wrap');
+      if (wrapper && !wrapper.contains(event.target)) {
+        closeProfileMenu();
+      }
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        closeProfileMenu();
+        closeCartDrawer();
+        closeAuthModal();
+      }
+    });
+
+    async function hydrateProfileDetails() {
+      if (!token) return;
+      const missingProfileData = !user.phone_number || !user.address || !user.city;
+      if (!missingProfileData) return;
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/me`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (!res.ok) return;
+        const profile = await res.json();
+        user = { ...user, ...profile };
+        localStorage.setItem('user', JSON.stringify(user));
+        applyAuthState();
+      } catch (err) {
+        console.warn('Could not refresh profile details:', err);
+      }
+    }
+
+    function categorizeItem(item) {
+      const text = `${item.item_name || ''} ${item.description || ''}`.toLowerCase();
+      if (text.includes('sweet') || text.includes('laddu') || text.includes('halwa')) return 'Sweets';
+      if (text.includes('snack') || text.includes('mixture') || text.includes('murukku')) return 'Snacks';
+      if (text.includes('meal') || text.includes('rice') || text.includes('curry')) return 'Meals';
+      return 'Specials';
+    }
+
+    function renderCategoryChips(items) {
+      const chipsWrap = document.getElementById('categoryChips');
+      const categories = ['All', ...Array.from(new Set(items.map(categorizeItem)))];
+      chipsWrap.innerHTML = categories
+        .map(cat => `<button type="button" class="chip ${cat === selectedCategory ? 'active' : ''}" data-cat="${escapeHtml(cat)}">${escapeHtml(cat)}</button>`)
+        .join('');
+
+      chipsWrap.querySelectorAll('.chip').forEach(btn => {
+        btn.addEventListener('click', () => {
+          selectedCategory = btn.dataset.cat || 'All';
+          renderCategoryChips(allItems);
+          renderItems();
+        });
+      });
+    }
+
+    function getFilteredItems() {
+      return allItems.filter(item => {
+        const categoryOk = selectedCategory === 'All' || categorizeItem(item) === selectedCategory;
+        const query = searchText.trim().toLowerCase();
+        const text = `${item.item_name || ''} ${item.description || ''} ${item.weight || ''}`.toLowerCase();
+        const searchOk = !query || text.includes(query);
+        return categoryOk && searchOk;
+      });
+    }
+
+    function getItemQuantity(itemId) {
+      return cart[itemId]?.quantity || 0;
+    }
+
+    function addToCart(itemId) {
+      const item = allItems.find(i => i.item_id === itemId);
+      if (!item) return;
+      lastPlacedOrderId = null;
+
+      if (!cart[itemId]) {
+        cart[itemId] = { item, quantity: 1 };
+      } else {
+        cart[itemId].quantity += 1;
+      }
+
+      renderItems();
+      renderCart();
+    }
+
+    function decrementFromCart(itemId) {
+      if (!cart[itemId]) return;
+      lastPlacedOrderId = null;
+      cart[itemId].quantity -= 1;
+      if (cart[itemId].quantity <= 0) delete cart[itemId];
+      renderItems();
+      renderCart();
+    }
+
+    function renderItems() {
+      const itemsGrid = document.getElementById('itemsGrid');
+      const filteredItems = getFilteredItems();
+      document.getElementById('itemsMeta').textContent = `${filteredItems.length} items`;
+
+      if (filteredItems.length === 0) {
+        itemsGrid.innerHTML = '<p class="empty-grid">No items found for this filter.</p>';
+        return;
+      }
+
+      itemsGrid.innerHTML = filteredItems.map(item => {
+        const qty = getItemQuantity(item.item_id);
+        const photoSrc = getItemPhotoSrc(item);
+        return `
+          <article class="food-card">
+            <div class="food-image-wrap">
+              <img
+                class="food-image"
+                src="${escapeHtml(photoSrc)}"
+                alt="${escapeHtml(item.item_name)}"
+                loading="lazy"
+                onerror="this.onerror=null;this.src='./assets/logo.png';"
+              />
+            </div>
+            <div class="food-top">
+              <div class="food-badge">${escapeHtml(categorizeItem(item))}</div>
+              <h3>${escapeHtml(item.item_name)}</h3>
+              <p>${escapeHtml(item.description || 'Freshly prepared homemade food.')}</p>
+            </div>
+
+            <div class="food-bottom">
+              <div>
+                <span class="food-meta">${escapeHtml(formatItemMeasure(item.weight))}</span>
+                <strong>${formatCurrency(item.price)}</strong>
+              </div>
+
+              <div class="food-actions">
+                ${qty === 0 ? `
+                  <button type="button" class="add-btn" onclick="addToCart(${item.item_id})">Add</button>
+                ` : `
+                  <div class="qty-stepper">
+                    <button type="button" onclick="decrementFromCart(${item.item_id})">-</button>
+                    <span>${qty}</span>
+                    <button type="button" onclick="addToCart(${item.item_id})">+</button>
+                  </div>
+                `}
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function renderCart() {
+      const entries = Object.values(cart);
+      const cartItemsEl = document.getElementById('cartItems');
+      const cartEmptyEl = document.getElementById('cartEmpty');
+      const cartErrorEl = document.getElementById('cartError');
+      const orderSuccessEl = document.getElementById('orderSuccessAction');
+      const orderSuccessTextEl = document.getElementById('orderSuccessText');
+
+      const totalItems = entries.reduce((sum, entry) => sum + entry.quantity, 0);
+      const subtotal = entries.reduce((sum, entry) => sum + (entry.item.price * entry.quantity), 0);
+
+      document.getElementById('cartCount').textContent = `${totalItems} item${totalItems === 1 ? '' : 's'}`;
+      document.getElementById('quickCartCount').textContent = String(totalItems);
+      document.getElementById('cartSubtotal').textContent = formatCurrency(subtotal);
+
+      if (entries.length === 0) {
+        cartEmptyEl.style.display = 'block';
+        cartItemsEl.innerHTML = '';
+        if (lastPlacedOrderId) {
+          orderSuccessTextEl.textContent = `Order #${lastPlacedOrderId} placed successfully.`;
+          orderSuccessEl.style.display = 'block';
+        } else {
+          orderSuccessEl.style.display = 'none';
+          orderSuccessTextEl.textContent = '';
+        }
+        return;
+      }
+
+      cartEmptyEl.style.display = 'none';
+      cartErrorEl.style.display = 'none';
+      cartErrorEl.textContent = '';
+      orderSuccessEl.style.display = 'none';
+      orderSuccessTextEl.textContent = '';
+      cartItemsEl.innerHTML = entries.map(({ item, quantity }) => `
+        <div class="cart-line">
+          <div>
+            <h4>${escapeHtml(item.item_name)}</h4>
+            <p>${quantity} x ${formatCurrency(item.price)}</p>
+          </div>
+          <div class="qty-stepper">
+            <button type="button" onclick="decrementFromCart(${item.item_id})">-</button>
+            <span>${quantity}</span>
+            <button type="button" onclick="addToCart(${item.item_id})">+</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function loadItems() {
+      const loadingMsg = document.getElementById('loadingMsg');
+      const itemsGrid = document.getElementById('itemsGrid');
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/items`);
+        if (!res.ok) throw new Error('Failed to load items');
+
+        const items = await res.json();
+        allItems = Array.isArray(items) ? items : [];
+
+        loadingMsg.style.display = 'none';
+        itemsGrid.style.display = 'grid';
+
+        renderCategoryChips(allItems);
+        renderItems();
+      } catch (err) {
+        loadingMsg.innerHTML = `<span style="color: var(--danger);">Error: ${err.message}</span>`;
+        console.error('Failed to load items:', err);
+      }
+    }
+
+    async function placeOrder() {
+      const placeOrderBtn = document.getElementById('placeOrderBtn');
+      const entries = Object.values(cart);
+      const cartErrorEl = document.getElementById('cartError');
+
+      if (entries.length === 0) {
+        cartErrorEl.textContent = 'Add at least one item to place an order.';
+        cartErrorEl.style.display = 'block';
+        return;
+      }
+
+      if (!token || !user.user_id) {
+        cartErrorEl.textContent = 'Please login to place an order.';
+        cartErrorEl.style.display = 'block';
+        closeCartDrawer();
+        openAuthModal('login');
+        return;
+      }
+
+      if (!user.address || !user.city) {
+        cartErrorEl.textContent = 'Address/City missing in profile. Please login again.';
+        cartErrorEl.style.display = 'block';
+        return;
+      }
+
+      const today = new Date();
+      const orderDate = today.toISOString().slice(0, 10);
+      const deliveryDate = new Date(today.getTime() + 4 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+
+      const payload = {
+        user_id: user.user_id,
+        order_status: 'pending',
+        payment_status: 'pending',
+        payment_mode: document.getElementById('paymentMode').value,
+        order_date: orderDate,
+        delivery_date: deliveryDate,
+        address: String(user.address || '').trim(),
+        city: String(user.city || '').trim(),
+        items: entries.map(({ item, quantity }) => ({
+          item_id: item.item_id,
+          quantity,
+          price: item.price
+        }))
+      };
+
+      try {
+        setButtonLoading(placeOrderBtn, 'Placing Order...', true);
+
+        const res = await fetch(`${API_BASE_URL}/orders/complete`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Order failed');
+        lastPlacedOrderId = data.order_id;
+        saveOrderRecord({
+          order_id: data.order_id,
+          order_status: payload.order_status,
+          payment_status: payload.payment_status,
+          order_date: payload.order_date,
+          delivery_date: payload.delivery_date,
+          payment_mode: payload.payment_mode,
+          address: payload.address,
+          city: payload.city,
+          items_count: payload.items.length,
+          total_amount: data.total_amount,
+          items: entries.map(({ item, quantity }) => ({
+            item_id: item.item_id,
+            item_name: item.item_name,
+            quantity,
+            unit_price: item.price,
+            line_total: item.price * quantity,
+            weight: item.weight || ''
+          }))
+        });
+
+        Object.keys(cart).forEach(key => delete cart[key]);
+        renderItems();
+        renderCart();
+      } catch (err) {
+        cartErrorEl.textContent = `Could not place order: ${err.message}`;
+        cartErrorEl.style.display = 'block';
+      } finally {
+        setButtonLoading(placeOrderBtn, 'Place Order', false);
+      }
+    }
+
+    function openCartDrawer() {
+      const drawer = document.getElementById('cartDrawer');
+      drawer.classList.add('active');
+      drawer.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeCartDrawer() {
+      const drawer = document.getElementById('cartDrawer');
+      drawer.classList.remove('active');
+      drawer.setAttribute('aria-hidden', 'true');
+      if (!document.getElementById('authOverlay').classList.contains('active')) {
+        document.body.style.overflow = 'auto';
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('user');
+      applyAuthState();
+      closeProfileMenu();
+      document.getElementById('cartError').style.display = 'none';
+    }
+
+    function showMyOrders() {
+      if (!token) {
+        openAuthModal('login');
+        return;
+      }
+      closeProfileMenu();
+      window.location.href = './my-orders.html';
+    }
+
+    document.getElementById('itemSearch').addEventListener('input', (event) => {
+      searchText = event.target.value || '';
+      renderItems();
+    });
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const message = document.getElementById('loginMessage');
+      const loginBtn = document.getElementById('loginBtn');
+      clearAlert(message);
+
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+
+      const body = new URLSearchParams();
+      body.append('username', email);
+      body.append('password', password);
+
+      try {
+        setButtonLoading(loginBtn, 'Signing in...', true);
+
+        const res = await fetch(`${API_BASE_URL}/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: body.toString()
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.detail || 'Login failed');
+        }
+
+        localStorage.setItem('access_token', data.access_token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        applyAuthState();
+        setAlert(message, 'success', 'Login successful!');
+
+        if (data.user && data.user.role === 'admin') {
+          setTimeout(() => {
+            window.location.href = './admin.html';
+          }, 500);
+          return;
+        }
+
+        setTimeout(() => {
+          closeAuthModal();
+        }, 450);
+      } catch (err) {
+        setAlert(message, 'error', err.message || 'Login failed');
+      } finally {
+        setButtonLoading(loginBtn, 'Sign In', false);
+      }
+    });
+
+    document.getElementById('signupForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const message = document.getElementById('signupMessage');
+      const signupBtn = document.getElementById('signupBtn');
+      clearAlert(message);
+
+      const payload = {
+        name: document.getElementById('signupName').value.trim(),
+        phone_number: Number(document.getElementById('signupPhone').value.trim()),
+        email: document.getElementById('signupEmail').value.trim(),
+        password: document.getElementById('signupPassword').value,
+        role: 'user',
+        address: document.getElementById('signupAddress').value.trim(),
+        city: document.getElementById('signupCity').value.trim()
+      };
+
+      try {
+        setButtonLoading(signupBtn, 'Creating...', true);
+
+        const res = await fetch(`${API_BASE_URL}/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.detail || 'Registration failed');
+        }
+
+        setAlert(message, 'success', `Account created successfully! User ID: ${data.user_id}. Please login.`);
+        document.getElementById('signupForm').reset();
+
+        setTimeout(() => {
+          switchAuthView('login');
+          clearAlert(message);
+        }, 1300);
+      } catch (err) {
+        setAlert(message, 'error', err.message || 'Registration failed');
+      } finally {
+        setButtonLoading(signupBtn, 'Create Account', false);
+      }
+    });
+
+    async function init() {
+      applyAuthState();
+      await hydrateProfileDetails();
+      renderCart();
+      await loadItems();
+    }
+
+    init();
+  </script>
 </body>
 </html>

@@ -904,3 +904,185 @@
 .bottom-cart-btn {
   background: linear-gradient(130deg, #0f6b4f, #0a4e3a);
 }
+
+/* Foodi-style warm theme overrides */
+.order-dashboard {
+  background:
+    radial-gradient(circle at 8% -10%, rgba(255, 184, 48, 0.2), transparent 34%),
+    radial-gradient(circle at 92% 0%, rgba(232, 82, 26, 0.12), transparent 28%),
+    #fff8f0;
+}
+
+.dash-nav {
+  background: rgba(255, 250, 245, 0.9);
+  border-bottom: 1px solid #eadfd5;
+  box-shadow: 0 10px 28px rgba(56, 28, 12, 0.08);
+  backdrop-filter: blur(8px);
+}
+
+.dash-brand img {
+  border-color: #eadfd5;
+}
+
+.dash-brand p,
+.panel-head span,
+.loading-block,
+.food-card p,
+.food-meta,
+.cart-note,
+.order-page-search-note p,
+.orders-empty,
+.orders-empty-page p,
+.order-item-empty,
+.cart-line p,
+.profile-row span,
+.summary-row span,
+.cart-summary label {
+  color: #7a6f68;
+}
+
+.dash-search-wrap input {
+  border-color: #eadfd5;
+  background: #fff;
+}
+
+.dash-search-wrap input:focus {
+  border-color: #ff6b35;
+}
+
+.cart-quick-btn,
+.drawer-close-btn,
+.profile-orders-btn {
+  border-color: #eadfd5;
+  background: #fff;
+  color: #1a120b;
+}
+
+.order-profile-btn {
+  background: linear-gradient(135deg, #ff6b35, #e8521a);
+}
+
+.order-profile-menu,
+.catalog-panel,
+.cart-panel,
+.orders-page-panel,
+.food-card,
+.cart-line,
+.order-history-card,
+.order-item-row {
+  background: #fff;
+  border-color: #eadfd5;
+  box-shadow: 0 10px 24px rgba(58, 25, 8, 0.05);
+}
+
+.order-hero {
+  background:
+    linear-gradient(130deg, rgba(26, 18, 11, 0.94), rgba(61, 36, 16, 0.94)),
+    radial-gradient(circle at 20% 25%, rgba(255, 107, 53, 0.26), transparent 40%),
+    radial-gradient(circle at 82% 70%, rgba(255, 184, 48, 0.22), transparent 44%);
+}
+
+.chip {
+  border-color: #eadfd5;
+  color: #5f544d;
+}
+
+.chip.active {
+  background: #1a120b;
+  border-color: #1a120b;
+  color: #fff;
+}
+
+.food-image-wrap {
+  background: #fff1e5;
+  border-color: #f0dfd2;
+}
+
+.food-badge {
+  background: #ffe8d6;
+  color: #b93814;
+}
+
+.food-bottom strong,
+.order-history-head span,
+.view-order-note {
+  color: #e8521a !important;
+}
+
+.add-btn {
+  border-color: #ff6b35;
+  background: #fff0e6;
+  color: #e8521a;
+}
+
+.qty-stepper {
+  border-color: #eadfd5;
+}
+
+.qty-stepper button {
+  background: #fffaf5;
+}
+
+.cart-empty,
+.orders-empty-page {
+  border-color: #ebddd0;
+}
+
+.cart-inline-error {
+  border-color: #f2b9bf;
+  background: #fdecee;
+  color: #9f1239;
+}
+
+.order-success-action {
+  border-color: #ffd8bf;
+  background: #fff2e8;
+  color: #b54708;
+}
+
+.view-orders-btn {
+  background: #e8521a;
+}
+
+.cart-summary {
+  border-top-color: #eadfd5;
+}
+
+.cart-summary select {
+  border-color: #eadfd5;
+}
+
+.place-order-btn {
+  background: linear-gradient(90deg, #ff6b35, #e8521a);
+}
+
+.bottom-cart-btn {
+  background: linear-gradient(90deg, #1a120b, #3d2410);
+  box-shadow: 0 12px 28px rgba(40, 18, 8, 0.35);
+}
+
+.bottom-cart-btn span {
+  color: #ffb830;
+}
+
+.cart-drawer-overlay {
+  background: rgba(26, 18, 11, 0.6);
+}
+
+.order-cancel-btn,
+.profile-logout-btn {
+  background: #b42318;
+}
+
+.order-history-card.clickable:hover {
+  border-color: #d8c8bb;
+  box-shadow: 0 10px 22px rgba(58, 25, 8, 0.1);
+}
+
+.order-history-details {
+  border-top-color: #eadfd5;
+}
+
+.order-item-row span {
+  color: #1a120b;
+}
