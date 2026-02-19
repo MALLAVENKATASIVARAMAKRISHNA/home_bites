@@ -1503,11 +1503,12 @@
       <section id="authLoginView" class="auth-view active">
         <form id="loginForm" novalidate>
           <div class="auth-group">
-            <label for="loginEmail" class="auth-label">Email address</label>
+            <label for="loginEmail" class="auth-label">Email or phone</label>
             <div class="auth-input-wrap">
               <span class="auth-input-icon">@</span>
-              <input id="loginEmail" type="email" class="auth-input has-icon" placeholder="hello@example.com" required autocomplete="email" />
+              <input id="loginEmail" type="text" class="auth-input has-icon" placeholder="hello@example.com / 9876543210" required autocomplete="email" />
             </div>
+            <small style="display:block;margin-top:4px;color:#b3885b;font-size:12px;">Use the email or mobile registered with Home Bites.</small>
           </div>
 
           <div class="auth-group">
@@ -2022,11 +2023,11 @@
     const loginBtn = document.getElementById('loginBtn');
     clearAlert(message);
 
-    const email = document.getElementById('loginEmail').value.trim();
-    const password = document.getElementById('loginPassword').value;
+      const identifier = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
 
     const body = new URLSearchParams();
-    body.append('username', email);
+      body.append('username', identifier);
     body.append('password', password);
 
     try {
