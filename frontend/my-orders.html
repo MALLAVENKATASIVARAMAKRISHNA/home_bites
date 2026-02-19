@@ -305,12 +305,12 @@
     }
 
     function goToDashboard() {
-      window.location.href = './dashboard.html';
+      window.location.href = './index.html';
     }
 
     function goToRoleDashboard() {
       const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
-      window.location.href = currentUser.role === 'admin' ? './admin.html' : './dashboard.html';
+      window.location.href = currentUser.role === 'admin' ? './admin.html' : './index.html';
     }
 
     function logout() {
