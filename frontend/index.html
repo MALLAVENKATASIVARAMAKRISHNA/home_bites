@@ -92,6 +92,73 @@
     gap: 14px;
   }
 
+  .profile-wrapper {
+    position: relative;
+  }
+
+  .profile-btn {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    background: var(--orange);
+    color: #fff;
+    font-weight: 700;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: border 0.2s ease, transform 0.2s ease;
+  }
+
+  .profile-btn:hover {
+    border-color: rgba(255, 255, 255, 0.6);
+    transform: translateY(-1px);
+  }
+
+  .profile-dropdown {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    width: 220px;
+    padding: 12px 14px;
+    background: #fff;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    display: none;
+    z-index: 110;
+  }
+
+  .profile-dropdown.active {
+    display: block;
+  }
+
+  .profile-details strong {
+    display: block;
+    font-size: 14px;
+    color: var(--text-dark);
+    margin-bottom: 4px;
+  }
+
+  .profile-details span {
+    display: block;
+    font-size: 13px;
+    color: var(--text-mid);
+    line-height: 1.4;
+  }
+
+  .profile-logout-btn {
+    width: 100%;
+    padding: 8px;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    font-size: 13px;
+    margin-top: 8px;
+    background: none;
+  }
+
   .btn-signin {
     background: none;
     border: none;
@@ -1324,7 +1391,19 @@
     <button id="signInBtn" class="btn-signin" onclick="openAuthModal('login')">Sign In</button>
     <button id="signUpBtn" class="btn-signup" onclick="openAuthModal('signup')">Sign Up</button>
     <button id="myOrdersBtn" class="btn-signin" style="display:none;" onclick="showMyOrders()">My Orders</button>
-    <button id="logoutBtn" class="btn-signup" style="display:none;" onclick="logout()">Logout</button>
+    <div class="profile-wrapper" id="profileArea" style="display:none;">
+      <button id="profileBtn" class="profile-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Profile menu">
+        <span id="profileInitial">👤</span>
+      </button>
+      <div id="profileDropdown" class="profile-dropdown" role="menu" aria-label="Profile details">
+        <div class="profile-details">
+          <strong id="profileName">User</strong>
+          <span id="profileEmail">Email</span>
+          <span id="profilePhone">Phone</span>
+        </div>
+        <button class="profile-logout-btn" type="button" onclick="logout()">Logout</button>
+      </div>
+    </div>
   </div>
 </nav>
 
@@ -1807,7 +1886,36 @@
     document.getElementById('signInBtn').style.display = loggedIn ? 'none' : '';
     document.getElementById('signUpBtn').style.display = loggedIn ? 'none' : '';
     document.getElementById('myOrdersBtn').style.display = loggedIn ? '' : 'none';
-    document.getElementById('logoutBtn').style.display = loggedIn ? '' : 'none';
+    updateProfileArea(loggedIn);
+  }
+
+  function getProfileInitial() {
+    const primary = String(user.name || user.email || '').trim();
+    if (!primary) return '👤';
+    return primary[0].toUpperCase();
+  }
+
+  function updateProfileArea(loggedIn) {
+    const wrapper = document.getElementById('profileArea');
+    if (!wrapper) return;
+    const dropdown = document.getElementById('profileDropdown');
+    const nameEl = document.getElementById('profileName');
+    const emailEl = document.getElementById('profileEmail');
+    const phoneEl = document.getElementById('profilePhone');
+    const initialEl = document.getElementById('profileInitial');
+
+    if (loggedIn) {
+      wrapper.style.display = '';
+      if (nameEl) nameEl.textContent = user.name || 'User';
+      if (emailEl) emailEl.textContent = user.email || 'Email not set';
+      if (phoneEl) phoneEl.textContent = user.phone_number ? String(user.phone_number) : 'Phone not set';
+      if (initialEl) initialEl.textContent = getProfileInitial();
+    } else {
+      wrapper.style.display = 'none';
+      if (dropdown) dropdown.classList.remove('active');
+      const profileBtn = document.getElementById('profileBtn');
+      if (profileBtn) profileBtn.setAttribute('aria-expanded', 'false');
+    }
   }
 
   async function hydrateProfileDetails() {
@@ -1997,6 +2105,8 @@
   });
 
   function logout() {
+    token = null;
+    user = {};
     localStorage.removeItem('access_token');
     localStorage.removeItem('user');
     applyAuthState();
@@ -2014,6 +2124,28 @@
     if (event.key === 'Escape') {
       closeCartDrawer();
       closeAuthModal();
+    }
+  });
+
+  const profileBtn = document.getElementById('profileBtn');
+  if (profileBtn) {
+    profileBtn.addEventListener('click', (event) => {
+      event.stopPropagation();
+      const dropdown = document.getElementById('profileDropdown');
+      if (!dropdown) return;
+      const wasOpen = dropdown.classList.contains('active');
+      dropdown.classList.toggle('active', !wasOpen);
+      profileBtn.setAttribute('aria-expanded', String(!wasOpen));
+    });
+  }
+
+  document.addEventListener('click', (event) => {
+    const wrapper = document.getElementById('profileArea');
+    const dropdown = document.getElementById('profileDropdown');
+    if (!wrapper || !dropdown) return;
+    if (!wrapper.contains(event.target)) {
+      dropdown.classList.remove('active');
+      document.getElementById('profileBtn')?.setAttribute('aria-expanded', 'false');
     }
   });
 
