@@ -513,11 +513,20 @@ def register(user: Users, db: Connection = Depends(get_db)):
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Connection = Depends(get_db)):
     cursor = db.cursor()
     try:
-        user = cursor.execute(
-            "SELECT * FROM users WHERE email = ?", 
-            (form_data.username,)
-        ).fetchone()
-        
+        identifier = form_data.username.strip()
+        is_phone_identifier = identifier.isdigit() and len(identifier) == 10
+
+        if is_phone_identifier:
+            user = cursor.execute(
+                "SELECT * FROM users WHERE phone_number = ?",
+                (int(identifier),)
+            ).fetchone()
+        else:
+            user = cursor.execute(
+                "SELECT * FROM users WHERE email = ?",
+                (identifier,)
+            ).fetchone()
+
         if not user or not verify_password(form_data.password, user["password"]):
             raise HTTPException(status_code=401, detail="Incorrect email or password")
         
