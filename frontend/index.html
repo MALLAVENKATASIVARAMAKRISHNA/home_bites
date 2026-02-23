@@ -151,12 +151,21 @@
 
   .profile-logout-btn {
     width: 100%;
-    padding: 8px;
+    padding: 10px 12px;
     border-radius: 10px;
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    border: 1px solid #a11a14;
     font-size: 13px;
+    font-weight: 700;
     margin-top: 8px;
-    background: none;
+    background: #b42318;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+  }
+
+  .profile-logout-btn:hover {
+    background: #951910;
+    transform: translateY(-1px);
   }
 
   .btn-signin {
@@ -1879,8 +1888,9 @@
   }
 
   function applyAuthState() {
-    token = localStorage.getItem('access_token');
+    token = getValidAccessToken();
     user = JSON.parse(localStorage.getItem('user') || '{}');
+    if (!token) user = {};
 
     const loggedIn = Boolean(token && user && user.user_id);
     document.getElementById('signInBtn').style.display = loggedIn ? 'none' : '';
@@ -2105,6 +2115,7 @@
   });
 
   function logout() {
+    stopSessionExpiryWatcher();
     token = null;
     user = {};
     localStorage.removeItem('access_token');
@@ -2179,6 +2190,11 @@
 
       localStorage.setItem('access_token', data.access_token);
       localStorage.setItem('user', JSON.stringify(data.user));
+      startSessionExpiryWatcher(() => {
+        token = null;
+        user = {};
+        applyAuthState();
+      });
       applyAuthState();
       setAlert(message, 'success', 'Login successful!');
 
@@ -2253,6 +2269,11 @@
   reveals.forEach((r) => observer.observe(r));
 
   async function init() {
+    startSessionExpiryWatcher(() => {
+      token = null;
+      user = {};
+      applyAuthState();
+    });
     applyAuthState();
     await hydrateProfileDetails();
     renderCart();

@@ -1,12 +1,17 @@
 // Check if user is admin
-const token = localStorage.getItem('access_token');
+const token = getValidAccessToken();
 const user = JSON.parse(localStorage.getItem('user') || '{}');
 let itemsCache = [];
 let editingItemId = null;
 
 if (!token || user.role !== 'admin') {
+  clearStoredAuth();
   window.location.href = './index.html';
 }
+
+startSessionExpiryWatcher(() => {
+  window.location.href = './index.html';
+});
 
 // Display admin info
 document.getElementById('adminName').textContent = user.name || 'Admin';
@@ -14,6 +19,7 @@ document.getElementById('adminEmail').textContent = user.email || '';
 
 // Logout function
 function logout() {
+  stopSessionExpiryWatcher();
   localStorage.removeItem('access_token');
   localStorage.removeItem('user');
   window.location.href = './index.html';

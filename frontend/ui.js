@@ -27,3 +27,71 @@ function setupPasswordToggle(inputId, toggleId) {
     toggle.textContent = hidden ? "Hide" : "Show";
   });
 }
+
+function clearStoredAuth() {
+  localStorage.removeItem("access_token");
+  localStorage.removeItem("user");
+}
+
+function decodeJwtPayload(token) {
+  try {
+    const parts = String(token || "").split(".");
+    if (parts.length < 2) return null;
+    const base64Url = parts[1];
+    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    const padded = base64 + "=".repeat((4 - (base64.length % 4)) % 4);
+    return JSON.parse(atob(padded));
+  } catch (err) {
+    return null;
+  }
+}
+
+function getTokenExpiryMs(token) {
+  const payload = decodeJwtPayload(token);
+  const expSeconds = Number(payload?.exp);
+  if (!Number.isFinite(expSeconds) || expSeconds <= 0) return null;
+  return expSeconds * 1000;
+}
+
+function getValidAccessToken() {
+  const token = localStorage.getItem("access_token");
+  if (!token) return null;
+  const expiryMs = getTokenExpiryMs(token);
+  if (!expiryMs || expiryMs <= Date.now()) {
+    clearStoredAuth();
+    return null;
+  }
+  return token;
+}
+
+function stopSessionExpiryWatcher() {
+  if (window.__homeBitesSessionExpiryTimer) {
+    clearTimeout(window.__homeBitesSessionExpiryTimer);
+    window.__homeBitesSessionExpiryTimer = null;
+  }
+}
+
+function startSessionExpiryWatcher(onExpire) {
+  stopSessionExpiryWatcher();
+  const token = localStorage.getItem("access_token");
+  if (!token) return;
+
+  const expiryMs = getTokenExpiryMs(token);
+  if (!expiryMs) {
+    clearStoredAuth();
+    if (typeof onExpire === "function") onExpire();
+    return;
+  }
+
+  const remainingMs = expiryMs - Date.now();
+  if (remainingMs <= 0) {
+    clearStoredAuth();
+    if (typeof onExpire === "function") onExpire();
+    return;
+  }
+
+  window.__homeBitesSessionExpiryTimer = setTimeout(() => {
+    clearStoredAuth();
+    if (typeof onExpire === "function") onExpire();
+  }, remainingMs + 200);
+}

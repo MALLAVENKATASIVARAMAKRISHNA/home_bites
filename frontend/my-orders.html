@@ -51,14 +51,19 @@
   <script src="./config.js"></script>
   <script src="./ui.js"></script>
   <script>
-    const token = localStorage.getItem('access_token');
+    const token = getValidAccessToken();
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     let activeOrderIndex = null;
     let ordersCache = [];
 
     if (!token) {
+      clearStoredAuth();
       window.location.href = './index.html';
     }
+
+    startSessionExpiryWatcher(() => {
+      window.location.href = './index.html';
+    });
 
     function escapeHtml(text) {
       const div = document.createElement('div');
@@ -313,6 +318,7 @@
     }
 
     function logout() {
+      stopSessionExpiryWatcher();
       localStorage.removeItem('access_token');
       localStorage.removeItem('user');
       window.location.href = './index.html';
