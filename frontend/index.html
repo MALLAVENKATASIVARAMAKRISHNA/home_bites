@@ -163,6 +163,25 @@
     transition: background 0.2s ease, transform 0.2s ease;
   }
 
+  .profile-action-btn {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    font-size: 13px;
+    font-weight: 700;
+    margin-top: 10px;
+    background: #fff7ef;
+    color: #9a4700;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+  }
+
+  .profile-action-btn:hover {
+    background: #ffeddc;
+    transform: translateY(-1px);
+  }
+
   .profile-logout-btn:hover {
     background: #951910;
     transform: translateY(-1px);
@@ -1410,6 +1429,7 @@
           <span id="profileEmail">Email</span>
           <span id="profilePhone">Phone</span>
         </div>
+        <button class="profile-action-btn" type="button" onclick="showMyProfile()">My Profile</button>
         <button class="profile-logout-btn" type="button" onclick="logout()">Logout</button>
       </div>
     </div>
@@ -2129,6 +2149,14 @@
       return;
     }
     window.location.href = './my-orders.html';
+  }
+
+  function showMyProfile() {
+    if (!token) {
+      openAuthModal('login');
+      return;
+    }
+    window.location.href = './my-profile.html';
   }
 
   document.addEventListener('keydown', (event) => {

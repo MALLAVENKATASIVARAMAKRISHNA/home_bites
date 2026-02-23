@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Profile - Home Bites</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="dashboard order-dashboard">
+    <nav class="dash-nav">
+      <button class="dash-brand brand-home-btn" type="button" onclick="goToRoleDashboard()" aria-label="Go to dashboard">
+        <img src="./assets/logo.png" alt="Home Bites logo" />
+        <div>
+          <strong>Home Bites</strong>
+          <p>Account details</p>
+        </div>
+      </button>
+
+      <div class="dash-search-wrap order-page-search-note">
+        <p>Check and confirm your profile details below.</p>
+      </div>
+
+      <div class="dash-actions">
+        <button class="cart-quick-btn" type="button" onclick="goToDashboard()">Back to Dashboard</button>
+        <button class="cart-quick-btn" type="button" onclick="goToMyOrders()">My Orders</button>
+        <button class="profile-logout-btn small-logout" type="button" onclick="logout()">Logout</button>
+      </div>
+    </nav>
+
+    <main class="order-main">
+      <section class="order-hero">
+        <h1>My Profile</h1>
+        <p>Your account information used for orders and delivery.</p>
+      </section>
+
+      <section class="orders-page-panel profile-page-panel">
+        <div class="panel-head">
+          <h2>Profile Details</h2>
+          <span id="profileMeta">Loading...</span>
+        </div>
+
+        <div id="profileMessage" class="alert"></div>
+        <div id="profileContent" class="profile-grid"></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="./config.js"></script>
+  <script src="./ui.js"></script>
+  <script>
+    const token = getValidAccessToken();
+    let user = JSON.parse(localStorage.getItem('user') || '{}');
+
+    if (!token) {
+      clearStoredAuth();
+      window.location.href = './index.html';
+    }
+
+    startSessionExpiryWatcher(() => {
+      window.location.href = './index.html';
+    });
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text ?? '';
+      return div.innerHTML;
+    }
+
+    function valueOrFallback(value) {
+      if (value === null || value === undefined) return '-';
+      const text = String(value).trim();
+      return text ? text : '-';
+    }
+
+    function renderProfile(profile) {
+      const content = document.getElementById('profileContent');
+      const meta = document.getElementById('profileMeta');
+
+      const details = [
+        { label: 'Full Name', value: valueOrFallback(profile.name) },
+        { label: 'Email', value: valueOrFallback(profile.email) },
+        { label: 'Phone Number', value: valueOrFallback(profile.phone_number) },
+        { label: 'Address', value: valueOrFallback(profile.address) },
+        { label: 'City', value: valueOrFallback(profile.city) },
+        { label: 'Role', value: valueOrFallback(profile.role) },
+        { label: 'User ID', value: valueOrFallback(profile.user_id) }
+      ];
+
+      content.innerHTML = details.map((detail) => `
+        <article class="profile-card">
+          <p class="profile-label">${escapeHtml(detail.label)}</p>
+          <strong class="profile-value">${escapeHtml(detail.value)}</strong>
+        </article>
+      `).join('');
+
+      meta.textContent = `User #${valueOrFallback(profile.user_id)}`;
+    }
+
+    async function loadProfile() {
+      const message = document.getElementById('profileMessage');
+      clearAlert(message);
+
+      renderProfile(user);
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/me`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Failed to load profile');
+
+        user = { ...user, ...data };
+        localStorage.setItem('user', JSON.stringify(user));
+        renderProfile(user);
+      } catch (err) {
+        setAlert(message, 'error', err.message || 'Could not refresh profile details');
+      }
+    }
+
+    function goToDashboard() {
+      window.location.href = './index.html';
+    }
+
+    function goToMyOrders() {
+      window.location.href = './my-orders.html';
+    }
+
+    function goToRoleDashboard() {
+      const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+      window.location.href = currentUser.role === 'admin' ? './admin.html' : './index.html';
+    }
+
+    function logout() {
+      stopSessionExpiryWatcher();
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('user');
+      window.location.href = './index.html';
+    }
+
+    loadProfile();
+  </script>
+  <style>
+    .profile-page-panel {
+      margin-bottom: 20px;
+    }
+
+    .profile-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      padding-top: 8px;
+    }
+
+    .profile-card {
+      border: 1px solid #eaecf0;
+      border-radius: 12px;
+      padding: 14px;
+      background: #fff;
+      box-shadow: 0 8px 18px rgba(16, 24, 40, 0.05);
+    }
+
+    .profile-label {
+      margin: 0 0 8px;
+      font-size: 0.78rem;
+      color: #667085;
+      text-transform: uppercase;
+      letter-spacing: 0.35px;
+      font-weight: 700;
+    }
+
+    .profile-value {
+      margin: 0;
+      font-size: 0.97rem;
+      color: #101828;
+      overflow-wrap: anywhere;
+      line-height: 1.45;
+    }
+
+    .hb-footer {
+      margin-top: 32px;
+      padding: 26px 18px 18px;
+      background: linear-gradient(145deg, #f3dcc5 0%, #f8f1e6 45%, #f0c38f 100%);
+      color: #3c2616;
+      border-top: 2px solid rgba(135, 72, 22, 0.18);
+    }
+
+    .hb-footer-contact {
+      text-align: center;
+      font-size: 14px;
+      margin: 10px 0 8px;
+    }
+
+    .hb-footer-contact a {
+      color: #7d260f;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .hb-footer-contact a:hover {
+      text-decoration: underline;
+    }
+
+    .hb-footer-copy {
+      margin: 0;
+      text-align: center;
+      font-size: 12px;
+      opacity: 0.85;
+    }
+  </style>
+  <footer class="hb-footer">
+    <p class="hb-footer-contact">Phone: <a href="tel:9014763361">9014763361</a> | Email: <a href="mailto:homebites@03112003.xyz">homebites@03112003.xyz</a></p>
+    <p class="hb-footer-copy">© 2026 Home Bites. All rights reserved.</p>
+  </footer>
+</body>
+</html>
