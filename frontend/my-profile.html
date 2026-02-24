@@ -40,11 +40,14 @@
       <section class="orders-page-panel profile-page-panel">
         <div class="panel-head">
           <h2>Profile Details</h2>
-          <span id="profileMeta">Loading...</span>
+          <span id="profileMeta"></span>
         </div>
 
         <div id="profileMessage" class="alert"></div>
         <div id="profileContent" class="profile-grid"></div>
+        <div class="profile-edit-actions">
+          <button id="saveProfileBtn" class="cart-quick-btn" type="button">Save Changes</button>
+        </div>
       </section>
     </main>
   </div>
@@ -54,6 +57,13 @@
   <script>
     const token = getValidAccessToken();
     let user = JSON.parse(localStorage.getItem('user') || '{}');
+    const editableFields = {
+      name: { minLen: 2, label: 'Name' },
+      address: { minLen: 5, label: 'Address' },
+      city: { minLen: 2, label: 'City' }
+    };
+    let editingState = { name: false, address: false, city: false };
+    let draftProfile = { name: '', address: '', city: '' };
 
     if (!token) {
       clearStoredAuth();
@@ -76,34 +86,113 @@
       return text ? text : '-';
     }
 
+    function getEditableValue(profile, key) {
+      const text = String(profile?.[key] ?? '').trim();
+      return text;
+    }
+
+    function resetDraftFromUser(profile) {
+      draftProfile.name = getEditableValue(profile, 'name');
+      draftProfile.address = getEditableValue(profile, 'address');
+      draftProfile.city = getEditableValue(profile, 'city');
+    }
+
+    function syncDraftFromInputs() {
+      Object.keys(editableFields).forEach((key) => {
+        if (!editingState[key]) return;
+        const input = document.getElementById(`inlineEdit_${key}`);
+        if (input) {
+          draftProfile[key] = input.value;
+        }
+      });
+    }
+
+    function hasProfileData(profile) {
+      if (!profile || typeof profile !== 'object') return false;
+      return Boolean(
+        String(profile.name || '').trim() ||
+        String(profile.email || '').trim() ||
+        String(profile.phone_number || '').trim() ||
+        String(profile.address || '').trim() ||
+        String(profile.city || '').trim()
+      );
+    }
+
+    function toggleProfileFieldEdit(field) {
+      if (!editableFields[field]) return;
+      syncDraftFromInputs();
+
+      if (editingState[field]) {
+        draftProfile[field] = getEditableValue(user, field);
+      }
+      editingState[field] = !editingState[field];
+      renderProfile(user);
+
+      if (editingState[field]) {
+        const input = document.getElementById(`inlineEdit_${field}`);
+        if (input) {
+          input.focus();
+          input.setSelectionRange(input.value.length, input.value.length);
+        }
+      }
+    }
+
+    function hasProfileChanges(values) {
+      return (
+        values.name !== getEditableValue(user, 'name') ||
+        values.address !== getEditableValue(user, 'address') ||
+        values.city !== getEditableValue(user, 'city')
+      );
+    }
+
     function renderProfile(profile) {
       const content = document.getElementById('profileContent');
       const meta = document.getElementById('profileMeta');
 
       const details = [
-        { label: 'Full Name', value: valueOrFallback(profile.name) },
-        { label: 'Email', value: valueOrFallback(profile.email) },
-        { label: 'Phone Number', value: valueOrFallback(profile.phone_number) },
-        { label: 'Address', value: valueOrFallback(profile.address) },
-        { label: 'City', value: valueOrFallback(profile.city) },
-        { label: 'Role', value: valueOrFallback(profile.role) },
-        { label: 'User ID', value: valueOrFallback(profile.user_id) }
+        { key: 'name', label: 'Full Name', value: valueOrFallback(profile.name), editable: true },
+        { key: 'email', label: 'Email', value: valueOrFallback(profile.email), editable: false },
+        { key: 'phone_number', label: 'Phone Number', value: valueOrFallback(profile.phone_number), editable: false },
+        { key: 'address', label: 'Address', value: valueOrFallback(profile.address), editable: true },
+        { key: 'city', label: 'City', value: valueOrFallback(profile.city), editable: true }
       ];
 
       content.innerHTML = details.map((detail) => `
         <article class="profile-card">
-          <p class="profile-label">${escapeHtml(detail.label)}</p>
-          <strong class="profile-value">${escapeHtml(detail.value)}</strong>
+          <div class="profile-card-head">
+            <p class="profile-label">${escapeHtml(detail.label)}</p>
+            ${detail.editable ? `
+              <button
+                class="edit-icon-btn"
+                type="button"
+                onclick="toggleProfileFieldEdit('${escapeHtml(detail.key)}')"
+                aria-label="Edit ${escapeHtml(detail.label)}"
+                title="Edit ${escapeHtml(detail.label)}"
+              >✎</button>
+            ` : ''}
+          </div>
+          ${detail.editable && editingState[detail.key] ? `
+            <input
+              id="inlineEdit_${escapeHtml(detail.key)}"
+              class="profile-inline-input"
+              type="text"
+              value="${escapeHtml(String(draftProfile[detail.key] ?? ''))}"
+            />
+          ` : `
+            <strong class="profile-value">${escapeHtml(detail.value)}</strong>
+          `}
         </article>
       `).join('');
 
-      meta.textContent = `User #${valueOrFallback(profile.user_id)}`;
+      meta.textContent = '';
     }
 
     async function loadProfile() {
       const message = document.getElementById('profileMessage');
       clearAlert(message);
 
+      resetDraftFromUser(user);
+      editingState = { name: false, address: false, city: false };
       renderProfile(user);
 
       try {
@@ -116,9 +205,67 @@
 
         user = { ...user, ...data };
         localStorage.setItem('user', JSON.stringify(user));
+        resetDraftFromUser(user);
         renderProfile(user);
       } catch (err) {
-        setAlert(message, 'error', err.message || 'Could not refresh profile details');
+        if (!hasProfileData(user)) {
+          setAlert(message, 'error', err.message || 'Could not refresh profile details');
+        }
+      }
+    }
+
+    async function saveProfile() {
+      const message = document.getElementById('profileMessage');
+      const saveBtn = document.getElementById('saveProfileBtn');
+      clearAlert(message);
+      syncDraftFromInputs();
+
+      const name = String(draftProfile.name || '').trim();
+      const address = String(draftProfile.address || '').trim();
+      const city = String(draftProfile.city || '').trim();
+
+      if (!hasProfileChanges({ name, address, city })) {
+        setAlert(message, 'error', 'No changes to save.');
+        return;
+      }
+
+      if (name.length < 2) {
+        setAlert(message, 'error', 'Name should be at least 2 characters.');
+        return;
+      }
+      if (address.length < 5) {
+        setAlert(message, 'error', 'Address should be at least 5 characters.');
+        return;
+      }
+      if (city.length < 2) {
+        setAlert(message, 'error', 'City should be at least 2 characters.');
+        return;
+      }
+
+      setButtonLoading(saveBtn, 'Saving...', true);
+      try {
+        const res = await fetch(`${API_BASE_URL}/me/profile`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({ name, address, city })
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Failed to update profile');
+
+        user = { ...user, ...data };
+        localStorage.setItem('user', JSON.stringify(user));
+        editingState = { name: false, address: false, city: false };
+        resetDraftFromUser(user);
+        renderProfile(user);
+        setAlert(message, 'success', 'Profile updated successfully.');
+      } catch (err) {
+        setAlert(message, 'error', err.message || 'Could not update profile');
+      } finally {
+        setButtonLoading(saveBtn, 'Saving...', false);
       }
     }
 
@@ -142,6 +289,8 @@
       window.location.href = './index.html';
     }
 
+    window.toggleProfileFieldEdit = toggleProfileFieldEdit;
+    document.getElementById('saveProfileBtn').addEventListener('click', saveProfile);
     loadProfile();
   </script>
   <style>
@@ -164,6 +313,13 @@
       box-shadow: 0 8px 18px rgba(16, 24, 40, 0.05);
     }
 
+    .profile-card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
     .profile-label {
       margin: 0 0 8px;
       font-size: 0.78rem;
@@ -173,12 +329,54 @@
       font-weight: 700;
     }
 
+    .edit-icon-btn {
+      border: 1px solid #d0d5dd;
+      background: #fff;
+      border-radius: 8px;
+      height: 28px;
+      min-width: 28px;
+      padding: 0 6px;
+      line-height: 1;
+      font-size: 14px;
+      color: #475467;
+      cursor: pointer;
+    }
+
+    .edit-icon-btn:hover {
+      border-color: #f97316;
+      color: #c2410c;
+      background: #fff7ed;
+    }
+
     .profile-value {
       margin: 0;
       font-size: 0.97rem;
       color: #101828;
       overflow-wrap: anywhere;
       line-height: 1.45;
+    }
+
+    .profile-inline-input {
+      width: 100%;
+      border: 1px solid #d0d5dd;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 0.95rem;
+      color: #101828;
+      background: #fff;
+      margin-top: 2px;
+    }
+
+    .profile-inline-input:focus {
+      outline: none;
+      border-color: #f97316;
+      box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.16);
+    }
+
+    .profile-edit-actions {
+      margin-top: 14px;
+      display: flex;
+      justify-content: flex-end;
     }
 
     .hb-footer {

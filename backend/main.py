@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, Depends, Request, status
 from database import create_users, get_db_connection, get_db
-from models import Users, UserResponse, Items, ItemResponse, Orders, OrderResponse, OrderDetails, OrderDetailResponse, CreateOrder, OrderItem
+from models import Users, UserResponse, UserProfileUpdate, Items, ItemResponse, Orders, OrderResponse, OrderDetails, OrderDetailResponse, CreateOrder, OrderItem
 from typing import Any, List, Optional
 Connection = Any
 import sqlite3
@@ -554,6 +554,45 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Connection = Dep
 @app.get("/me", response_model=UserResponse)
 def get_current_user_profile(current_user: dict = Depends(get_current_user)):
     return current_user
+
+@app.put("/me/profile", response_model=UserResponse)
+def update_current_user_profile(
+    payload: UserProfileUpdate,
+    db: Connection = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
+):
+    cursor = db.cursor()
+    try:
+        cursor.execute(
+            """
+            UPDATE users
+            SET name = ?, address = ?, city = ?
+            WHERE user_id = ?
+            """,
+            (payload.name, payload.address, payload.city, current_user["user_id"])
+        )
+        db.commit()
+
+        updated = cursor.execute(
+            """
+            SELECT user_id, name, phone_number, email, role, address, city
+            FROM users
+            WHERE user_id = ?
+            """,
+            (current_user["user_id"],)
+        ).fetchone()
+
+        if not updated:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        return dict(updated)
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
 
 @app.get("/admin/users", response_model=List[UserResponse])
 def admin_get_all_users(db: Connection = Depends(get_db), admin: dict = Depends(get_admin_user)):

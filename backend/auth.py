@@ -45,7 +45,11 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
     conn = get_db_connection()
     cursor = conn.cursor()
     user = cursor.execute(
-        "SELECT user_id, name, email, role FROM users WHERE user_id = ?", 
+        """
+        SELECT user_id, name, phone_number, email, role, address, city
+        FROM users
+        WHERE user_id = ?
+        """,
         (int(user_id),)
     ).fetchone()
     cursor.close()

@@ -25,6 +25,11 @@ class UserResponse(BaseModel):
     address: str
     city: str
 
+class UserProfileUpdate(BaseModel):
+    name: str = Field(..., min_length=2, max_length=100)
+    address: str = Field(..., min_length=5)
+    city: str = Field(..., min_length=2)
+
 class Items(BaseModel):
     item_name: str
     price: int
