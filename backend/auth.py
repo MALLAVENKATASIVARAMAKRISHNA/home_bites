@@ -3,10 +3,19 @@ from jose import JWTError, jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from typing import Optional
+import os
 import sqlite3
 from database import get_db_connection
 
-SECRET_KEY = "your-secret-key-here-change-in-production"
+def _load_secret_key() -> str:
+    secret = os.getenv("SECRET_KEY", "").strip()
+    if not secret:
+        raise RuntimeError("SECRET_KEY environment variable is required")
+    if len(secret) < 32:
+        raise RuntimeError("SECRET_KEY must be at least 32 characters long")
+    return secret
+
+SECRET_KEY = _load_secret_key()
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 

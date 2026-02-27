@@ -60,7 +60,7 @@ def startup():
 
 
 @app.post("/users/", status_code=201)
-def add_user(user: Users):
+def add_user(user: Users, admin: dict = Depends(get_admin_user)):
     """
     Add a new user to the database
     """
@@ -498,10 +498,11 @@ def register(user: Users, db: Connection = Depends(get_db)):
     cursor = db.cursor()
     try:
         hashed_password = hash_password(user.password)
+        # Prevent privilege escalation: self-registration is always a regular user.
         cursor.execute("""
             INSERT INTO users (name, phone_number, email, password, role, address, city)
             VALUES (?, ?, ?, ?, ?, ?, ?)
-        """, (user.name, user.phone_number, user.email, hashed_password, user.role, user.address, user.city))
+        """, (user.name, user.phone_number, user.email, hashed_password, "user", user.address, user.city))
         db.commit()
         return {"message": "User registered successfully", "user_id": cursor.lastrowid}
     except sqlite3.IntegrityError:
@@ -626,9 +627,15 @@ def search_users(name: Optional[str] = None, city: Optional[str] = None, db: Con
         cursor.close()
 
 @app.get("/users/{user_id}/orders", response_model=List[OrderResponse])
-def get_user_orders(user_id: int, db: Connection = Depends(get_db)):
+def get_user_orders(
+    user_id: int,
+    db: Connection = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
+):
     cursor = db.cursor()
     try:
+        if current_user["user_id"] != user_id and current_user["role"] != "admin":
+            raise HTTPException(status_code=403, detail="Access forbidden")
         data = cursor.execute("SELECT * FROM orders WHERE user_id = ?", (user_id,)).fetchall()
         return [dict(row) for row in data]
     finally:
