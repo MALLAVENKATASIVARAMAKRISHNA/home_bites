@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Home Bites - Explore Items</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --cream: #fdf8f3;
+    --warm-white: #fffcf8;
+    --orange: #ff4500;
+    --orange-light: #ff6b35;
+    --text-dark: #1a1a1a;
+    --text-mid: #4a4a4a;
+    --text-light: #8a8a8a;
+    --border: #ede8e0;
+    --danger: #b42318;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: "DM Sans", sans-serif; background: var(--cream); color: var(--text-dark); }
+
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 60px;
+    background: rgba(253, 248, 243, 0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    text-decoration: none;
+    font-family: "Playfair Display", serif;
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--orange);
+    letter-spacing: -1px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .logo img { width: 30px; height: 30px; border-radius: 8px; object-fit: cover; background: #fff; }
+  .logo span { color: var(--text-dark); }
+
+  .nav-links { display: flex; gap: 36px; list-style: none; }
+  .nav-links a {
+    text-decoration: none;
+    color: var(--text-mid);
+    font-weight: 500;
+    font-size: 15px;
+  }
+  .nav-links a.active, .nav-links a:hover { color: var(--orange); }
+
+  .nav-actions { display: flex; align-items: center; gap: 14px; }
+  .btn-signin {
+    background: none; border: none; font-family: inherit; font-size: 15px;
+    font-weight: 500; color: var(--text-mid); cursor: pointer;
+  }
+  .btn-signup {
+    background: #2ecc71; color: #fff; border: none; padding: 10px 22px;
+    border-radius: 100px; font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
+  }
+  .profile-wrapper { position: relative; }
+  .profile-btn {
+    width: 42px; height: 42px; border-radius: 50%; border: 2px solid transparent;
+    background: var(--orange); color: #fff; font-weight: 700; font-size: 16px;
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+  }
+  .profile-dropdown {
+    position: absolute; top: calc(100% + 10px); right: 0; width: 220px; padding: 12px 14px;
+    background: #fff; border-radius: 14px; border: 1px solid var(--border);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15); display: none; z-index: 110;
+  }
+  .profile-dropdown.active { display: block; }
+  .profile-details strong { display: block; font-size: 14px; margin-bottom: 4px; }
+  .profile-details span { display: block; font-size: 13px; color: var(--text-mid); line-height: 1.4; }
+  .profile-action-btn, .profile-logout-btn {
+    width: 100%; padding: 10px 12px; border-radius: 10px; font-size: 13px; font-weight: 700;
+    margin-top: 10px; cursor: pointer; border: 1px solid var(--border);
+  }
+  .profile-action-btn { background: #fff7ef; color: #9a4700; }
+  .profile-logout-btn { background: #b42318; color: #fff; border-color: #a11a14; }
+
+  main { padding: 110px 60px 40px; }
+  .items-hero {
+    background: linear-gradient(135deg, #fff4eb, #ffe2d2 45%, #ffe5d6 80%);
+    border-radius: 32px;
+    padding: 30px 30px 22px;
+    margin-bottom: 24px;
+    border: 1px solid #ffd9c8;
+  }
+  .items-hero h1 { font-family: "Playfair Display", serif; font-size: clamp(34px, 5vw, 54px); line-height: 1.1; }
+  .items-hero p { margin-top: 8px; color: var(--text-mid); font-size: 16px; }
+
+  .filter-bar {
+    margin-top: 18px;
+    display: grid;
+    grid-template-columns: 1.6fr 1fr 1fr;
+    gap: 12px;
+  }
+  .filter-input, .filter-select {
+    width: 100%; border: 1px solid var(--border); background: #fff; border-radius: 14px;
+    padding: 12px 14px; font-family: inherit; font-size: 14px;
+  }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .chip {
+    border: 1px solid #ffd3c2; background: #fff8f2; color: #9a4700;
+    border-radius: 999px; padding: 8px 14px; font-size: 13px; cursor: pointer; font-weight: 600;
+  }
+  .chip.active { background: var(--orange); border-color: var(--orange); color: #fff; }
+
+  #itemsMeta { margin: 18px 2px 10px; color: var(--text-mid); font-weight: 600; }
+  #itemsError { margin-bottom: 12px; color: var(--danger); font-weight: 600; min-height: 20px; }
+
+  .items-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 18px;
+  }
+
+  .item-card {
+    background: #fff;
+    border: 1px solid #f1e5db;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 8px 22px rgba(30, 10, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+  }
+  .item-photo-wrap {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: #fff5ed;
+    padding: 8px;
+  }
+  .item-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 14px;
+    display: block;
+  }
+  .item-body { padding: 14px 14px 12px; display: flex; flex-direction: column; gap: 8px; }
+  .item-title-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .item-name { font-family: "Playfair Display", serif; font-size: 30px; font-weight: 700; }
+  .item-price { font-weight: 800; color: var(--orange); font-size: 18px; }
+  .item-desc { color: #6f6f6f; font-size: 14px; line-height: 1.45; min-height: 40px; }
+  .item-meta { color: #8a8a8a; font-size: 12px; }
+  .item-action-row { display: flex; align-items: center; justify-content: space-between; margin-top: 2px; }
+  .tag { background: #fff4eb; color: #b14a12; border: 1px solid #ffd8c4; border-radius: 999px; padding: 5px 10px; font-size: 12px; font-weight: 700; }
+
+  .add-btn {
+    border: none; border-radius: 999px; background: #ffbf3d; color: #8f4d00;
+    padding: 8px 12px; font-weight: 700; font-size: 12px; cursor: pointer;
+  }
+  .qty-wrap { display: flex; align-items: center; gap: 8px; }
+  .qty-btn {
+    width: 24px; height: 24px; border-radius: 999px; border: none; background: #ffe0cf; color: #9c4100;
+    font-weight: 800; cursor: pointer;
+  }
+
+  footer {
+    margin-top: 26px;
+    background: linear-gradient(145deg, #1f1f1f 0%, #2f2f2f 60%, #383838 100%);
+    color: #fff;
+    padding: 42px 60px 28px;
+    border-top-left-radius: 36px;
+    border-top-right-radius: 36px;
+  }
+  .footer-logo { font-family: "Playfair Display", serif; font-size: 30px; color: var(--orange-light); margin-bottom: 10px; }
+  .footer-copy { color: rgba(255,255,255,0.78); font-size: 14px; margin-bottom: 14px; }
+  .footer-links { display: flex; gap: 22px; flex-wrap: wrap; }
+  .footer-links a { color: rgba(255,255,255,0.82); text-decoration: none; font-size: 14px; }
+
+  @media (max-width: 980px) {
+    nav { padding: 14px 16px; flex-wrap: wrap; gap: 10px; }
+    .nav-links { order: 3; width: 100%; gap: 18px; overflow-x: auto; padding-bottom: 4px; }
+    main { padding: 108px 14px 24px; }
+    .items-hero { padding: 22px 16px; border-radius: 22px; }
+    .filter-bar { grid-template-columns: 1fr; }
+    .items-grid { grid-template-columns: 1fr; gap: 14px; }
+    footer { padding: 28px 14px 20px; border-top-left-radius: 24px; border-top-right-radius: 24px; }
+  }
+</style>
+</head>
+<body>
+<nav>
+  <a class="logo" href="./index.html"><img src="./assets/logo.png" alt="Home Bites" /><span>Home</span>Bites</a>
+  <ul class="nav-links">
+    <li><a href="./items.html" class="active">Find Food</a></li>
+    <li><a href="./index.html#stats">Tracking</a></li>
+    <li><a href="./items.html">Find Restaurant</a></li>
+    <li><a href="#footer">Location</a></li>
+  </ul>
+  <div class="nav-actions">
+    <button id="signInBtn" class="btn-signin" onclick="window.location.href='./index.html'">Sign In</button>
+    <button id="signUpBtn" class="btn-signup" onclick="window.location.href='./index.html'">Sign Up</button>
+    <button id="myOrdersBtn" class="btn-signin" style="display:none;" onclick="showMyOrders()">My Orders</button>
+    <div class="profile-wrapper" id="profileArea" style="display:none;">
+      <button id="profileBtn" class="profile-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Profile menu">
+        <span id="profileInitial">👤</span>
+      </button>
+      <div id="profileDropdown" class="profile-dropdown" role="menu" aria-label="Profile details">
+        <div class="profile-details">
+          <strong id="profileName">User</strong>
+          <span id="profileEmail">Email</span>
+          <span id="profilePhone">Phone</span>
+        </div>
+        <button class="profile-action-btn" type="button" onclick="showMyProfile()">My Profile</button>
+        <button class="profile-logout-btn" type="button" onclick="logout()">Logout</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main>
+  <section class="items-hero">
+    <h1>Choose Your Favorite Dishes</h1>
+    <p>Explore all available Home Bites items with quick filters and sort options.</p>
+    <div class="filter-bar">
+      <input id="searchInput" class="filter-input" type="text" placeholder="Search by item name or description" />
+      <select id="categoryFilter" class="filter-select">
+        <option value="all">All Categories</option>
+      </select>
+      <select id="sortFilter" class="filter-select">
+        <option value="name_asc">Sort: Name A-Z</option>
+        <option value="price_low">Sort: Price Low-High</option>
+        <option value="price_high">Sort: Price High-Low</option>
+      </select>
+    </div>
+    <div id="categoryChips" class="chips"></div>
+  </section>
+
+  <div id="itemsMeta">Loading items...</div>
+  <div id="itemsError"></div>
+  <section id="itemsGrid" class="items-grid"></section>
+</main>
+
+<footer id="footer">
+  <div class="footer-logo">homebites</div>
+  <p class="footer-copy">© 2026 Home Bites. Phone: 9014763361 | Email: homebites@03112003.xyz</p>
+  <div class="footer-links">
+    <a href="#">Privacy</a>
+    <a href="#">Terms</a>
+    <a href="#">Contact</a>
+    <a href="#">Help</a>
+  </div>
+</footer>
+
+<script src="./config.js"></script>
+<script src="./ui.js"></script>
+<script>
+  let token = getValidAccessToken();
+  let user = JSON.parse(localStorage.getItem("user") || "{}");
+  let allItems = [];
+  let activeCategory = "all";
+  let cart = JSON.parse(localStorage.getItem("home_bites_items_cart") || "{}");
+
+  function escapeHtml(text) {
+    const div = document.createElement("div");
+    div.textContent = text ?? "";
+    return div.innerHTML;
+  }
+
+  function formatItemName(name) {
+    const text = String(name || "").trim().toLowerCase();
+    if (!text) return "Item";
+    return text.replace(/\b\w/g, (match) => match.toUpperCase());
+  }
+
+  function formatCurrency(amount) {
+    return `Rs ${Number(amount || 0)}`;
+  }
+
+  function formatItemMeasure(value) {
+    const text = String(value || "").trim();
+    if (!text) return "Standard";
+    return /^\d+(\.\d+)?$/.test(text) ? `${text}g` : text;
+  }
+
+  function getItemPhotoSrc(item) {
+    const file = String(item.photos || "").trim();
+    if (!file) return "./assets/logo.png";
+    if (file.startsWith("http://") || file.startsWith("https://") || file.startsWith("./") || file.startsWith("/")) {
+      return file;
+    }
+    return `./assets/items/${file}`;
+  }
+
+  function categorizeItem(item) {
+    const text = `${item.item_name || ""} ${item.description || ""}`.toLowerCase();
+    if (text.includes("sweet") || text.includes("laddu") || text.includes("halwa") || text.includes("cake") || text.includes("bobbat")) return "Sweets";
+    if (text.includes("snack") || text.includes("mixture") || text.includes("murukku")) return "Snacks";
+    if (text.includes("meal") || text.includes("rice") || text.includes("curry")) return "Meals";
+    return "Specials";
+  }
+
+  function getQty(itemId) {
+    return Number(cart[itemId] || 0);
+  }
+
+  function addQty(itemId) {
+    cart[itemId] = getQty(itemId) + 1;
+    localStorage.setItem("home_bites_items_cart", JSON.stringify(cart));
+    renderItems();
+  }
+
+  function subQty(itemId) {
+    const qty = getQty(itemId);
+    if (qty <= 1) {
+      delete cart[itemId];
+    } else {
+      cart[itemId] = qty - 1;
+    }
+    localStorage.setItem("home_bites_items_cart", JSON.stringify(cart));
+    renderItems();
+  }
+
+  function fillCategories(items) {
+    const categories = ["All", ...new Set(items.map(categorizeItem))];
+    const select = document.getElementById("categoryFilter");
+    select.innerHTML = categories.map((cat) => `<option value="${cat.toLowerCase()}">${cat}</option>`).join("");
+
+    const chips = document.getElementById("categoryChips");
+    chips.innerHTML = categories.map((cat) => `
+      <button class="chip ${cat.toLowerCase() === activeCategory ? "active" : ""}" data-category="${cat.toLowerCase()}">${cat}</button>
+    `).join("");
+
+    chips.querySelectorAll(".chip").forEach((chip) => {
+      chip.addEventListener("click", () => {
+        activeCategory = chip.dataset.category || "all";
+        select.value = activeCategory;
+        renderItems();
+      });
+    });
+  }
+
+  function getFilteredItems() {
+    const q = document.getElementById("searchInput").value.trim().toLowerCase();
+    const category = activeCategory;
+    const sortBy = document.getElementById("sortFilter").value;
+
+    const filtered = allItems.filter((item) => {
+      const hay = `${item.item_name || ""} ${item.description || ""}`.toLowerCase();
+      const bySearch = !q || hay.includes(q);
+      const byCategory = category === "all" || categorizeItem(item).toLowerCase() === category;
+      return bySearch && byCategory;
+    });
+
+    if (sortBy === "price_low") filtered.sort((a, b) => Number(a.price || 0) - Number(b.price || 0));
+    if (sortBy === "price_high") filtered.sort((a, b) => Number(b.price || 0) - Number(a.price || 0));
+    if (sortBy === "name_asc") filtered.sort((a, b) => String(a.item_name || "").localeCompare(String(b.item_name || "")));
+    return filtered;
+  }
+
+  function renderItems() {
+    const grid = document.getElementById("itemsGrid");
+    const meta = document.getElementById("itemsMeta");
+    const items = getFilteredItems();
+
+    meta.textContent = `${items.length} item${items.length === 1 ? "" : "s"} found`;
+
+    if (!items.length) {
+      grid.innerHTML = `<div style="color:#7a7a7a;">No items match your filter.</div>`;
+      return;
+    }
+
+    grid.innerHTML = items.map((item) => {
+      const qty = getQty(item.item_id);
+      return `
+        <article class="item-card">
+          <div class="item-photo-wrap">
+            <img class="item-photo" src="${escapeHtml(getItemPhotoSrc(item))}" alt="${escapeHtml(item.item_name || "Item")}" loading="lazy" />
+          </div>
+          <div class="item-body">
+            <div class="item-title-row">
+              <h3 class="item-name">${escapeHtml(formatItemName(item.item_name))}</h3>
+              <span class="item-price">${formatCurrency(item.price)}</span>
+            </div>
+            <p class="item-desc">${escapeHtml(item.description || "Fresh homemade item prepared with care.")}</p>
+            <div class="item-meta">${escapeHtml(formatItemMeasure(item.weight))}</div>
+            <div class="item-action-row">
+              <span class="tag">${escapeHtml(categorizeItem(item))}</span>
+              ${qty === 0 ? `
+                <button class="add-btn" type="button" onclick="addQty(${item.item_id})">Add To Cart</button>
+              ` : `
+                <div class="qty-wrap">
+                  <button class="qty-btn" type="button" onclick="subQty(${item.item_id})">-</button>
+                  <strong>${qty}</strong>
+                  <button class="qty-btn" type="button" onclick="addQty(${item.item_id})">+</button>
+                </div>
+              `}
+            </div>
+          </div>
+        </article>
+      `;
+    }).join("");
+
+    document.querySelectorAll("#categoryChips .chip").forEach((chip) => {
+      chip.classList.toggle("active", (chip.dataset.category || "all") === activeCategory);
+    });
+  }
+
+  async function loadItems() {
+    const errEl = document.getElementById("itemsError");
+    errEl.textContent = "";
+    try {
+      const res = await fetch(`${API_BASE_URL}/items`);
+      if (!res.ok) throw new Error("Failed to load items");
+      const data = await res.json();
+      allItems = Array.isArray(data) ? data : [];
+      fillCategories(allItems);
+      renderItems();
+    } catch (err) {
+      document.getElementById("itemsMeta").textContent = "0 items found";
+      document.getElementById("itemsGrid").innerHTML = "";
+      errEl.textContent = `Could not load items: ${err.message}`;
+    }
+  }
+
+  function applyAuthState() {
+    token = getValidAccessToken();
+    user = JSON.parse(localStorage.getItem("user") || "{}");
+    if (!token) user = {};
+    const loggedIn = Boolean(token && user && user.user_id);
+    document.getElementById("signInBtn").style.display = loggedIn ? "none" : "";
+    document.getElementById("signUpBtn").style.display = loggedIn ? "none" : "";
+    document.getElementById("myOrdersBtn").style.display = loggedIn ? "" : "none";
+
+    const wrapper = document.getElementById("profileArea");
+    if (!loggedIn) {
+      wrapper.style.display = "none";
+      return;
+    }
+    wrapper.style.display = "";
+    document.getElementById("profileName").textContent = user.name || "User";
+    document.getElementById("profileEmail").textContent = user.email || "Email";
+    document.getElementById("profilePhone").textContent = user.phone_number ? String(user.phone_number) : "Phone";
+    document.getElementById("profileInitial").textContent = String(user.name || user.email || "U").trim().charAt(0).toUpperCase();
+  }
+
+  function showMyOrders() {
+    if (!token) {
+      window.location.href = "./index.html";
+      return;
+    }
+    window.location.href = "./my-orders.html";
+  }
+
+  function showMyProfile() {
+    if (!token) {
+      window.location.href = "./index.html";
+      return;
+    }
+    window.location.href = "./my-profile.html";
+  }
+
+  function logout() {
+    stopSessionExpiryWatcher();
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("user");
+    applyAuthState();
+  }
+
+  document.getElementById("searchInput").addEventListener("input", renderItems);
+  document.getElementById("categoryFilter").addEventListener("change", (e) => {
+    activeCategory = e.target.value || "all";
+    renderItems();
+  });
+  document.getElementById("sortFilter").addEventListener("change", renderItems);
+
+  const profileBtn = document.getElementById("profileBtn");
+  if (profileBtn) {
+    profileBtn.addEventListener("click", (event) => {
+      event.stopPropagation();
+      const dropdown = document.getElementById("profileDropdown");
+      const wasOpen = dropdown.classList.contains("active");
+      dropdown.classList.toggle("active", !wasOpen);
+      profileBtn.setAttribute("aria-expanded", String(!wasOpen));
+    });
+  }
+  document.addEventListener("click", (event) => {
+    const wrapper = document.getElementById("profileArea");
+    const dropdown = document.getElementById("profileDropdown");
+    if (wrapper && dropdown && !wrapper.contains(event.target)) {
+      dropdown.classList.remove("active");
+      profileBtn?.setAttribute("aria-expanded", "false");
+    }
+  });
+
+  function init() {
+    startSessionExpiryWatcher(() => applyAuthState());
+    applyAuthState();
+    loadItems();
+  }
+  init();
+</script>
+</body>
+</html>
