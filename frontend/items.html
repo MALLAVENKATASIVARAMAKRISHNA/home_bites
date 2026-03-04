@@ -125,6 +125,7 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 18px;
+    align-items: stretch;
   }
 
   .item-card {
@@ -135,27 +136,47 @@
     box-shadow: 0 8px 22px rgba(30, 10, 0, 0.05);
     display: flex;
     flex-direction: column;
+    height: 100%;
+    min-height: 490px;
   }
   .item-photo-wrap {
     width: 100%;
-    aspect-ratio: 16 / 9;
-    background: #fff5ed;
-    padding: 8px;
+    height: 210px;
+    background: #f7ece3;
+    overflow: hidden;
   }
   .item-photo {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: 14px;
+    object-position: center;
     display: block;
   }
-  .item-body { padding: 14px 14px 12px; display: flex; flex-direction: column; gap: 8px; }
+  .item-body { padding: 14px 14px 12px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
   .item-title-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-  .item-name { font-family: "Playfair Display", serif; font-size: 30px; font-weight: 700; }
+  .item-name {
+    font-family: "Playfair Display", serif;
+    font-size: 44px;
+    font-weight: 700;
+    line-height: 1.08;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
   .item-price { font-weight: 800; color: var(--orange); font-size: 18px; }
-  .item-desc { color: #6f6f6f; font-size: 14px; line-height: 1.45; min-height: 40px; }
+  .item-desc {
+    color: #6f6f6f;
+    font-size: 14px;
+    line-height: 1.45;
+    min-height: 60px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
   .item-meta { color: #8a8a8a; font-size: 12px; }
-  .item-action-row { display: flex; align-items: center; justify-content: space-between; margin-top: 2px; }
+  .item-action-row { display: flex; align-items: center; justify-content: space-between; margin-top: auto; }
   .tag { background: #fff4eb; color: #b14a12; border: 1px solid #ffd8c4; border-radius: 999px; padding: 5px 10px; font-size: 12px; font-weight: 700; }
 
   .add-btn {
@@ -188,6 +209,9 @@
     .items-hero { padding: 22px 16px; border-radius: 22px; }
     .filter-bar { grid-template-columns: 1fr; }
     .items-grid { grid-template-columns: 1fr; gap: 14px; }
+    .item-card { min-height: 0; }
+    .item-photo-wrap { height: 200px; }
+    .item-name { font-size: 36px; }
     footer { padding: 28px 14px 20px; border-top-left-radius: 24px; border-top-right-radius: 24px; }
   }
 </style>
