@@ -238,11 +238,11 @@
   }
 
   .hero {
-    min-height: 100vh;
+    min-height: 78vh;
     display: grid;
     grid-template-columns: 1fr 1fr;
     align-items: center;
-    padding: 120px 60px 80px;
+    padding: 100px 60px 52px;
     position: relative;
     overflow: hidden;
     background: linear-gradient(135deg, #fff4eb, #ffe2d2 45%, #ffe5d6 80%);
@@ -333,7 +333,8 @@
     background: var(--orange);
     color: white;
     border: none;
-    padding: 16px 32px;
+    padding: 16px 44px;
+    min-width: 210px;
     border-radius: 100px;
     font-family: inherit;
     font-size: 16px;
@@ -341,6 +342,7 @@
     cursor: pointer;
     transition: all 0.25s;
     box-shadow: 0 8px 24px rgba(255,69,0,0.3);
+    margin-top: 10px;
   }
 
   .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(255,69,0,0.4); }
@@ -1468,21 +1470,6 @@
     <p class="hero-sub">Just confirm your order and enjoy our delicious fastest delivery. Fresh from the kitchen to your doorstep.</p>
     <div class="hero-actions">
       <button class="btn-primary" onclick="document.getElementById('find-food').scrollIntoView({behavior:'smooth'})">Order Now</button>
-      <button class="btn-ghost" onclick="document.getElementById('find-food').scrollIntoView({behavior:'smooth'})">📋 See Menu</button>
-    </div>
-    <div class="social-proof">
-      <div class="avatars">
-        <div class="avatar av1">M</div>
-        <div class="avatar av2">S</div>
-        <div class="avatar av3">A</div>
-        <div class="avatar av4">K</div>
-        <div class="avatar more">2k+</div>
-      </div>
-      <div class="proof-text">
-        <div class="stars">★★★★★</div>
-        <strong>Our Happy Customers</strong>
-        <span>28k+ reviews worldwide</span>
-      </div>
     </div>
   </div>
 
