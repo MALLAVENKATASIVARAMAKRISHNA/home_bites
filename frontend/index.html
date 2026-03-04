@@ -1743,6 +1743,22 @@
   let allItems = [];
   const cart = {};
   let lastPlacedOrderId = null;
+  const API_TIMEOUT_MS = 10000;
+
+  async function apiFetch(url, options = {}) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT_MS);
+    try {
+      return await fetch(url, { ...options, signal: controller.signal });
+    } catch (err) {
+      if (err && err.name === 'AbortError') {
+        throw new Error(`Request timed out after ${API_TIMEOUT_MS / 1000}s`);
+      }
+      throw err;
+    } finally {
+      clearTimeout(timeoutId);
+    }
+  }
 
   function escapeHtml(text) {
     const div = document.createElement('div');
@@ -1985,7 +2001,7 @@
     if (!missingProfileData) return;
 
     try {
-      const res = await fetch(`${API_BASE_URL}/me`, {
+      const res = await apiFetch(`${API_BASE_URL}/me`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -2001,7 +2017,7 @@
 
   async function loadItems() {
     try {
-      const res = await fetch(`${API_BASE_URL}/items`);
+      const res = await apiFetch(`${API_BASE_URL}/items`);
       if (!res.ok) throw new Error('Failed to load items');
       const items = await res.json();
       allItems = Array.isArray(items) ? items : [];
@@ -2059,7 +2075,7 @@
     try {
       setButtonLoading(placeOrderBtn, 'Placing Order...', true);
 
-      const res = await fetch(`${API_BASE_URL}/orders/complete`, {
+      const res = await apiFetch(`${API_BASE_URL}/orders/complete`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -2235,7 +2251,7 @@
     try {
       setButtonLoading(loginBtn, 'Signing in...', true);
 
-      const res = await fetch(`${API_BASE_URL}/login`, {
+      const res = await apiFetch(`${API_BASE_URL}/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: body.toString()
@@ -2293,7 +2309,7 @@
     try {
       setButtonLoading(signupBtn, 'Creating...', true);
 
-      const res = await fetch(`${API_BASE_URL}/register`, {
+      const res = await apiFetch(`${API_BASE_URL}/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
