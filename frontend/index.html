@@ -242,7 +242,7 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     align-items: center;
-    padding: 100px 60px 52px;
+    padding: 124px 60px 52px;
     position: relative;
     overflow: hidden;
     background: linear-gradient(135deg, #fff4eb, #ffe2d2 45%, #ffe5d6 80%);
@@ -536,18 +536,22 @@
     width: 100%;
     height: 156px;
     border-radius: 16px;
-    background: linear-gradient(135deg, #fff5f0, #ffe8d6);
+    background: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
     margin-bottom: 14px;
     overflow: hidden;
+    padding: 8px;
   }
 
   .food-card-img img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    image-rendering: -webkit-optimize-contrast;
     transition: transform 0.35s ease;
   }
 
@@ -1436,7 +1440,7 @@
 <nav>
   <div class="logo"><img src="./assets/logo.png" alt="Home Bites" /><span>Home</span>Bites</div>
   <ul class="nav-links">
-    <li><a href="#find-food">Find Food</a></li>
+    <li><a href="./items.html">Find Food</a></li>
     <li><a href="#stats">Tracking</a></li>
     <li><a href="#find-food">Find Restaurant</a></li>
     <li><a href="#footer">Location</a></li>
@@ -1469,7 +1473,7 @@
     <h1 class="hero-title">Order Tasty &<br />Fresh Food <span class="accent">anytime!</span></h1>
     <p class="hero-sub">Just confirm your order and enjoy our delicious fastest delivery. Fresh from the kitchen to your doorstep.</p>
     <div class="hero-actions">
-      <button class="btn-primary" onclick="document.getElementById('find-food').scrollIntoView({behavior:'smooth'})">Order Now</button>
+      <button class="btn-primary" onclick="window.location.href='./items.html'">Order Now</button>
     </div>
   </div>
 
@@ -1483,7 +1487,7 @@
 <section class="categories reveal" id="find-food">
   <div class="section-header">
     <h2 class="section-title">Special Picks For You</h2>
-    <a href="#" class="see-all" onclick="event.preventDefault();">See All →</a>
+    <a href="./items.html" class="see-all">See All →</a>
   </div>
   <div id="loadingItems" class="food-card-desc" style="margin-bottom: 14px;">Loading items...</div>
   <div id="foodCards" class="food-cards"></div>
