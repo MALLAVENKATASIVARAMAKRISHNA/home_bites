@@ -1760,6 +1760,21 @@
     }
   }
 
+  function isBackendUnreachableError(err) {
+    const message = String(err?.message || '');
+    return (
+      err instanceof TypeError ||
+      message.includes('Failed to fetch') ||
+      message.includes('NetworkError') ||
+      message.includes('Load failed') ||
+      message.includes('Request timed out')
+    );
+  }
+
+  function backendUnreachableMessage(action) {
+    return `Cannot ${action}. Backend server (${API_BASE_URL}) is not reachable. Start backend and try again.`;
+  }
+
   function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text ?? '';
@@ -2023,7 +2038,10 @@
       allItems = Array.isArray(items) ? items : [];
       renderSpecialPicks();
     } catch (err) {
-      document.getElementById('loadingItems').textContent = `Error: ${err.message}`;
+      const msg = isBackendUnreachableError(err)
+        ? backendUnreachableMessage('load items')
+        : `Error: ${err.message}`;
+      document.getElementById('loadingItems').textContent = msg;
     }
   }
 
@@ -2284,7 +2302,10 @@
         closeAuthModal();
       }, 450);
     } catch (err) {
-      setAlert(message, 'error', err.message || 'Login failed');
+      const loginError = isBackendUnreachableError(err)
+        ? backendUnreachableMessage('sign in')
+        : (err.message || 'Login failed');
+      setAlert(message, 'error', loginError);
     } finally {
       setButtonLoading(loginBtn, 'Sign In', false);
     }
