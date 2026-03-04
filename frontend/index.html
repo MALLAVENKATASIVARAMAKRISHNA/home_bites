@@ -1490,30 +1490,6 @@
     <div class="food-circle">
       <img src="./assets/logo.png" alt="Home Bites" />
     </div>
-
-    <div class="float-card card-1">
-      <div class="card-icon">🚴</div>
-      <div>
-        <div class="card-label">Delivery Time</div>
-        <div class="card-value">~25 mins</div>
-      </div>
-    </div>
-
-    <div class="float-card card-2">
-      <div class="card-icon">⭐</div>
-      <div>
-        <div class="card-label">Top Rated</div>
-        <div class="card-value">4.9 / 5.0</div>
-      </div>
-    </div>
-
-    <div class="float-card card-3">
-      <div class="card-icon">🎉</div>
-      <div>
-        <div class="card-label">Orders Today</div>
-        <div class="card-value" id="ordersToday">0+</div>
-      </div>
-    </div>
   </div>
 </section>
 
@@ -1903,7 +1879,10 @@
     }).join('');
 
     document.getElementById('menuCount').textContent = `${allItems.length}+`;
-    document.getElementById('ordersToday').textContent = `${Math.max(1200, allItems.length * 32)}+`;
+    const ordersTodayEl = document.getElementById('ordersToday');
+    if (ordersTodayEl) {
+      ordersTodayEl.textContent = `${Math.max(1200, allItems.length * 32)}+`;
+    }
   }
 
   function renderCart() {
