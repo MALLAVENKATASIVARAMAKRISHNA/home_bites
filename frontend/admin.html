@@ -299,10 +299,10 @@ body {
       </div>
     </div>
     <div class="tabs">
-      <button class="tab active" onclick="switchTab('overview')">Overview</button>
-      <button class="tab" onclick="switchTab('items')">Items</button>
-      <button class="tab" onclick="switchTab('users')">Users</button>
-      <button class="tab" onclick="switchTab('orders')">Orders</button>
+      <button class="tab active" data-tab="overview" onclick="switchTab('overview')">Overview</button>
+      <button class="tab" data-tab="items" onclick="switchTab('items')">Items</button>
+      <button class="tab" data-tab="users" onclick="switchTab('users')">Users</button>
+      <button class="tab" data-tab="orders" onclick="switchTab('orders')">Orders</button>
     </div>
     <div id="overview-tab" class="tab-content active">
       <div class="stat-grid">

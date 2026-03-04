@@ -40,6 +40,12 @@ function switchTab(tabName) {
   });
   document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
 
+  // Keep top tab buttons in sync with selected section
+  document.querySelectorAll('.tabs .tab').forEach(tab => {
+    tab.classList.remove('active');
+  });
+  document.querySelector(`.tabs .tab[data-tab="${tabName}"]`)?.classList.add('active');
+
   // Update tab content
   document.querySelectorAll('.tab-content').forEach(tab => {
     tab.classList.remove('active');
