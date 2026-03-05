@@ -1708,6 +1708,7 @@
   let token = localStorage.getItem('access_token');
   let user = JSON.parse(localStorage.getItem('user') || '{}');
   let allItems = [];
+  let specialPickItems = [];
   const cart = {};
   let lastPlacedOrderId = null;
   const API_TIMEOUT_MS = 10000;
@@ -1830,8 +1831,9 @@
   function renderSpecialPicks() {
     const wrap = document.getElementById('foodCards');
     const loading = document.getElementById('loadingItems');
+    const picks = specialPickItems.length ? specialPickItems : allItems.slice(0, 3);
 
-    if (!allItems.length) {
+    if (!picks.length) {
       loading.style.display = 'block';
       loading.textContent = 'No items available right now.';
       wrap.innerHTML = '';
@@ -1840,7 +1842,7 @@
 
     loading.style.display = 'none';
 
-    wrap.innerHTML = allItems.map((item, index) => {
+    wrap.innerHTML = picks.map((item, index) => {
       const qty = getItemQuantity(item.item_id);
       const photo = getItemPhotoSrc(item);
       const reviewCount = 160 + (index * 37) % 300;
@@ -2002,10 +2004,26 @@
 
   async function loadItems() {
     try {
-      const res = await apiFetch(`${API_BASE_URL}/items`);
-      if (!res.ok) throw new Error('Failed to load items');
-      const items = await res.json();
+      const [itemsRes, topItemsRes] = await Promise.all([
+        apiFetch(`${API_BASE_URL}/items`),
+        apiFetch(`${API_BASE_URL}/items/top-ordered?limit=3`)
+      ]);
+
+      if (!itemsRes.ok) throw new Error('Failed to load items');
+      const items = await itemsRes.json();
       allItems = Array.isArray(items) ? items : [];
+
+      if (topItemsRes.ok) {
+        const topItems = await topItemsRes.json();
+        specialPickItems = Array.isArray(topItems) ? topItems.slice(0, 3) : [];
+      } else {
+        specialPickItems = allItems.slice(0, 3);
+      }
+
+      if (!specialPickItems.length) {
+        specialPickItems = allItems.slice(0, 3);
+      }
+
       renderSpecialPicks();
     } catch (err) {
       const msg = isBackendUnreachableError(err)

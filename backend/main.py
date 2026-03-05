@@ -192,6 +192,26 @@ def get_items(db: Connection = Depends(get_db)):
     finally:
         cursor.close()
 
+@app.get("/items/top-ordered", response_model=List[ItemResponse])
+def get_top_ordered_items(limit: int = 3, db: Connection = Depends(get_db)):
+    cursor = db.cursor()
+    try:
+        safe_limit = max(1, min(limit, 20))
+        data = cursor.execute("""
+            SELECT i.*
+            FROM items i
+            LEFT JOIN (
+                SELECT item_id, SUM(quantity) AS ordered_qty
+                FROM order_details
+                GROUP BY item_id
+            ) stats ON stats.item_id = i.item_id
+            ORDER BY COALESCE(stats.ordered_qty, 0) DESC, i.item_id ASC
+            LIMIT ?
+        """, (safe_limit,)).fetchall()
+        return [dict(row) for row in data]
+    finally:
+        cursor.close()
+
 @app.get("/items/{item_id}", response_model=ItemResponse)
 def get_item(item_id: int, db: Connection = Depends(get_db)):
     cursor = db.cursor()

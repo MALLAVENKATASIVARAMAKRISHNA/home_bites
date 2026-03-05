@@ -123,8 +123,8 @@
 
   .items-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 18px;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 14px;
     align-items: stretch;
   }
 
@@ -137,11 +137,11 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    min-height: 490px;
+    min-height: 370px;
   }
   .item-photo-wrap {
     width: 100%;
-    height: 210px;
+    height: 180px;
     background: #f7ece3;
     overflow: hidden;
   }
@@ -153,30 +153,34 @@
     display: block;
   }
   .item-body { padding: 14px 14px 12px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
-  .item-title-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .item-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
   .item-name {
     font-family: "Playfair Display", serif;
-    font-size: 44px;
+    font-size: 24px;
     font-weight: 700;
-    line-height: 1.08;
-    display: -webkit-box;
-    -webkit-line-clamp: 1;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    line-height: 1.15;
+    display: block;
+    overflow-wrap: anywhere;
   }
-  .item-price { font-weight: 800; color: var(--orange); font-size: 18px; }
+  .item-price {
+    font-weight: 800;
+    color: var(--orange);
+    font-size: 18px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
   .item-desc {
     color: #6f6f6f;
     font-size: 14px;
     line-height: 1.45;
-    min-height: 60px;
+    min-height: 54px;
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
   .item-meta { color: #8a8a8a; font-size: 12px; }
-  .item-action-row { display: flex; align-items: center; justify-content: space-between; margin-top: auto; }
+  .item-action-row { display: flex; align-items: center; justify-content: space-between; margin-top: 6px; }
   .tag { background: #fff4eb; color: #b14a12; border: 1px solid #ffd8c4; border-radius: 999px; padding: 5px 10px; font-size: 12px; font-weight: 700; }
 
   .add-btn {
@@ -210,8 +214,8 @@
     .filter-bar { grid-template-columns: 1fr; }
     .items-grid { grid-template-columns: 1fr; gap: 14px; }
     .item-card { min-height: 0; }
-    .item-photo-wrap { height: 200px; }
-    .item-name { font-size: 36px; }
+    .item-photo-wrap { height: 170px; }
+    .item-name { font-size: 21px; }
     footer { padding: 28px 14px 20px; border-top-left-radius: 24px; border-top-right-radius: 24px; }
   }
 </style>
