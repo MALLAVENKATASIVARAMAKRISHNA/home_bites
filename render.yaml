@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: home-bites-api
+    env: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: alembic -c alembic.ini upgrade head && uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: DEBUG
+        value: "false"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: home-bites-db
+          property: connectionString
+      - key: CORS_ORIGINS
+        sync: false
+
+databases:
+  - name: home-bites-db
+    databaseName: home_bites
+    user: home_bites
