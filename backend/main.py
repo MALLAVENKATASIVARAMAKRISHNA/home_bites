@@ -1,6 +1,5 @@
 import logging
 from datetime import date, datetime, timedelta
-from typing import Optional
 
 from fastapi import Depends, FastAPI, HTTPException, Request, Response, status
 from fastapi.exceptions import RequestValidationError
@@ -36,50 +35,21 @@ from models import (
     UserResponse,
     Users,
 )
-from settings import ALLOWED_ORIGINS, DEBUG, IS_PRODUCTION
+from settings import ALLOWED_ORIGINS, CORS_ALLOW_ORIGIN_REGEX, DEBUG, IS_PRODUCTION
 
 
 app = FastAPI()
 logger = logging.getLogger(__name__)
 
 
-def get_cors_allow_origin(origin: Optional[str]) -> Optional[str]:
-    if not origin:
-        return None
-    if "*" in ALLOWED_ORIGINS:
-        return origin
-    if origin in ALLOWED_ORIGINS:
-        return origin
-    return None
-
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS or [],
-    allow_credentials=bool(ALLOWED_ORIGINS and "*" not in ALLOWED_ORIGINS),
+    allow_origin_regex=CORS_ALLOW_ORIGIN_REGEX,
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-@app.middleware("http")
-async def add_explicit_cors_headers(request: Request, call_next):
-    origin = request.headers.get("origin")
-    allowed_origin = get_cors_allow_origin(origin)
-
-    if request.method == "OPTIONS":
-        response = Response(status_code=204)
-    else:
-        response = await call_next(request)
-
-    if allowed_origin:
-        response.headers["Access-Control-Allow-Origin"] = allowed_origin
-        response.headers["Access-Control-Allow-Credentials"] = "true"
-        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
-        response.headers["Access-Control-Allow-Headers"] = "Authorization, Content-Type"
-        response.headers["Vary"] = "Origin"
-
-    return response
 
 
 @app.exception_handler(RequestValidationError)
