@@ -2308,6 +2308,36 @@
       city: document.getElementById('signupCity').value.trim()
     };
 
+    if (!/^\d{10}$/.test(String(payload.phone_number))) {
+      setAlert(message, 'error', 'Enter a valid 10-digit phone number.');
+      return;
+    }
+
+    if (payload.name.length < 2) {
+      setAlert(message, 'error', 'Full name must be at least 2 characters.');
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email)) {
+      setAlert(message, 'error', 'Enter a valid email address.');
+      return;
+    }
+
+    if (payload.password.length < 8) {
+      setAlert(message, 'error', 'Password must be at least 8 characters.');
+      return;
+    }
+
+    if (payload.address.length < 5) {
+      setAlert(message, 'error', 'Address must be at least 5 characters.');
+      return;
+    }
+
+    if (payload.city.length < 2) {
+      setAlert(message, 'error', 'City must be at least 2 characters.');
+      return;
+    }
+
     try {
       setButtonLoading(signupBtn, 'Creating...', true);
 
