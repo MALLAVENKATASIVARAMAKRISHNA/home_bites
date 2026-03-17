@@ -31,7 +31,7 @@ def get_allowed_origins() -> List[str]:
     if raw_origins:
         return [origin.strip() for origin in raw_origins.split(",") if origin.strip()]
     if IS_PRODUCTION:
-        return []
+        return ["https://home-bites-frontend.onrender.com"]
     return ["*"]
 
 
