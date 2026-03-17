@@ -2063,7 +2063,6 @@
     const deliveryDate = new Date(today.getTime() + 4 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
     const payload = {
-      user_id: user.user_id,
       order_status: 'pending',
       payment_status: 'pending',
       payment_mode: document.getElementById('paymentMode').value,
@@ -2073,8 +2072,7 @@
       city: String(user.city || '').trim(),
       items: entries.map(({ item, quantity }) => ({
         item_id: item.item_id,
-        quantity,
-        price: item.price
+        quantity
       }))
     };
 

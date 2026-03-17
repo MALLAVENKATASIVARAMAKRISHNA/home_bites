@@ -97,6 +97,20 @@ def fetch_all_dicts(db: Session, query: str, params: Optional[dict] = None):
     return rows_to_dicts(rows)
 
 
+def get_item_prices(db: Session, item_ids: list[int]) -> dict[int, int]:
+    if not item_ids:
+        return {}
+
+    placeholders = ", ".join(f":item_id_{index}" for index in range(len(item_ids)))
+    params = {f"item_id_{index}": item_id for index, item_id in enumerate(item_ids)}
+    rows = fetch_all_dicts(
+        db,
+        f"SELECT item_id, price FROM items WHERE item_id IN ({placeholders})",
+        params,
+    )
+    return {row["item_id"]: row["price"] for row in rows}
+
+
 @app.post("/users/", status_code=201)
 def add_user(user: Users, admin: dict = Depends(get_admin_user), db: Session = Depends(get_db)):
     try:
@@ -329,7 +343,7 @@ def delete_item(item_id: int, db: Session = Depends(get_db), admin: dict = Depen
 
 
 @app.post("/orders/", status_code=201)
-def add_order(order: Orders, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
+def add_order(order: Orders, db: Session = Depends(get_db), admin: dict = Depends(get_admin_user)):
     try:
         result = db.execute(
             text(
@@ -459,7 +473,28 @@ def delete_order(order_id: int, db: Session = Depends(get_db), admin: dict = Dep
 @app.post("/orders/complete", status_code=201)
 def create_complete_order(order: CreateOrder, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
     try:
-        total_amount = sum(item.price * item.quantity for item in order.items)
+        if not order.items:
+            raise HTTPException(status_code=400, detail="At least one item is required")
+
+        item_ids = [item.item_id for item in order.items]
+        item_prices = get_item_prices(db, item_ids)
+        if len(item_prices) != len(set(item_ids)):
+            raise HTTPException(status_code=400, detail="One or more items are invalid")
+
+        order_user_id = current_user["user_id"]
+        normalized_items = []
+        total_amount = 0
+        for item in order.items:
+            price = item_prices[item.item_id]
+            normalized_items.append(
+                {
+                    "item_id": item.item_id,
+                    "quantity": item.quantity,
+                    "price": price,
+                }
+            )
+            total_amount += price * item.quantity
+
         result = db.execute(
             text(
                 """
@@ -474,7 +509,7 @@ def create_complete_order(order: CreateOrder, db: Session = Depends(get_db), cur
                 """
             ),
             {
-                "user_id": order.user_id,
+                "user_id": order_user_id,
                 "amount": total_amount,
                 "order_status": order.order_status,
                 "payment_status": order.payment_status,
@@ -486,7 +521,7 @@ def create_complete_order(order: CreateOrder, db: Session = Depends(get_db), cur
             },
         )
         order_id = result.lastrowid
-        for item in order.items:
+        for item in normalized_items:
             db.execute(
                 text(
                     """
@@ -496,9 +531,9 @@ def create_complete_order(order: CreateOrder, db: Session = Depends(get_db), cur
                 ),
                 {
                     "order_id": order_id,
-                    "item_id": item.item_id,
-                    "quantity": item.quantity,
-                    "price": item.price,
+                    "item_id": item["item_id"],
+                    "quantity": item["quantity"],
+                    "price": item["price"],
                 },
             )
         db.commit()
@@ -506,7 +541,7 @@ def create_complete_order(order: CreateOrder, db: Session = Depends(get_db), cur
             "message": "Order created successfully",
             "order_id": order_id,
             "total_amount": total_amount,
-            "items_count": len(order.items),
+            "items_count": len(normalized_items),
         }
     except IntegrityError:
         db.rollback()
@@ -547,6 +582,24 @@ def get_complete_order(order_id: int, db: Session = Depends(get_db), current_use
 @app.post("/order-details/", status_code=201)
 def add_order_detail(detail: OrderDetails, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
     try:
+        order = fetch_one_dict(
+            db,
+            "SELECT user_id FROM orders WHERE order_id = :order_id",
+            {"order_id": detail.order_id},
+        )
+        if not order:
+            raise HTTPException(status_code=404, detail="Order not found")
+        if order["user_id"] != current_user["user_id"] and current_user["role"] != "admin":
+            raise HTTPException(status_code=403, detail="Access forbidden")
+
+        item_row = fetch_one_dict(
+            db,
+            "SELECT price FROM items WHERE item_id = :item_id",
+            {"item_id": detail.item_id},
+        )
+        if not item_row:
+            raise HTTPException(status_code=400, detail="Order or Item not found")
+
         result = db.execute(
             text(
                 """
@@ -558,7 +611,7 @@ def add_order_detail(detail: OrderDetails, db: Session = Depends(get_db), curren
                 "order_id": detail.order_id,
                 "item_id": detail.item_id,
                 "quantity": detail.quantity,
-                "price": detail.price,
+                "price": item_row["price"],
             },
         )
         db.commit()
@@ -597,6 +650,14 @@ def update_order_detail(detail_id: int, detail: OrderDetails, db: Session = Depe
     if not existing:
         raise HTTPException(status_code=404, detail="Order detail not found")
 
+    item_row = fetch_one_dict(
+        db,
+        "SELECT price FROM items WHERE item_id = :item_id",
+        {"item_id": detail.item_id},
+    )
+    if not item_row:
+        raise HTTPException(status_code=400, detail="Order or Item not found")
+
     db.execute(
         text(
             """
@@ -612,7 +673,7 @@ def update_order_detail(detail_id: int, detail: OrderDetails, db: Session = Depe
             "order_id": detail.order_id,
             "item_id": detail.item_id,
             "quantity": detail.quantity,
-            "price": detail.price,
+            "price": item_row["price"],
             "detail_id": detail_id,
         },
     )
