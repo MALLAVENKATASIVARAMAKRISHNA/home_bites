@@ -2,7 +2,7 @@ import logging
 from datetime import date, datetime, timedelta
 from typing import Optional
 
-from fastapi import Depends, FastAPI, HTTPException, Request, status
+from fastapi import Depends, FastAPI, HTTPException, Request, Response, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -13,11 +13,13 @@ from sqlalchemy.orm import Session
 
 from auth import (
     ACCESS_TOKEN_EXPIRE_MINUTES,
+    clear_auth_cookie,
     create_access_token,
     get_admin_user,
     get_current_user,
     hash_password,
     password_needs_rehash,
+    set_auth_cookie,
     verify_password,
 )
 from database import get_db, init_db
@@ -729,7 +731,7 @@ def register(user: Users, db: Session = Depends(get_db)):
 
 
 @app.post("/login")
-def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+def login(response: Response, form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     identifier = form_data.username.strip()
     is_phone_identifier = identifier.isdigit() and len(identifier) == 10
 
@@ -750,9 +752,8 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
 
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(data={"sub": str(user["user_id"])}, expires_delta=access_token_expires)
+    set_auth_cookie(response, access_token)
     return {
-        "access_token": access_token,
-        "token_type": "bearer",
         "user": {
             "user_id": user["user_id"],
             "name": user["name"],
@@ -763,6 +764,12 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
             "city": user["city"],
         },
     }
+
+
+@app.post("/logout")
+def logout(response: Response):
+    clear_auth_cookie(response)
+    return {"message": "Logged out successfully"}
 
 
 @app.get("/me", response_model=UserResponse)
