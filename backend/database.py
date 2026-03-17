@@ -1,79 +1,56 @@
-import sqlite3
+import os
+from pathlib import Path
+from typing import Generator
 
-DB_NAME = "homebites.db"
+from sqlalchemy import create_engine, event
+from sqlalchemy.engine import Engine
+from sqlalchemy.orm import Session, sessionmaker
 
-def get_db_connection():
-    conn = sqlite3.connect(DB_NAME)
-    conn.row_factory = sqlite3.Row
-    return conn
-
-def create_users():
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("""
-CREATE TABLE IF NOT EXISTS users (
-    user_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    phone_number INTEGER UNIQUE NOT NULL,
-    email TEXT NOT NULL,
-    password TEXT NOT NULL,
-    role TEXT NOT NULL CHECK (role IN ('admin', 'user')),
-    address TEXT,
-    city TEXT
-)
-""")
-
-    cursor.execute("""
-CREATE TABLE IF NOT EXISTS items (
-    item_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    item_name TEXT NOT NULL,
-    price INTEGER NOT NULL,
-    weight TEXT NOT NULL,
-    photos TEXT,
-    videos TEXT,
-    description TEXT
-)
-""")
-    cursor.execute("""
-CREATE TABLE IF NOT EXISTS orders (
-    order_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER NOT NULL,
-    amount INTEGER NOT NULL,
-
-    order_status TEXT NOT NULL CHECK(order_status IN ('pending','confirmed','delivered','cancelled')),
-    payment_status TEXT NOT NULL CHECK(payment_status IN ('pending','paid','failed')),
-    payment_mode TEXT NOT NULL CHECK(payment_mode IN ('cash','upi','card')),
-
-    order_date TEXT NOT NULL,
-    delivery_date TEXT,
-    address TEXT NOT NULL,
-    city TEXT NOT NULL,
-
-    FOREIGN KEY (user_id) REFERENCES users(user_id)
-)
-""")
-    cursor.execute("""
-CREATE TABLE IF NOT EXISTS order_details (
-    order_detail_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    order_id INTEGER NOT NULL,
-    item_id INTEGER NOT NULL,
-
-    quantity INTEGER NOT NULL CHECK (quantity > 0),
-    price INTEGER NOT NULL CHECK (price >= 0),
-
-    FOREIGN KEY (order_id) REFERENCES orders(order_id),
-    FOREIGN KEY (item_id) REFERENCES items(item_id)
-)
-""")
+from db_models import Base
 
 
-    cursor.close()
-    conn.commit()
-    conn.close()
+BASE_DIR = Path(__file__).resolve().parent
+SQLITE_PATH = BASE_DIR / "homebites.db"
 
-def get_db():
-    conn = get_db_connection()
+
+def get_database_url() -> str:
+    database_url = os.getenv("DATABASE_URL", "").strip()
+    if database_url:
+        if database_url.startswith("postgres://"):
+            return database_url.replace("postgres://", "postgresql+psycopg://", 1)
+        if database_url.startswith("postgresql://"):
+            return database_url.replace("postgresql://", "postgresql+psycopg://", 1)
+        return database_url
+    return f"sqlite+pysqlite:///{SQLITE_PATH}"
+
+
+DATABASE_URL = get_database_url()
+IS_SQLITE = DATABASE_URL.startswith("sqlite")
+
+engine_kwargs = {"future": True}
+if IS_SQLITE:
+    engine_kwargs["connect_args"] = {"check_same_thread": False}
+
+engine: Engine = create_engine(DATABASE_URL, **engine_kwargs)
+SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False, future=True)
+
+
+@event.listens_for(engine, "connect")
+def set_sqlite_pragma(dbapi_connection, _connection_record) -> None:
+    if IS_SQLITE:
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.close()
+
+
+def init_db() -> None:
+    if IS_SQLITE:
+        Base.metadata.create_all(bind=engine)
+
+
+def get_db() -> Generator[Session, None, None]:
+    db = SessionLocal()
     try:
-        yield conn
+        yield db
     finally:
-        conn.close()
+        db.close()

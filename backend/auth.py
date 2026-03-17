@@ -1,12 +1,16 @@
 from datetime import datetime, timedelta
-from jose import JWTError, jwt
-from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
 from typing import Optional
 import os
 import secrets
-import sqlite3
-from database import get_db_connection
+
+from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
+from jose import JWTError, jwt
+from sqlalchemy import text
+from sqlalchemy.orm import Session
+
+from database import SessionLocal
+
 
 def _load_dotenv() -> None:
     dotenv_path = os.path.join(os.path.dirname(__file__), ".env")
@@ -24,19 +28,20 @@ def _load_dotenv() -> None:
             if key:
                 os.environ.setdefault(key, value)
 
+
 def _load_secret_key() -> str:
     secret = os.getenv("SECRET_KEY", "").strip()
     if not secret:
         app_env = os.getenv("APP_ENV", "development").lower()
         if app_env in {"production", "prod"}:
             raise RuntimeError("SECRET_KEY environment variable is required in production")
-        # Generate an ephemeral key for local development to avoid startup failure.
         secret = secrets.token_urlsafe(48)
         os.environ["SECRET_KEY"] = secret
         print("WARNING: SECRET_KEY not set. Using an ephemeral development key.")
     if len(secret) < 32:
         raise RuntimeError("SECRET_KEY must be at least 32 characters long")
     return secret
+
 
 _load_dotenv()
 SECRET_KEY = _load_secret_key()
@@ -45,21 +50,21 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
+
 def hash_password(password: str) -> str:
     return password
+
 
 def verify_password(plain_password: str, stored_password: str) -> bool:
     return plain_password == stored_password
 
+
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.utcnow() + expires_delta
-    else:
-        expire = datetime.utcnow() + timedelta(minutes=15)
+    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=15))
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
 
 def get_current_user(token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(
@@ -69,28 +74,31 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
     )
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_id: str = payload.get("sub")
+        user_id = payload.get("sub")
         if user_id is None:
             raise credentials_exception
     except JWTError:
         raise credentials_exception
-    
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    user = cursor.execute(
-        """
-        SELECT user_id, name, phone_number, email, role, address, city
-        FROM users
-        WHERE user_id = ?
-        """,
-        (int(user_id),)
-    ).fetchone()
-    cursor.close()
-    conn.close()
-    
+
+    db: Session = SessionLocal()
+    try:
+        user = db.execute(
+            text(
+                """
+                SELECT user_id, name, phone_number, email, role, address, city
+                FROM users
+                WHERE user_id = :user_id
+                """
+            ),
+            {"user_id": int(user_id)},
+        ).mappings().first()
+    finally:
+        db.close()
+
     if user is None:
         raise credentials_exception
     return dict(user)
+
 
 def get_admin_user(current_user: dict = Depends(get_current_user)):
     if current_user["role"] != "admin":
