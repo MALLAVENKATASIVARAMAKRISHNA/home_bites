@@ -1743,6 +1743,16 @@
     return `Cannot ${action}. Backend server (${API_BASE_URL}) is not reachable right now. If Render is waking the service, wait a few seconds and try again.`;
   }
 
+  function warmBackend() {
+    fetch(`${API_BASE_URL}/health`, {
+      method: 'GET',
+      mode: 'no-cors',
+      cache: 'no-store'
+    }).catch(() => {
+      // Best-effort warm-up for Render cold starts.
+    });
+  }
+
   function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text ?? '';
@@ -2122,6 +2132,7 @@
   }
 
   function openAuthModal(view = 'login') {
+    warmBackend();
     switchAuthView(view);
     const overlay = document.getElementById('authOverlay');
     overlay.classList.add('active');
@@ -2376,6 +2387,7 @@
   reveals.forEach((r) => observer.observe(r));
 
   async function init() {
+    warmBackend();
     startSessionExpiryWatcher(() => applyAuthState());
     applyAuthState();
     await hydrateProfileDetails();
