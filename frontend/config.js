@@ -1,3 +1,8 @@
+const IS_LOCAL_HOST =
+  window.location.hostname === "localhost" ||
+  window.location.hostname === "127.0.0.1" ||
+  window.location.hostname === "";
+
 const API_BASE_URL =
   window.HOME_BITES_API_BASE_URL ||
-  (window.location.protocol.startsWith("http") ? `${window.location.origin}` : "http://127.0.0.1:8000");
+  (IS_LOCAL_HOST ? "http://127.0.0.1:8000" : "https://home-bites.onrender.com");
