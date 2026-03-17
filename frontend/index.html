@@ -1711,7 +1711,7 @@
   let specialPickItems = [];
   const cart = {};
   let lastPlacedOrderId = null;
-  const API_TIMEOUT_MS = 10000;
+  const API_TIMEOUT_MS = 30000;
 
   async function apiFetch(url, options = {}) {
     const controller = new AbortController();
@@ -1740,7 +1740,7 @@
   }
 
   function backendUnreachableMessage(action) {
-    return `Cannot ${action}. Backend server (${API_BASE_URL}) is not reachable. Start backend and try again.`;
+    return `Cannot ${action}. Backend server (${API_BASE_URL}) is not reachable right now. If Render is waking the service, wait a few seconds and try again.`;
   }
 
   function escapeHtml(text) {
