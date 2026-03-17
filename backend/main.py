@@ -1,5 +1,6 @@
 import logging
 from datetime import date, datetime, timedelta
+from typing import Optional
 
 from fastapi import Depends, FastAPI, HTTPException, Request, Response, status
 from fastapi.exceptions import RequestValidationError
