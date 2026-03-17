@@ -256,7 +256,7 @@
 <script src="./ui.js"></script>
 <script>
   let token = getValidAccessToken();
-  let user = JSON.parse(localStorage.getItem("user") || "{}");
+  let user = getStoredUser();
   let allItems = [];
   let activeCategory = "all";
   const FIXED_CATEGORIES = [
@@ -407,7 +407,7 @@
     const errEl = document.getElementById("itemsError");
     errEl.textContent = "";
     try {
-      const res = await fetch(`${API_BASE_URL}/items`);
+      const res = await apiFetch(`${API_BASE_URL}/items`);
       if (!res.ok) throw new Error("Failed to load items");
       const data = await res.json();
       allItems = Array.isArray(data) ? data : [];
@@ -421,7 +421,7 @@
 
   function applyAuthState() {
     token = getValidAccessToken();
-    user = JSON.parse(localStorage.getItem("user") || "{}");
+    user = getStoredUser();
     if (!token) user = {};
     const loggedIn = Boolean(token && user && user.user_id);
     document.getElementById("signInBtn").style.display = loggedIn ? "none" : "";
@@ -456,10 +456,9 @@
     window.location.href = "./my-profile.html";
   }
 
-  function logout() {
+  async function logout() {
     stopSessionExpiryWatcher();
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("user");
+    await logoutSession();
     applyAuthState();
   }
 

@@ -55,8 +55,7 @@
   <script src="./config.js"></script>
   <script src="./ui.js"></script>
   <script>
-    const token = getValidAccessToken();
-    let user = JSON.parse(localStorage.getItem('user') || '{}');
+    let user = getStoredUser();
     const editableFields = {
       name: { minLen: 2, label: 'Name' },
       address: { minLen: 5, label: 'Address' },
@@ -65,7 +64,7 @@
     let editingState = { name: false, address: false, city: false };
     let draftProfile = { name: '', address: '', city: '' };
 
-    if (!token) {
+    if (!hasStoredSession()) {
       clearStoredAuth();
       window.location.href = './index.html';
     }
@@ -196,9 +195,7 @@
       renderProfile(user);
 
       try {
-        const res = await fetch(`${API_BASE_URL}/me`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const res = await apiFetch(`${API_BASE_URL}/me`);
 
         const data = await res.json();
         if (!res.ok) throw new Error(data.detail || 'Failed to load profile');
@@ -244,11 +241,10 @@
 
       setButtonLoading(saveBtn, 'Saving...', true);
       try {
-        const res = await fetch(`${API_BASE_URL}/me/profile`, {
+        const res = await apiFetch(`${API_BASE_URL}/me/profile`, {
           method: 'PUT',
           headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify({ name, address, city })
         });
@@ -282,10 +278,9 @@
       window.location.href = currentUser.role === 'admin' ? './admin.html' : './index.html';
     }
 
-    function logout() {
+    async function logout() {
       stopSessionExpiryWatcher();
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('user');
+      await logoutSession();
       window.location.href = './index.html';
     }
 

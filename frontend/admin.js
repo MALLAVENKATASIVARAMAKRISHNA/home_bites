@@ -1,10 +1,9 @@
 // Check if user is admin
-const token = getValidAccessToken();
-const user = JSON.parse(localStorage.getItem('user') || '{}');
+const user = getStoredUser();
 let itemsCache = [];
 let editingItemId = null;
 
-if (!token || user.role !== 'admin') {
+if (!hasStoredSession() || user.role !== 'admin') {
   clearStoredAuth();
   window.location.href = './index.html';
 }
@@ -18,15 +17,14 @@ document.getElementById('adminName').textContent = user.name || 'Admin';
 document.getElementById('adminEmail').textContent = user.email || '';
 
 // Logout function
-function logout() {
+async function logout() {
   stopSessionExpiryWatcher();
-  localStorage.removeItem('access_token');
-  localStorage.removeItem('user');
+  await logoutSession();
   window.location.href = './index.html';
 }
 
 function fetchFresh(url, options = {}) {
-  return fetch(url, {
+  return apiFetch(url, {
     cache: 'no-store',
     ...options
   });
@@ -72,12 +70,8 @@ async function loadOverviewStats() {
   try {
     const [itemsRes, usersRes, ordersRes] = await Promise.all([
       fetchFresh(`${API_BASE_URL}/items`),
-      fetchFresh(`${API_BASE_URL}/users`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      }),
-      fetchFresh(`${API_BASE_URL}/orders`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      })
+      fetchFresh(`${API_BASE_URL}/users`),
+      fetchFresh(`${API_BASE_URL}/orders`)
     ]);
 
     const items = await itemsRes.json();
@@ -207,9 +201,7 @@ async function loadUsers() {
   container.innerHTML = '<p class="loading">Loading users...</p>';
 
   try {
-    const res = await fetchFresh(`${API_BASE_URL}/users`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
+    const res = await fetchFresh(`${API_BASE_URL}/users`);
     const users = await res.json();
 
     const html = `
@@ -253,9 +245,7 @@ async function loadOrders() {
   container.innerHTML = '<p class="loading">Loading orders...</p>';
 
   try {
-    const res = await fetchFresh(`${API_BASE_URL}/orders`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
+    const res = await fetchFresh(`${API_BASE_URL}/orders`);
     allOrders = await res.json();
 
     displayOrders(allOrders);
@@ -362,11 +352,10 @@ async function updateOrderStatus(orderId) {
   };
 
   try {
-    const res = await fetch(`${API_BASE_URL}/orders/${orderId}`, {
+    const res = await apiFetch(`${API_BASE_URL}/orders/${orderId}`, {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify(updatedPayload)
     });
@@ -511,11 +500,10 @@ document.getElementById('addItemForm').addEventListener('submit', async (e) => {
     const endpoint = isEditMode ? `${API_BASE_URL}/items/${editingItemId}` : `${API_BASE_URL}/items/`;
     const method = isEditMode ? 'PUT' : 'POST';
 
-    const res = await fetch(endpoint, {
+    const res = await apiFetch(endpoint, {
       method,
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify(payload)
     });
@@ -554,9 +542,8 @@ async function deleteItem(itemId) {
   }
 
   try {
-    const res = await fetch(`${API_BASE_URL}/items/${itemId}`, {
-      method: 'DELETE',
-      headers: { 'Authorization': `Bearer ${token}` }
+    const res = await apiFetch(`${API_BASE_URL}/items/${itemId}`, {
+      method: 'DELETE'
     });
 
     if (!res.ok) {
@@ -583,9 +570,7 @@ async function viewOrderDetails(orderId) {
   container.innerHTML = '<p class="loading">Loading order details...</p>';
 
   try {
-    const res = await fetchFresh(`${API_BASE_URL}/orders/${orderId}/complete`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
+    const res = await fetchFresh(`${API_BASE_URL}/orders/${orderId}/complete`);
 
     const data = await res.json();
     const order = data.order;

@@ -51,12 +51,11 @@
   <script src="./config.js"></script>
   <script src="./ui.js"></script>
   <script>
-    const token = getValidAccessToken();
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const user = getStoredUser();
     let activeOrderIndex = null;
     let ordersCache = [];
 
-    if (!token) {
+    if (!hasStoredSession()) {
       clearStoredAuth();
       window.location.href = './index.html';
     }
@@ -126,9 +125,8 @@
       const localOrders = getSavedOrders();
 
       try {
-        const res = await fetch(`${API_BASE_URL}/users/${user.user_id}/orders`, {
-          cache: 'no-store',
-          headers: { Authorization: `Bearer ${token}` }
+        const res = await apiFetch(`${API_BASE_URL}/users/${user.user_id}/orders`, {
+          cache: 'no-store'
         });
         if (!res.ok) throw new Error('Failed to load orders');
 
@@ -203,9 +201,7 @@
       const selectedOrder = ordersCache[index];
       if (selectedOrder && (!Array.isArray(selectedOrder.items) || selectedOrder.items.length === 0)) {
         try {
-          const res = await fetch(`${API_BASE_URL}/orders/${selectedOrder.order_id}/complete`, {
-            headers: { Authorization: `Bearer ${token}` }
-          });
+          const res = await apiFetch(`${API_BASE_URL}/orders/${selectedOrder.order_id}/complete`);
           if (res.ok) {
             const detail = await res.json();
             const detailedItems = Array.isArray(detail.items) ? detail.items.map(item => ({
@@ -290,9 +286,8 @@
       clearAlert(pageMessage);
 
       try {
-        const res = await fetch(`${API_BASE_URL}/orders/${orderId}/cancel`, {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${token}` }
+        const res = await apiFetch(`${API_BASE_URL}/orders/${orderId}/cancel`, {
+          method: 'POST'
         });
         const data = await res.json();
         if (!res.ok) {
@@ -317,10 +312,9 @@
       window.location.href = currentUser.role === 'admin' ? './admin.html' : './index.html';
     }
 
-    function logout() {
+    async function logout() {
       stopSessionExpiryWatcher();
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('user');
+      await logoutSession();
       window.location.href = './index.html';
     }
 

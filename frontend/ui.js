@@ -33,6 +33,19 @@ function clearStoredAuth() {
   localStorage.removeItem("user");
 }
 
+function getStoredUser() {
+  try {
+    return JSON.parse(localStorage.getItem("user") || "{}");
+  } catch (err) {
+    return {};
+  }
+}
+
+function hasStoredSession() {
+  const user = getStoredUser();
+  return Boolean(user && user.user_id);
+}
+
 function decodeJwtPayload(token) {
   try {
     const parts = String(token || "").split(".");
@@ -54,14 +67,7 @@ function getTokenExpiryMs(token) {
 }
 
 function getValidAccessToken() {
-  const token = localStorage.getItem("access_token");
-  if (!token) return null;
-  const expiryMs = getTokenExpiryMs(token);
-  if (!expiryMs || expiryMs <= Date.now()) {
-    clearStoredAuth();
-    return null;
-  }
-  return token;
+  return hasStoredSession() ? "cookie-session" : null;
 }
 
 function stopSessionExpiryWatcher() {
@@ -73,25 +79,26 @@ function stopSessionExpiryWatcher() {
 
 function startSessionExpiryWatcher(onExpire) {
   stopSessionExpiryWatcher();
-  const token = localStorage.getItem("access_token");
-  if (!token) return;
-
-  const expiryMs = getTokenExpiryMs(token);
-  if (!expiryMs) {
-    clearStoredAuth();
-    if (typeof onExpire === "function") onExpire();
-    return;
+  if (!hasStoredSession()) return;
+  if (typeof onExpire === "function") {
+    window.__homeBitesSessionExpiryTimer = setTimeout(() => {
+      onExpire();
+    }, 30 * 60 * 1000);
   }
+}
 
-  const remainingMs = expiryMs - Date.now();
-  if (remainingMs <= 0) {
-    clearStoredAuth();
-    if (typeof onExpire === "function") onExpire();
-    return;
+function apiFetch(url, options = {}) {
+  return fetch(url, {
+    credentials: "include",
+    ...options,
+  });
+}
+
+async function logoutSession() {
+  try {
+    await apiFetch(`${API_BASE_URL}/logout`, { method: "POST" });
+  } catch (err) {
+    // Clearing client state is still enough to force a local logout view.
   }
-
-  window.__homeBitesSessionExpiryTimer = setTimeout(() => {
-    clearStoredAuth();
-    if (typeof onExpire === "function") onExpire();
-  }, remainingMs + 200);
+  clearStoredAuth();
 }

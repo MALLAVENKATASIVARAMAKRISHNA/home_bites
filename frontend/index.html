@@ -1705,8 +1705,8 @@
 <script src="./config.js"></script>
 <script src="./ui.js"></script>
 <script>
-  let token = localStorage.getItem('access_token');
-  let user = JSON.parse(localStorage.getItem('user') || '{}');
+  let token = getValidAccessToken();
+  let user = getStoredUser();
   let allItems = [];
   let specialPickItems = [];
   const cart = {};
@@ -1717,7 +1717,7 @@
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT_MS);
     try {
-      return await fetch(url, { ...options, signal: controller.signal });
+      return await fetch(url, { credentials: 'include', ...options, signal: controller.signal });
     } catch (err) {
       if (err && err.name === 'AbortError') {
         throw new Error(`Request timed out after ${API_TIMEOUT_MS / 1000}s`);
@@ -1943,7 +1943,7 @@
 
   function applyAuthState() {
     token = getValidAccessToken();
-    user = JSON.parse(localStorage.getItem('user') || '{}');
+    user = getStoredUser();
     if (!token) user = {};
 
     const loggedIn = Boolean(token && user && user.user_id);
@@ -1988,9 +1988,7 @@
     if (!missingProfileData) return;
 
     try {
-      const res = await apiFetch(`${API_BASE_URL}/me`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await apiFetch(`${API_BASE_URL}/me`);
 
       if (!res.ok) return;
       const profile = await res.json();
@@ -2082,8 +2080,7 @@
       const res = await apiFetch(`${API_BASE_URL}/orders/complete`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(payload)
       });
@@ -2185,12 +2182,11 @@
     }
   });
 
-  function logout() {
+  async function logout() {
     stopSessionExpiryWatcher();
     token = null;
     user = {};
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('user');
+    await logoutSession();
     applyAuthState();
   }
 
@@ -2267,7 +2263,6 @@
         throw new Error(data.detail || 'Login failed');
       }
 
-      localStorage.setItem('access_token', data.access_token);
       localStorage.setItem('user', JSON.stringify(data.user));
       startSessionExpiryWatcher(() => {
         token = null;
@@ -2351,11 +2346,7 @@
   reveals.forEach((r) => observer.observe(r));
 
   async function init() {
-    startSessionExpiryWatcher(() => {
-      token = null;
-      user = {};
-      applyAuthState();
-    });
+    startSessionExpiryWatcher(() => applyAuthState());
     applyAuthState();
     await hydrateProfileDetails();
     renderCart();
