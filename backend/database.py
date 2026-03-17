@@ -7,6 +7,7 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session, sessionmaker
 
 from db_models import Base
+from settings import IS_PRODUCTION
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -44,7 +45,7 @@ def set_sqlite_pragma(dbapi_connection, _connection_record) -> None:
 
 
 def init_db() -> None:
-    if IS_SQLITE:
+    if IS_SQLITE and not IS_PRODUCTION:
         Base.metadata.create_all(bind=engine)
 
 

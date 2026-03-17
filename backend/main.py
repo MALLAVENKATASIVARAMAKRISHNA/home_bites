@@ -1,3 +1,4 @@
+import logging
 from datetime import date, datetime, timedelta
 from typing import Optional
 
@@ -16,6 +17,7 @@ from auth import (
     get_admin_user,
     get_current_user,
     hash_password,
+    password_needs_rehash,
     verify_password,
 )
 from database import get_db, init_db
@@ -32,15 +34,17 @@ from models import (
     UserResponse,
     Users,
 )
+from settings import ALLOWED_ORIGINS, DEBUG, IS_PRODUCTION
 
 
 app = FastAPI()
+logger = logging.getLogger(__name__)
 
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=ALLOWED_ORIGINS or [],
+    allow_credentials=bool(ALLOWED_ORIGINS and "*" not in ALLOWED_ORIGINS),
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -50,33 +54,37 @@ app.add_middleware(
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-        content={"detail": "Validation error", "errors": exc.errors()},
+        content={"detail": "Validation error", "errors": exc.errors() if not IS_PRODUCTION else []},
     )
 
 
 @app.exception_handler(SQLAlchemyError)
 async def sqlalchemy_exception_handler(request: Request, exc: SQLAlchemyError):
+    logger.exception("Database error on %s %s", request.method, request.url.path, exc_info=exc)
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        content={"detail": "Database error occurred", "error": str(exc)},
+        content={"detail": "Database error occurred"},
     )
 
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
+    logger.exception("Unhandled error on %s %s", request.method, request.url.path, exc_info=exc)
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        content={
-            "detail": "An unexpected error occurred",
-            "error": str(exc),
-            "type": type(exc).__name__,
-        },
+        content={"detail": "An unexpected error occurred"},
     )
 
 
 @app.on_event("startup")
 def startup():
+    logging.basicConfig(level=logging.DEBUG if DEBUG else logging.INFO)
     init_db()
+
+
+@app.get("/health")
+def health_check():
+    return {"status": "ok", "environment": "production" if IS_PRODUCTION else "development"}
 
 
 def fetch_one_dict(db: Session, query: str, params: Optional[dict] = None):
@@ -672,6 +680,13 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
     if not user or not verify_password(form_data.password, user["password"]):
         raise HTTPException(status_code=401, detail="Incorrect email or password")
 
+    if password_needs_rehash(user["password"]):
+        db.execute(
+            text("UPDATE users SET password = :password WHERE user_id = :user_id"),
+            {"password": hash_password(form_data.password), "user_id": user["user_id"]},
+        )
+        db.commit()
+
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(data={"sub": str(user["user_id"])}, expires_delta=access_token_expires)
     return {
@@ -748,7 +763,12 @@ def admin_get_all_users(db: Session = Depends(get_db), admin: dict = Depends(get
 
 
 @app.get("/users/search/")
-def search_users(name: Optional[str] = None, city: Optional[str] = None, db: Session = Depends(get_db)):
+def search_users(
+    name: Optional[str] = None,
+    city: Optional[str] = None,
+    db: Session = Depends(get_db),
+    admin: dict = Depends(get_admin_user),
+):
     conditions = []
     params = {}
     if name:
@@ -773,7 +793,7 @@ def get_user_orders(user_id: int, db: Session = Depends(get_db), current_user: d
 
 
 @app.get("/orders/status/{status}", response_model=list[OrderResponse])
-def get_orders_by_status(status: str, db: Session = Depends(get_db)):
+def get_orders_by_status(status: str, db: Session = Depends(get_db), admin: dict = Depends(get_admin_user)):
     if status not in ["pending", "confirmed", "delivered", "cancelled"]:
         raise HTTPException(status_code=400, detail="Invalid status")
     return fetch_all_dicts(db, "SELECT * FROM orders WHERE order_status = :status", {"status": status})

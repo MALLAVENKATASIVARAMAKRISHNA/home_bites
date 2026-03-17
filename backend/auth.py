@@ -1,32 +1,17 @@
-from datetime import datetime, timedelta
-from typing import Optional
 import os
 import secrets
+from datetime import datetime, timedelta
+from typing import Optional
 
 from fastapi import Depends, HTTPException, status
+from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from database import SessionLocal
-
-
-def _load_dotenv() -> None:
-    dotenv_path = os.path.join(os.path.dirname(__file__), ".env")
-    if not os.path.exists(dotenv_path):
-        return
-
-    with open(dotenv_path, "r", encoding="utf-8") as env_file:
-        for raw_line in env_file:
-            line = raw_line.strip()
-            if not line or line.startswith("#") or "=" not in line:
-                continue
-            key, value = line.split("=", 1)
-            key = key.strip()
-            value = value.strip().strip("\"'")
-            if key:
-                os.environ.setdefault(key, value)
+from settings import IS_PRODUCTION
 
 
 def _load_secret_key() -> str:
@@ -43,20 +28,33 @@ def _load_secret_key() -> str:
     return secret
 
 
-_load_dotenv()
 SECRET_KEY = _load_secret_key()
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def hash_password(password: str) -> str:
-    return password
+    return pwd_context.hash(password)
 
 
 def verify_password(plain_password: str, stored_password: str) -> bool:
+    try:
+        if stored_password.startswith("$2"):
+            return pwd_context.verify(plain_password, stored_password)
+    except Exception:
+        return False
+    if IS_PRODUCTION:
+        return False
     return plain_password == stored_password
+
+
+def password_needs_rehash(stored_password: str) -> bool:
+    if not stored_password.startswith("$2"):
+        return True
+    return pwd_context.needs_update(stored_password)
 
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
