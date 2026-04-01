@@ -1,5 +1,5 @@
 // Check if user is admin
-const user = getStoredUser();
+let user = getStoredUser();
 let itemsCache = [];
 let editingItemId = null;
 
@@ -12,9 +12,12 @@ startSessionExpiryWatcher(() => {
   window.location.href = './index.html';
 });
 
-// Display admin info
-document.getElementById('adminName').textContent = user.name || 'Admin';
-document.getElementById('adminEmail').textContent = user.email || '';
+function syncAdminHeader(currentUser) {
+  document.getElementById('adminName').textContent = currentUser.name || 'Admin';
+  document.getElementById('adminEmail').textContent = currentUser.email || '';
+}
+
+syncAdminHeader(user);
 
 // Logout function
 async function logout() {
@@ -667,4 +670,27 @@ document.addEventListener('keydown', (e) => {
 });
 
 // Initialize
-loadOverviewStats();
+async function validateAdminSession() {
+  try {
+    const res = await fetchFresh(`${API_BASE_URL}/me`);
+    const currentUser = await res.json();
+
+    if (!res.ok) {
+      throw new Error(currentUser.detail || 'Session expired');
+    }
+
+    if (!currentUser || currentUser.role !== 'admin') {
+      throw new Error('Admin access required');
+    }
+
+    user = currentUser;
+    localStorage.setItem('user', JSON.stringify(currentUser));
+    syncAdminHeader(currentUser);
+    loadOverviewStats();
+  } catch (err) {
+    clearStoredAuth();
+    window.location.href = './index.html';
+  }
+}
+
+validateAdminSession();
