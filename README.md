@@ -96,6 +96,31 @@ Admin:
 - `GET /orders`
 - `PUT /orders/{order_id}`
 
+## MCP Server
+
+A lightweight MCP server is available at `backend/mcp_server.py`. It exposes project data as MCP tools/resources for assistants and agent clients.
+
+Highlights:
+
+- read tools for health, items, users, and orders
+- opt-in write tools for creating orders and updating order state
+- write operations are disabled by default for safety
+
+Run it from the `backend` directory after installing dependencies:
+
+```bash
+cd backend
+pip install -r requirements.txt
+python mcp_server.py
+```
+
+To enable write-capable tools:
+
+```bash
+export HOME_BITES_MCP_ALLOW_WRITES=true
+python mcp_server.py
+```
+
 ## Local Development
 
 ### Backend
