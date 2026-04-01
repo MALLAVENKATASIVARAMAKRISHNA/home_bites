@@ -1,0 +1,38 @@
+name: Render Deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy-backend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Trigger backend Render deploy
+        env:
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$RENDER_DEPLOY_HOOK_URL" ]; then
+            echo "Missing RENDER_DEPLOY_HOOK_URL secret"
+            exit 1
+          fi
+
+          curl -fsSL -X POST "$RENDER_DEPLOY_HOOK_URL"
+
+  deploy-frontend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Trigger frontend Render deploy
+        env:
+          RENDER_FRONTEND_DEPLOY_HOOK_URL: ${{ secrets.RENDER_FRONTEND_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$RENDER_FRONTEND_DEPLOY_HOOK_URL" ]; then
+            echo "Missing RENDER_FRONTEND_DEPLOY_HOOK_URL secret"
+            exit 1
+          fi
+
+          curl -fsSL -X POST "$RENDER_FRONTEND_DEPLOY_HOOK_URL"
